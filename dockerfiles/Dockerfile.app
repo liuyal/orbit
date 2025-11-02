@@ -1,0 +1,32 @@
+# Dockerfile for a basic Ubuntu container with networking tools and SSH server
+FROM ubuntu:latest
+
+# Maintainer information
+LABEL maintainer="jerrylarryliu@gmail.com"
+WORKDIR /home
+
+RUN apt-get update && \
+    apt-get install -y \
+        vim \
+        git \
+        curl \
+        sqlite3 \
+        net-tools \
+        iputils-ping \
+        tcpdump \
+        iperf3 \
+        iproute2 \
+        iptables \
+        openssh-server \
+        openssh-client \
+        python3 \
+        python3-keyring \
+        python3-paramiko
+
+RUN sysctl net.ipv4.conf.all.forwarding=1
+RUN mkdir /var/run/sshd
+RUN echo 'root:root' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

@@ -1,0 +1,29 @@
+# Use the official PostgreSQL image from the Docker Hub
+FROM postgres:latest
+
+# Maintainer information
+LABEL maintainer="jerrylarryliu@gmail.com"
+WORKDIR /home
+
+# Set environment variables for the default user, password, and database
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+ENV POSTGRES_DB=postgres
+
+# Expose PostgreSQL port
+EXPOSE 5432
+
+# Optional: persist data
+#VOLUME ["/var/lib/postgresql/data"]
+
+RUN apt-get update && apt-get install -y \
+    vim \
+    curl \
+    net-tools \
+    iputils-ping \
+    tcpdump \
+    iperf3 \
+    iproute2 \
+    openssh-server \
+    openssh-client \
+    python3
