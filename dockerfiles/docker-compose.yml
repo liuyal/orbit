@@ -1,9 +1,0 @@
-services:
-  web:
-    image: web-app
-    ports:
-      - "80:80"
-  db:
-    image: postgres-db
-    ports:
-      - "5432:5432"
