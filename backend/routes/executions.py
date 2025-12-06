@@ -12,7 +12,7 @@ class TestExecution(BaseModel):
     status: str
     started_at: str
     finished_at: str
-    logs: str
+    comments: str
 
 
 class TestExecutionUpdate(BaseModel):
