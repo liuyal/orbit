@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 async def root(request: Request):
     """ Root endpoint to check service status. """
 
-    logger.info(f"Root endpoint")
-    logger.debug("Root endpoint DEBUG")
+    logger.info(f"root endpoint")
+    logger.debug("root endpoint DEBUG")
 
     # TODO add service status info
     return RedirectResponse(url="/docs")

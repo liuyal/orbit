@@ -16,7 +16,11 @@ import uvicorn
 import yaml
 from fastapi import FastAPI
 
-from db import get_db_client, DB_NAME
+from db import (
+    get_db_client,
+    DB_NAME,
+    DB_COLLECTIONS
+)
 from routes import routers
 
 logger = logging.getLogger(__name__)
@@ -43,10 +47,22 @@ async def lifespan(app):
 
     client = get_db_client()
 
-    if DB_NAME not in await client.list_database_names():
-        await client[DB_NAME].create_collection("init")
-        await client[DB_NAME].drop_collection("init")
+    # Drop the database if in debug mode
+    if args.debug:
+        await client.drop_database(DB_NAME)
 
+    # Initialize the database
+    if DB_NAME not in await client.list_database_names():
+        await client[DB_NAME].drop_collection("init")
+        await client[DB_NAME].create_collection("init")
+
+    # Initialize required collections
+    collections = await client[DB_NAME].list_collection_names()
+    for item in DB_COLLECTIONS:
+        if item not in collections:
+            await client[DB_NAME].create_collection(item)
+
+    # Attach the database client to the app state
     app.state.db = client[DB_NAME]
     yield
     client.close()

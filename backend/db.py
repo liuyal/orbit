@@ -12,12 +12,12 @@ import os
 from motor.motor_asyncio import AsyncIOMotorClient
 
 DB_NAME = "orbit"
+DB_COLLECTIONS = ["projects", "test_cases", "test_executions", "test_cycles"]
 
 MONGODB_HOST = os.getenv("MONGODB_HOST", "localhost")
 MONGODB_PORT = os.getenv("MONGODB_PORT", "27017")
 MONGODB_USER = os.getenv("MONGODB_USER", "admin")
 MONGODB_PASS = os.getenv("MONGODB_PASS", "password")
-
 MONGODB_URL = f"mongodb://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_HOST}:{MONGODB_PORT}"
 
 
