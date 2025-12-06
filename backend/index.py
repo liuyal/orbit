@@ -6,25 +6,37 @@
 # License: MIT
 # ================================================================
 
+from contextlib import asynccontextmanager
+
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 
+from db import get_client, DB_NAME
 from routes import routers
+
+
+@asynccontextmanager
+async def lifespan(app):
+    client = get_client()
+    app.state.db = client[DB_NAME]
+    yield
+    client.close()
+
 
 app = FastAPI(title="ORBIT",
               description="API spec for Orbit application",
               version="0.1.0",
-              debug=True)
+              debug=True,
+              lifespan=lifespan
+              )
 
 
 @app.get("/", tags=["root"])
-def root():
+async def root(request: Request):
     """ Root endpoint to check service status. """
 
     # TODO add service status info
-
-    # redirect to /docs for now
     return RedirectResponse(url="/docs")
 
 

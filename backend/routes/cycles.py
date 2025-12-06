@@ -7,7 +7,7 @@
 
 # routes/cycles.py
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, status
 from pydantic import BaseModel
 
 from backend.routes.executions import TestExecution
@@ -51,7 +51,7 @@ class TestCycleUpdate(BaseModel):
 @router.get("/api/cycles/",
             tags=["cycles"],
             response_model=list[TestCycle])
-def list_cycles():
+async def list_cycles(request: Request):
     """List all test cycles."""
 
 
@@ -59,29 +59,33 @@ def list_cycles():
              tags=["cycles"],
              response_model=TestCycle,
              status_code=status.HTTP_201_CREATED)
-def create_cycle(cycle: TestCycleCreate):
+async def create_cycle(request: Request,
+                       cycle: TestCycleCreate):
     """Create a new test cycle."""
 
 
 @router.get("/api/cycles/{cycle_key}",
             tags=["cycles"],
             response_model=TestCycle)
-def get_cycle(cycle_key: str):
+async def get_cycle(request: Request,
+                    cycle_key: str):
     """Get a specific test cycle by its ID."""
 
 
 @router.put("/api/cycles/{cycle_key}",
             tags=["cycles"],
             response_model=TestCycle)
-def update_cycle(cycle_key: str,
-                 cycle: TestCycleUpdate):
+async def update_cycle(request: Request,
+                       cycle_key: str,
+                       cycle: TestCycleUpdate):
     """Update a specific test cycle by its ID."""
 
 
 @router.delete("/api/cycles/{cycle_key}",
                tags=["cycles"],
                status_code=status.HTTP_204_NO_CONTENT)
-def delete_cycle(cycle_key: str):
+async def delete_cycle(request: Request,
+                       cycle_key: str):
     """Delete a specific test cycle by its ID."""
 
 
@@ -89,7 +93,8 @@ def delete_cycle(cycle_key: str):
 @router.get("/api/cycles/{cycle_key}/executions",
             tags=["cycles"],
             response_model=list[TestExecution])
-def list_cycle_executions(cycle_key: str):
+async def list_cycle_executions(request: Request,
+                                cycle_key: str):
     """List all test executions associated with a specific test cycle."""
 
 
@@ -97,14 +102,16 @@ def list_cycle_executions(cycle_key: str):
 @router.post("/api/cycles/{cycle_key}/executions",
              tags=["cycles"],
              status_code=status.HTTP_204_NO_CONTENT)
-def add_execution_to_cycle(cycle_key: str,
-                           execution_key: str):
+async def add_execution_to_cycle(request: Request,
+                                 cycle_key: str,
+                                 execution_key: str):
     """Add a test execution to a specific test cycle."""
 
 
 @router.delete("/api/cycles/{cycle_key}/executions/{execution_id}",
                tags=["cycles"],
                status_code=status.HTTP_204_NO_CONTENT)
-def remove_executions_from_cycle(cycle_key: str,
-                                 execution_id: str):
+async def remove_executions_from_cycle(request: Request,
+                                       cycle_key: str,
+                                       execution_id: str):
     """Remove all test executions from a specific test cycle."""

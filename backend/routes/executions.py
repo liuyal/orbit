@@ -7,7 +7,7 @@
 
 # routes/execution.py
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, status
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -53,38 +53,48 @@ class TestExecutionUpdate(BaseModel):
 @router.get("/api/projects/{project_key}/test-cases/{test_case_key}/executions",
             tags=["executions"],
             response_model=list[TestExecution])
-def list_executions_for_test_case(project_key: str,
-                                  test_case_key: str):
+async def list_executions_for_test_case(request: Request,
+                                        project_key: str,
+                                        test_case_key: str):
     """List all test executions for a specific test case within a project."""
+
 
 
 @router.post("/api/projects/{project_key}/test-cases/{test_case_key}/executions",
              tags=["executions"],
              response_model=TestExecution,
              status_code=status.HTTP_201_CREATED)
-def create_execution_for_test_case(project_key: str,
-                                   test_case_key: str,
-                                   execution: TestExecutionCreate):
+async def create_execution_for_test_case(request: Request,
+                                         project_key: str,
+                                         test_case_key: str,
+                                         execution: TestExecutionCreate):
     """Create a new test execution for a specific test case within a project."""
+
 
 
 @router.get("/api/executions/{execution_key}",
             tags=["executions"],
             response_model=TestExecution)
-def get_execution(execution_key: str):
+async def get_execution(request: Request,
+                        execution_key: str):
     """Retrieve a specific test execution by its ID."""
+
 
 
 @router.put("/api/executions/{execution_key}",
             tags=["executions"],
             response_model=TestExecutionUpdate)
-def update_execution(execution_key: str,
-                     execution: TestExecutionUpdate):
+async def update_execution(request: Request,
+                           execution_key: str,
+                           execution: TestExecutionUpdate):
     """Update a specific test execution by its ID."""
+
 
 
 @router.delete("/api/executions/{execution_key}",
                tags=["executions"],
                status_code=status.HTTP_204_NO_CONTENT)
-def delete_execution(execution_key: str):
+async def delete_execution(request: Request,
+                           execution_key: str):
     """Delete a specific test execution by its ID."""
+

@@ -7,7 +7,7 @@
 
 # routes/test_cases.py
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, status
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -63,45 +63,51 @@ class TestCaseUpdate(BaseModel):
 @router.get("/api/projects/{project_key}/test-cases/",
             tags=["test-cases"],
             response_model=list[TestCase])
-def list_test_cases(project_key: str):
+async def list_test_cases(request: Request,
+                          project_key: str):
     """List all test cases in the specified project."""
 
 
 @router.post("/api/projects/{project_key}/test-cases/",
              tags=["test-cases"],
              status_code=status.HTTP_204_NO_CONTENT)
-def create_test_case(project_key: str,
-                     test_case: TestCaseCreate):
+async def create_test_case(request: Request,
+                           project_key: str,
+                           test_case: TestCaseCreate):
     """Create a new test case in the specified project."""
 
 
 @router.delete("/api/projects/{project_key}/test-cases/",
                tags=["test-cases"],
                status_code=status.HTTP_204_NO_CONTENT)
-def delete_all_test_case(project_key: str):
+async def delete_all_test_case(request: Request,
+                               project_key: str):
     """Delete all test cases in the specified project."""
 
 
 @router.get("/api/projects/{project_key}/test-cases/{test_case_key}",
             tags=["test-cases"],
             response_model=TestCase)
-def get_test_case_by_key(project_key: str,
-                         test_case_key: str):
+async def get_test_case_by_key(request: Request,
+                               project_key: str
+                               , test_case_key: str):
     """Retrieve a specific test case by its ID within the specified project."""
 
 
 @router.put("/api/projects/{project_key}/test-cases/{test_case_key}",
             tags=["test-cases"],
             response_model=TestCase)
-def update_test_case_by_key(project_key: str,
-                            test_case_key: str,
-                            test_case: TestCaseUpdate):
+async def update_test_case_by_key(request: Request,
+                                  project_key: str,
+                                  test_case_key: str,
+                                  test_case: TestCaseUpdate):
     """Update a specific test case by its ID within the specified project."""
 
 
 @router.delete("/api/projects/{project_key}/test-cases/{test_case_key}",
                tags=["test-cases"],
                status_code=status.HTTP_204_NO_CONTENT)
-def delete_test_case_by_key(project_key: str,
-                            test_case_key: str):
+async def delete_test_case_by_key(request: Request,
+                                  project_key: str,
+                                  test_case_key: str):
     """Delete a specific test case by its ID within the specified project."""

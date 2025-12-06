@@ -7,7 +7,7 @@
 
 # routes/projects.py
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Request, status
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -41,14 +41,14 @@ class ProjectUpdate(BaseModel):
             tags=["projects"],
             response_model=list[Project],
             status_code=status.HTTP_200_OK)
-def list_projects():
+async def list_projects(request: Request):
     """Endpoint to get projects"""
 
 
 @router.post("/api/projects",
              tags=["projects"],
              status_code=status.HTTP_204_NO_CONTENT)
-def create_project(project: ProjectCreate):
+async def create_project(request: Request, project: ProjectCreate):
     """Endpoint to create project."""
 
 
@@ -56,7 +56,7 @@ def create_project(project: ProjectCreate):
             tags=["projects"],
             response_model=Project,
             status_code=status.HTTP_200_OK)
-def get_project(project_key: str):
+async def get_project(request: Request, project_key: str):
     """Endpoint to get project"""
 
 
@@ -64,13 +64,12 @@ def get_project(project_key: str):
             tags=["projects"],
             response_model=ProjectUpdate,
             status_code=status.HTTP_200_OK)
-def update_project(project_key: str,
-                   project: ProjectUpdate):
+async def update_project(request: Request, project_key: str, project: ProjectUpdate):
     """Endpoint to update project"""
 
 
 @router.delete("/api/projects/{project_key}",
                tags=["projects"],
                status_code=status.HTTP_204_NO_CONTENT)
-def delete_project(project_key: str):
+async def delete_project(request: Request, project_key: str):
     """Endpoint to delete project"""
