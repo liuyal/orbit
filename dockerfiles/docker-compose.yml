@@ -1,9 +1,13 @@
 services:
-  web:
-    image: web-app
+  web-client:
+    image: web-client-app
     ports:
       - "80:80"
-  db:
-    image: postgres-db
+  server:
+    image: server-app
     ports:
-      - "5432:5432"
+      - "5000:5000"
+  db:
+    image: db-app
+    ports:
+      - "27017:27017"

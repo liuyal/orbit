@@ -1,0 +1,25 @@
+# Use the official MongoDB image as the base
+FROM mongo:latest
+
+# Maintainer information
+LABEL maintainer="jerrylarryliu@gmail.com"
+
+# Optional: Set environment variables for initial user creation (for development/testing)
+# These variables are only effective when the data directory is empty on container startup.
+ENV MONGO_INITDB_ROOT_USERNAME=admin
+ENV MONGO_INITDB_ROOT_PASSWORD=password
+ENV MONGO_INITDB_DATABASE=database
+
+# Optional: Copy custom configuration file
+# COPY mongod.conf /etc/mongo/mongod.conf
+
+# Optional: Copy initialization scripts
+# Scripts in /docker-entrypoint-initdb.d are executed when the container starts
+# and the data directory is empty.
+# COPY ./docker-entrypoint-initdb.d/init.js /docker-entrypoint-initdb.d/init.js
+
+# Expose the default MongoDB port
+EXPOSE 27017
+
+# The default command for the mongo image is `mongod`, which starts the MongoDB server.
+# CMD ["mongod", "--config", "/etc/mongo/mongod.conf"]
