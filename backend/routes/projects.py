@@ -1,71 +1,77 @@
 # routes/projects.py
 
-from docs.projects import (
-    GET_RESPONSES,
-    POST_RESPONSES,
-    PUT_RESPONSES,
-    DELETE_RESPONSES
-)
-from fastapi import APIRouter
-from fastapi.responses import (
-    JSONResponse,
-    Response
-)
-from models.projects import (
-    Project,
-    ProjectCreate,
-)
+from fastapi import APIRouter, status
+from pydantic import BaseModel
 
 router = APIRouter()
 
 
+class Project(BaseModel):
+    name: str
+    short_name: str
+    description: str
+    id: str
+    created_at: str
+    updated_at: str
+    test_cases: int
+    test_cycles: int
+    is_active: bool = True
+
+
+class ProjectCreate(BaseModel):
+    name: str
+    short_name: str
+    description: str
+    id: str
+
+
 @router.get("/api/projects",
-            response_model=list[Project],
-            responses=GET_RESPONSES)
+            tags=["projects"],
+            response_model=list[Project])
 def list_projects():
     """Endpoint to get projects"""
 
     projects = {"projects": []}
 
-    return JSONResponse(status_code=200, content=projects)
+    return
 
 
 @router.post("/api/projects",
-             status_code=201,
-             response_model=ProjectCreate,
-             responses=POST_RESPONSES)
+             tags=["projects"],
+             status_code=status.HTTP_201_CREATED,
+             response_model=ProjectCreate)
 def create_project():
     """Endpoint to create project."""
 
-    return JSONResponse(status_code=201, content=None)
+    return
 
 
 @router.get("/api/projects/{project_id}",
-            response_model=Project,
-            responses=GET_RESPONSES)
+            tags=["projects"],
+            response_model=Project)
 def get_project(project_id: str):
     """Endpoint to get project"""
 
     project = {}
 
-    return JSONResponse(status_code=200, content=project)
+    return
 
 
 @router.put("/api/projects/{project_id}",
-            response_model=Project,
-            responses=PUT_RESPONSES)
+            tags=["projects"],
+            response_model=Project)
 def update_project(project_id: str):
     """Endpoint to update project"""
 
     project = {}
 
-    return JSONResponse(status_code=200, content=project)
+    return
 
 
 @router.delete("/api/projects/{project_id}",
-               status_code=204,
-               responses=DELETE_RESPONSES)
+               tags=["projects"],
+               status_code=status.HTTP_204_NO_CONTENT, )
 def delete_project(project_id: str):
     """Endpoint to delete project"""
 
-    return Response(status_code=204)
+    return
