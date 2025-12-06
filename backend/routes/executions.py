@@ -15,7 +15,7 @@ router = APIRouter()
 
 class TestExecution(BaseModel):
     id: str
-    key: str
+    execution_key: str
     project_key: str
     test_cycle_key: str
     test_case_key: str
@@ -28,7 +28,7 @@ class TestExecution(BaseModel):
 
 
 class TestExecutionCreate(BaseModel):
-    key: str
+    execution_key: str
     project_key: str
     test_cycle_key: str
     test_case_key: str
@@ -41,7 +41,7 @@ class TestExecutionCreate(BaseModel):
 
 
 class TestExecutionUpdate(BaseModel):
-    key: str
+    execution_key: str
     result: str = None
     custom_fields: dict[str, str] = None
     comments: str = None
@@ -50,44 +50,41 @@ class TestExecutionUpdate(BaseModel):
     links: list[str] = None
 
 
-# List Executions For Test Case
-@router.get("/api/projects/{project_id}/test-cases/{test_case_id}/executions",
+@router.get("/api/projects/{project_key}/test-cases/{test_case_key}/executions",
             tags=["executions"],
             response_model=list[TestExecution])
-def list_executions_for_test_case(project_id: str,
-                                  test_case_id: str):
-    return
+def list_executions_for_test_case(project_key: str,
+                                  test_case_key: str):
+    """List all test executions for a specific test case within a project."""
 
 
-# Create Execution For Test Case
-@router.post("/api/projects/{project_id}/test-cases/{test_case_id}/executions",
+@router.post("/api/projects/{project_key}/test-cases/{test_case_key}/executions",
              tags=["executions"],
              response_model=TestExecution,
              status_code=status.HTTP_201_CREATED)
-def create_execution_for_test_case(project_id: str,
-                                   test_case_id: str):
-    return
+def create_execution_for_test_case(project_key: str,
+                                   test_case_key: str,
+                                   execution: TestExecutionCreate):
+    """Create a new test execution for a specific test case within a project."""
 
 
-# Get Execution
-@router.get("/api/executions/{execution_id}",
+@router.get("/api/executions/{execution_key}",
             tags=["executions"],
             response_model=TestExecution)
-def get_execution(execution_id: str):
-    return
+def get_execution(execution_key: str):
+    """Retrieve a specific test execution by its ID."""
 
 
-# Update Execution
-@router.put("/api/executions/{execution_id}",
+@router.put("/api/executions/{execution_key}",
             tags=["executions"],
             response_model=TestExecutionUpdate)
-def update_execution(execution_id: str):
-    return
+def update_execution(execution_key: str,
+                     execution: TestExecutionUpdate):
+    """Update a specific test execution by its ID."""
 
 
-# Delete Execution
-@router.delete("/api/executions/{execution_id}",
+@router.delete("/api/executions/{execution_key}",
                tags=["executions"],
                status_code=status.HTTP_204_NO_CONTENT)
-def delete_execution(xecution_id: str):
-    return
+def delete_execution(execution_key: str):
+    """Delete a specific test execution by its ID."""

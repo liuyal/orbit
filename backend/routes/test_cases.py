@@ -15,8 +15,8 @@ router = APIRouter()
 
 class TestCase(BaseModel):
     id: str
+    test_case_key: str
     project_key: str
-    key: str
     title: str
     description: str
     folder: str
@@ -27,10 +27,11 @@ class TestCase(BaseModel):
     last_execution_id: str = None
     test_frequency: list[str] = None
     labels: list[str] = None
+    links: list[str] = None
 
 
 class TestCaseCreate(BaseModel):
-    key: str
+    test_case_key: str
     project_key: str
     title: str
     description: str
@@ -39,9 +40,10 @@ class TestCaseCreate(BaseModel):
     priority: str = None
     test_scripts: str = None
     last_result: str = None
-    last_execution_id: str = None
+    last_execution_key: str = None
     test_frequency: list[str] = None
     labels: list[str] = None
+    links: list[str] = None
 
 
 class TestCaseUpdate(BaseModel):
@@ -52,59 +54,54 @@ class TestCaseUpdate(BaseModel):
     priority: str = None
     test_scripts: str = None
     last_result: str = None
-    last_execution_id: str = None
+    last_execution_key: str = None
     test_frequency: list[str] = None
     labels: list[str] = None
+    links: list[str] = None
 
 
-# List Test Cases
-@router.get("/api/projects/{project_id}/test-cases/",
+@router.get("/api/projects/{project_key}/test-cases/",
             tags=["test-cases"],
             response_model=list[TestCase])
-def list_test_cases(project_id: str):
+def list_test_cases(project_key: str):
     """List all test cases in the specified project."""
 
 
-# Create Test Case
-@router.post("/api/projects/{project_id}/test-cases/",
+@router.post("/api/projects/{project_key}/test-cases/",
              tags=["test-cases"],
              status_code=status.HTTP_204_NO_CONTENT)
-def create_test_case(project_id: str,
+def create_test_case(project_key: str,
                      test_case: TestCaseCreate):
     """Create a new test case in the specified project."""
 
 
-# Delete all Test Case
-@router.delete("/api/projects/{project_id}/test-cases/",
+@router.delete("/api/projects/{project_key}/test-cases/",
                tags=["test-cases"],
                status_code=status.HTTP_204_NO_CONTENT)
-def delete_all_test_case(project_id: str):
+def delete_all_test_case(project_key: str):
     """Delete all test cases in the specified project."""
 
 
-# Get Test Case
-@router.get("/api/projects/{project_id}/test-cases/{test_case_id}",
+@router.get("/api/projects/{project_key}/test-cases/{test_case_key}",
             tags=["test-cases"],
             response_model=TestCase)
-def get_test_case_by_id(project_id: str,
-                        test_case_id: str):
+def get_test_case_by_key(project_key: str,
+                         test_case_key: str):
     """Retrieve a specific test case by its ID within the specified project."""
 
 
-# Update Test Case
-@router.put("/api/projects/{project_id}/test-cases/{test_case_id}",
+@router.put("/api/projects/{project_key}/test-cases/{test_case_key}",
             tags=["test-cases"],
             response_model=TestCase)
-def update_test_case_by_id(project_id: str,
-                           test_case_id: str,
-                           test_case: TestCaseUpdate):
+def update_test_case_by_key(project_key: str,
+                            test_case_key: str,
+                            test_case: TestCaseUpdate):
     """Update a specific test case by its ID within the specified project."""
 
 
-# Delete Test Case
-@router.delete("/api/projects/{project_id}/test-cases/{test_case_id}",
+@router.delete("/api/projects/{project_key}/test-cases/{test_case_key}",
                tags=["test-cases"],
                status_code=status.HTTP_204_NO_CONTENT)
-def delete_test_case_by_id(project_id: str,
-                           test_case_id: str):
+def delete_test_case_by_key(project_key: str,
+                            test_case_key: str):
     """Delete a specific test case by its ID within the specified project."""

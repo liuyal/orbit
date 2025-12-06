@@ -15,7 +15,7 @@ router = APIRouter()
 
 class Project(BaseModel):
     id: str
-    key: str
+    project_key: str
     description: str
     test_cases: int
     test_cycles: int
@@ -25,7 +25,7 @@ class Project(BaseModel):
 
 
 class ProjectCreate(BaseModel):
-    key: str
+    project_key: str
     created_at: str
     description: str = None
     is_active: bool = None
@@ -37,7 +37,6 @@ class ProjectUpdate(BaseModel):
     is_active: bool = None
 
 
-# List Projects
 @router.get("/api/projects",
             tags=["projects"],
             response_model=list[Project],
@@ -46,7 +45,6 @@ def list_projects():
     """Endpoint to get projects"""
 
 
-# Create Project
 @router.post("/api/projects",
              tags=["projects"],
              status_code=status.HTTP_204_NO_CONTENT)
@@ -54,7 +52,6 @@ def create_project(project: ProjectCreate):
     """Endpoint to create project."""
 
 
-# Get Project
 @router.get("/api/projects/{project_key}",
             tags=["projects"],
             response_model=Project,
@@ -63,7 +60,6 @@ def get_project(project_key: str):
     """Endpoint to get project"""
 
 
-# Update Project
 @router.put("/api/projects/{project_key}",
             tags=["projects"],
             response_model=ProjectUpdate,
@@ -73,7 +69,6 @@ def update_project(project_key: str,
     """Endpoint to update project"""
 
 
-# Delete Project
 @router.delete("/api/projects/{project_key}",
                tags=["projects"],
                status_code=status.HTTP_204_NO_CONTENT)
