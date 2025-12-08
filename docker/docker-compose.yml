@@ -24,3 +24,5 @@ services:
     container_name: db-app
     ports:
       - "27017:27017"
+    volumes:
+      - ./mongodb_data:/data/db
