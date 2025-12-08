@@ -12,4 +12,4 @@ docker rm -f $(docker ps -aq)
 
 docker system prune -af
 
-docker-compose up --build -d
+docker compose -f docker/docker-compose.yml up --build -d

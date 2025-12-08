@@ -8,6 +8,7 @@ docker run -d --name app-1 -p 127.0.0.1:2222:22 -t app:latest
 Build and start containers with docker-compose
 ```
 docker-compose up --build -d
+docker compose -f docker/docker-compose.yml up --build -d
 ```
 Stop and remove all containers
 ```

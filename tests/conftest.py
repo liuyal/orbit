@@ -24,7 +24,7 @@ def pytest_addoption(parser):
     parser.addoption(
         '--port',
         dest='port',
-        default=5080,
+        default=8000,
         help='Port of the backend server'
     )
     parser.addoption(

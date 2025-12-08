@@ -1,4 +1,3 @@
-version: '0.1.0'
 services:
   frontend:
     build:
@@ -15,7 +14,7 @@ services:
     image: backend-app:latest
     container_name: backend-app
     ports:
-      - "5000:5000"
+      - "8000:8000"
   db:
     build:
       context: .
@@ -25,4 +24,4 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - ./mongodb_data:/data/db
+      - ./data:/data/db

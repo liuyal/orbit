@@ -30,6 +30,12 @@ def build_parser():
         description='Orbit FastAPI Backend'
     )
     parser.add_argument(
+        '-p', '--port',
+        dest='port',
+        default=8000,
+        help='Set server listening port (default: 8000)'
+    )
+    parser.add_argument(
         '--debug',
         dest='debug',
         action='store_true',
@@ -105,6 +111,6 @@ if __name__ == "__main__":
     log_conf = configure_logging_file(args.debug)
     uvicorn.run("index:app",
                 host="0.0.0.0",
-                port=5080,
+                port=args.port,
                 reload=args.debug,
                 log_config=log_conf)
