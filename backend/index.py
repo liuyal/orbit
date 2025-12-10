@@ -6,7 +6,11 @@
 # License: MIT
 # ================================================================
 
-import argparse
+from backend.app_def.build_parser import build_parser
+
+parser = build_parser()
+args = parser.parse_args()
+
 import logging.config
 import os
 import pathlib
@@ -22,41 +26,6 @@ from db.sqlite import SqliteClient
 from routes import routers
 
 logger = logging.getLogger(__name__)
-
-
-def build_parser():
-    """ Build argument parser. """
-
-    parser = argparse.ArgumentParser(
-        description='Orbit FastAPI Backend'
-    )
-    parser.add_argument(
-        '--host',
-        dest='host',
-        default='127.0.0.1',
-        help='Set server host (default:127.0.0.1)'
-    )
-    parser.add_argument(
-        '-p', '--port',
-        dest='port',
-        default=8000,
-        help='Set server listening port (default: 8000)'
-    )
-    parser.add_argument(
-        '--db',
-        dest='db_type',
-        type=lambda x: DBType(x),
-        choices=[DBType.MONGODB, DBType.SQLITE],
-        default=DBType.MONGODB,
-        help='Set database type, choices: mongodb, sqlite. (default: mongodb)'
-    )
-    parser.add_argument(
-        '--debug',
-        dest='debug',
-        action='store_true',
-        help='Set server to debug'
-    )
-    return parser
 
 
 @asynccontextmanager
@@ -101,9 +70,6 @@ def configure_logging_file(debug: bool = False) -> str:
     return str(log_conf_path)
 
 
-parser = build_parser()
-args = parser.parse_args()
-
 app = FastAPI(title="ORBIT",
               description="API spec for Orbit application",
               version="0.1.0",
@@ -117,6 +83,6 @@ if __name__ == "__main__":
     log_conf = configure_logging_file(args.debug)
     uvicorn.run("index:app",
                 host=args.host,
-                port=args.port,
+                port=int(args.port),
                 reload=False,  # args.debug,
                 log_config=log_conf)

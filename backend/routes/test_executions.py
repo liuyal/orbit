@@ -23,7 +23,7 @@ from backend.models.test_executions import (
 router = APIRouter()
 
 
-@router.get("/api/projects/{project_key}/test-cases/{test_case_key}/executions",
+@router.get("/tm/api/v1/projects/{project_key}/test-cases/{test_case_key}/executions",
             tags=[DB_COLLECTION_TE],
             response_model=list[TestExecution])
 async def get_all_executions_for_test_case(request: Request,
@@ -39,7 +39,7 @@ async def get_all_executions_for_test_case(request: Request,
                         content=test_executions)
 
 
-@router.post("/api/projects/{project_key}/test-cases/{test_case_key}/executions",
+@router.post("/tm/api/v1/projects/{project_key}/test-cases/{test_case_key}/executions",
              tags=[DB_COLLECTION_TE],
              response_model=TestExecution,
              status_code=status.HTTP_201_CREATED)
@@ -97,7 +97,7 @@ async def create_execution_for_test_case(request: Request,
     return Response(status_code=status.HTTP_201_CREATED)
 
 
-@router.delete("/api/projects/{project_key}/test-cases/{test_case_key}/executions",
+@router.delete("/tm/api/v1/projects/{project_key}/test-cases/{test_case_key}/executions",
                tags=[DB_COLLECTION_TE],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_execution_for_test_case(request: Request,
@@ -119,7 +119,7 @@ async def delete_all_execution_for_test_case(request: Request,
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get("/api/executions/{execution_key}",
+@router.get("/tm/api/v1/executions/{execution_key}",
             tags=[DB_COLLECTION_TE],
             response_model=TestExecution)
 async def get_execution(request: Request,
@@ -141,7 +141,7 @@ async def get_execution(request: Request,
                         content=test_execution)
 
 
-@router.put("/api/executions/{execution_key}",
+@router.put("/tm/api/v1/executions/{execution_key}",
             tags=[DB_COLLECTION_TE],
             response_model=TestExecutionUpdate)
 async def update_execution(request: Request,
@@ -172,7 +172,7 @@ async def update_execution(request: Request,
                         content=updated_test_execution)
 
 
-@router.delete("/api/executions/{execution_key}",
+@router.delete("/tm/api/v1/executions/{execution_key}",
                tags=[DB_COLLECTION_TE],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_execution(request: Request,

@@ -21,14 +21,14 @@ from backend.routes.test_executions import TestExecution
 router = APIRouter()
 
 
-@router.get("/api/cycles",
+@router.get("/tm/api/v1/cycles",
             tags=[DB_COLLECTION_TCY],
             response_model=list[TestCycle])
 async def get_all_cycles(request: Request):
     """Get all test cycles."""
 
 
-@router.get("/api/projects/{project_key}/cycles",
+@router.get("/tm/api/v1/projects/{project_key}/cycles",
             tags=[DB_COLLECTION_TCY],
             response_model=list[TestCycle])
 async def get_all_cycles_for_project(request: Request,
@@ -36,7 +36,7 @@ async def get_all_cycles_for_project(request: Request,
     """Get all test cycles for project."""
 
 
-@router.post("/api/projects/{project_key}/cycles",
+@router.post("/tm/api/v1/projects/{project_key}/cycles",
              tags=[DB_COLLECTION_TCY],
              response_model=TestCycle,
              status_code=status.HTTP_201_CREATED)
@@ -46,7 +46,7 @@ async def create_cycle_for_project(request: Request,
     """Create a new test cycle for project."""
 
 
-@router.get("/api/cycles/{cycle_key}",
+@router.get("/tm/api/v1/cycles/{cycle_key}",
             tags=[DB_COLLECTION_TCY],
             response_model=TestCycle)
 async def get_cycle(request: Request,
@@ -54,7 +54,7 @@ async def get_cycle(request: Request,
     """Get a specific test cycle by its ID."""
 
 
-@router.put("/api/cycles/{cycle_key}",
+@router.put("/tm/api/v1/cycles/{cycle_key}",
             tags=[DB_COLLECTION_TCY],
             response_model=TestCycle)
 async def update_cycle(request: Request,
@@ -63,7 +63,7 @@ async def update_cycle(request: Request,
     """Update a specific test cycle by its ID."""
 
 
-@router.delete("/api/cycles/{cycle_key}",
+@router.delete("/tm/api/v1/cycles/{cycle_key}",
                tags=[DB_COLLECTION_TCY],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_cycle(request: Request,
@@ -71,7 +71,7 @@ async def delete_cycle(request: Request,
     """Delete a specific test cycle by its ID."""
 
 
-@router.get("/api/cycles/{cycle_key}/executions",
+@router.get("/tm/api/v1/cycles/{cycle_key}/executions",
             tags=[DB_COLLECTION_TCY],
             response_model=list[TestExecution])
 async def get_cycle_executions(request: Request,
@@ -79,7 +79,7 @@ async def get_cycle_executions(request: Request,
     """Get all test executions associated with a specific test cycle."""
 
 
-@router.post("/api/cycles/{cycle_key}/executions",
+@router.post("/tm/api/v1/cycles/{cycle_key}/executions",
              tags=[DB_COLLECTION_TCY],
              status_code=status.HTTP_204_NO_CONTENT)
 async def add_execution_to_cycle(request: Request,
@@ -88,7 +88,7 @@ async def add_execution_to_cycle(request: Request,
     """Add a test execution to a specific test cycle."""
 
 
-@router.delete("/api/cycles/{cycle_key}/executions/{execution_id}",
+@router.delete("/tm/api/v1/cycles/{cycle_key}/executions/{execution_id}",
                tags=[DB_COLLECTION_TCY],
                status_code=status.HTTP_204_NO_CONTENT)
 async def remove_executions_from_cycle(request: Request,

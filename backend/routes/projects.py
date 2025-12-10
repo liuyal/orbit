@@ -28,7 +28,7 @@ from backend.tools.tools import (
 router = APIRouter()
 
 
-@router.get("/api/projects",
+@router.get("/tm/api/v1/projects",
             tags=[DB_COLLECTION_PRJ],
             response_model=list[Project],
             status_code=status.HTTP_200_OK)
@@ -42,7 +42,7 @@ async def get_all_projects(request: Request):
                         content=projects)
 
 
-@router.post("/api/projects",
+@router.post("/tm/api/v1/projects",
              tags=[DB_COLLECTION_PRJ],
              response_model=Project,
              status_code=status.HTTP_201_CREATED)
@@ -88,7 +88,7 @@ async def create_project_by_project_key(request: Request,
                         content=created_project)
 
 
-@router.get("/api/projects/{project_key}",
+@router.get("/tm/api/v1/projects/{project_key}",
             tags=[DB_COLLECTION_PRJ],
             response_model=Project,
             status_code=status.HTTP_200_OK)
@@ -114,7 +114,7 @@ async def get_project_by_project_key(request: Request,
                             content=result)
 
 
-@router.put("/api/projects/{project_key}",
+@router.put("/tm/api/v1/projects/{project_key}",
             tags=[DB_COLLECTION_PRJ],
             response_model=Project,
             status_code=status.HTTP_200_OK)
@@ -151,7 +151,7 @@ async def update_project_by_project_key(request: Request,
                         content=updated_project)
 
 
-@router.delete("/api/projects/{project_key}",
+@router.delete("/tm/api/v1/projects/{project_key}",
                tags=[DB_COLLECTION_PRJ],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_project_by_project_key(request: Request,
@@ -185,7 +185,7 @@ async def delete_project_by_project_key(request: Request,
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.delete("/api/projects/{project_key}/nuke",
+@router.delete("/tm/api/v1/projects/{project_key}/nuke",
                tags=[DB_COLLECTION_PRJ],
                status_code=status.HTTP_204_NO_CONTENT)
 async def force_delete_project_by_project_key(request: Request,

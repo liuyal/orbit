@@ -28,7 +28,7 @@ async def root(request: Request):
     return RedirectResponse(url="/docs")
 
 
-@router.post("/api/reset", tags=["root"])
+@router.post("/tm/api/v1/reset", tags=["root"])
 async def reset_server(request: Request):
     """ Root endpoint to reset server. """
 

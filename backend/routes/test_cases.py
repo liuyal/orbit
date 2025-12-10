@@ -17,7 +17,7 @@ from backend.tools.tools import get_current_utc_time
 router = APIRouter()
 
 
-@router.get("/api/test-cases",
+@router.get("/tm/api/v1/test-cases",
             tags=[DB_COLLECTION_TC],
             response_model=list[TestCase])
 async def get_all_test_cases(request: Request):
@@ -31,7 +31,7 @@ async def get_all_test_cases(request: Request):
                         content=test_cases)
 
 
-@router.get("/api/projects/{project_key}/test-cases",
+@router.get("/tm/api/v1/projects/{project_key}/test-cases",
             tags=[DB_COLLECTION_TC],
             response_model=list[TestCase])
 async def get_all_test_cases_by_project(request: Request,
@@ -46,7 +46,7 @@ async def get_all_test_cases_by_project(request: Request,
                         content=test_cases)
 
 
-@router.post("/api/projects/{project_key}/test-cases",
+@router.post("/tm/api/v1/projects/{project_key}/test-cases",
              tags=[DB_COLLECTION_TC],
              status_code=status.HTTP_201_CREATED)
 async def create_test_case_by_project(request: Request,
@@ -98,7 +98,7 @@ async def create_test_case_by_project(request: Request,
     return Response(status_code=status.HTTP_201_CREATED)
 
 
-@router.delete("/api/projects/{project_key}/test-cases",
+@router.delete("/tm/api/v1/projects/{project_key}/test-cases",
                tags=[DB_COLLECTION_TC],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_test_case_by_project(request: Request,
@@ -118,7 +118,7 @@ async def delete_all_test_case_by_project(request: Request,
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get("/api/projects/{project_key}/test-cases/{test_case_key}",
+@router.get("/tm/api/v1/projects/{project_key}/test-cases/{test_case_key}",
             tags=[DB_COLLECTION_TC],
             response_model=TestCase)
 async def get_test_case_by_test_case_key(request: Request,
@@ -142,7 +142,7 @@ async def get_test_case_by_test_case_key(request: Request,
                             content=result)
 
 
-@router.put("/api/projects/{project_key}/test-cases/{test_case_key}",
+@router.put("/tm/api/v1/projects/{project_key}/test-cases/{test_case_key}",
             tags=[DB_COLLECTION_TC],
             response_model=TestCase)
 async def update_test_case_by_test_case_key(request: Request,
@@ -179,7 +179,7 @@ async def update_test_case_by_test_case_key(request: Request,
                         content=updated_test_case)
 
 
-@router.delete("/api/projects/{project_key}/test-cases/{test_case_key}",
+@router.delete("/tm/api/v1/projects/{project_key}/test-cases/{test_case_key}",
                tags=[DB_COLLECTION_TC],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_test_case_by_test_case_key(request: Request,
