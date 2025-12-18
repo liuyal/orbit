@@ -80,9 +80,9 @@ for router in routers:
     app.include_router(router)
 
 if __name__ == "__main__":
-    log_conf = configure_logging_file(args.debug)
+    #log_conf = configure_logging_file(args.debug)
     uvicorn.run("index:app",
                 host=args.host,
                 port=int(args.port),
                 reload=args.debug,
-                log_config=log_conf)
+                log_config=None)
