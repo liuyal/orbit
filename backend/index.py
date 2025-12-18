@@ -13,6 +13,7 @@ args = parser.parse_args()
 
 import logging.config
 import os
+import sys
 import pathlib
 from contextlib import asynccontextmanager
 
@@ -24,6 +25,8 @@ from backend.db.db import DBType
 from db.mongodb import MongoClient
 from db.sqlite import SqliteClient
 from routes import routers
+
+sys.path.append(str(pathlib.Path(__file__).parent))
 
 logger = logging.getLogger(__name__)
 
