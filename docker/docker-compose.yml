@@ -1,5 +1,5 @@
 services:
-  frontend:
+  frontend-app:
     build:
       context: .
       dockerfile: Dockerfile_frontend
@@ -7,15 +7,19 @@ services:
     container_name: frontend-app
     ports:
       - "80:80"
-  backend:
+  backend-app:
     build:
       context: .
       dockerfile: Dockerfile_backend
     image: backend-app:latest
     container_name: backend-app
+    environment:
+      - MONGODB_HOST=db-app
+    depends_on:
+      - db-app
     ports:
       - "8000:8000"
-  db:
+  db-app:
     build:
       context: .
       dockerfile: Dockerfile_mongodb
@@ -23,5 +27,5 @@ services:
     container_name: db-app
     ports:
       - "27017:27017"
-    volumes:
-      - ./data:/data/db
+    #volumes:
+    #  - ./data:/data/db

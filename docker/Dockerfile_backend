@@ -7,13 +7,14 @@ WORKDIR /home
 
 RUN apt-get update && \
     apt-get install -y \
+        ca-certificates \
         curl \
         git \
         net-tools \
-        iputils-ping \
         openssh-server \
+        iputils-ping \
         python3 \
-        python3-fastapi
+        python3-pip
 
 RUN sysctl net.ipv4.conf.all.forwarding=1
 RUN mkdir /var/run/sshd
@@ -24,4 +25,10 @@ EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
 
 RUN git clone https://github.com/liuyal/project_orbit.git orbit
-RUN python3 orbit/backend/index.py &
+
+ENV PYTHONPATH=/home/orbit
+ENV MONGODB_HOST=db-app
+
+RUN pip install --no-cache-dir --break-system-packages -r /home/orbit/poetry-env/requirements.txt
+
+CMD ["python3", "/home/orbit/backend/index.py"]
