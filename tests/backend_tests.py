@@ -57,12 +57,10 @@ class OrbitBackendSanityTest(unittest.TestCase):
         # Verify no projects exist after cleanup
         response = requests.get(f"{self.__class__.url}/projects")
         assert response.status_code == 200
-        assert response.json() == []
-
-        # Number of projects to create
-        n = 3
+        assert len(response.json()) == 0
 
         # Create n projects & verify
+        n = 3
         for i in range(0, n):
             # Create project
             payload = {"project_key": f"PRJ{i}", "description": f"Project #{i}"}
@@ -93,7 +91,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         for i in range(0, n):
             # Delete project
             response = requests.delete(f"{self.__class__.url}/projects/PRJ{i}")
-            assert response.status_code == 200
+            assert response.status_code == 204
 
             # Verify project deleted
             response = requests.get(f"{self.__class__.url}/projects")
@@ -103,79 +101,84 @@ class OrbitBackendSanityTest(unittest.TestCase):
         # Verify no projects exist after cleanup
         response = requests.get(f"{self.__class__.url}/projects")
         assert response.status_code == 200
-        assert response.json() == []
+        assert len(response.json()) == 0
 
         self.__class__.clean_up_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
-    # @pytest.mark.order(2)
-    # def test_cases(self):
-    #     """ Test: Test Cases """
-    #
-    #     logging.info(f"--- Starting test: {self._testMethodName} ---")
-    #     self.__class__.clean_up_db()
-    #
-    #     n = 3
-    #     for i in range(0, n):
-    #         payload = {"project_key": f"PRJ{i}", "description": f"Project #{i}"}
-    #         response = requests.post(f"{self.__class__.url}/projects", json=payload)
-    #         assert response.status_code == 201
-    #     response = requests.get(f"{self.__class__.url}/projects")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n
-    #
-    #     n = 25
-    #     project_key = "PRJ0"
-    #     for i in range(0, n):
-    #         payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
-    #         response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json=payload)
-    #         assert response.status_code == 201
-    #     response = requests.get(f"{self.__class__.url}/test-cases")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n
-    #
-    #     project_key = "PRJ1"
-    #     for i in range(0, n):
-    #         payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
-    #         response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json=payload)
-    #         assert response.status_code == 201
-    #     response = requests.get(f"{self.__class__.url}/test-cases")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n * 2
-    #
-    #     project_key = "PRJ2"
-    #     for i in range(0, n):
-    #         payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
-    #         response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json=payload)
-    #         assert response.status_code == 201
-    #     response = requests.get(f"{self.__class__.url}/test-cases")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n * 3
-    #
-    #     prj_key = "PRJ1"
-    #     response = requests.delete(f"{self.__class__.url}/projects/{prj_key}/test-cases/")
-    #     assert response.status_code == 204
-    #     response = requests.get(f"{self.__class__.url}/test-cases")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n * 2
-    #
-    #     prj_key = "PRJ2"
-    #     response = requests.delete(f"{self.__class__.url}/projects/{prj_key}/test-cases/")
-    #     assert response.status_code == 204
-    #     response = requests.get(f"{self.__class__.url}/test-cases")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n
-    #
-    #     prj_key = "PRJ0"
-    #     response = requests.delete(f"{self.__class__.url}/projects/{prj_key}/test-cases/")
-    #     assert response.status_code == 204
-    #     response = requests.get(f"{self.__class__.url}/test-cases")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == 0
-    #
-    #     self.__class__.clean_up_db()
-    #     logging.info(f"--- Test: {self._testMethodName} Complete ---")
-    #
+    @pytest.mark.order(2)
+    def test_cases(self):
+        """ Test: Test Cases """
+
+        logging.info(f"--- Starting test: {self._testMethodName} ---")
+        self.__class__.clean_up_db()
+
+        n = 3
+        k = 10
+        for i in range(0, n):
+            # Create project
+            project_key = f"PRJ{i}"
+            payload = {"project_key": project_key, "description": f"Project #{i}"}
+            response = requests.post(f"{self.__class__.url}/projects", json=payload)
+            assert response.status_code == 201
+
+            # Verify projects created
+            response = requests.get(f"{self.__class__.url}/projects")
+            assert response.status_code == 200
+            assert len(response.json()) == i + 1
+
+            for j in range(0, k):
+                # Create test case
+                ti = j + i * k
+                payload = {"test_case_key": f"{project_key}-T{ti}", "project_key": project_key}
+                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json=payload)
+                assert response.status_code == 201
+
+                # Verify test case created
+                response = requests.get(f"{self.__class__.url}/test-cases")
+                assert response.status_code == 200
+                assert len(response.json()) == (j + i * k) + 1
+
+        # Check total test cases
+        response = requests.get(f"{self.__class__.url}/test-cases")
+        assert response.status_code == 200
+        assert len(response.json()) == n * k
+
+        for i in range(0, n):
+            for j in range(0, k):
+                # Get test case by key
+                ti = j + i * k
+                project_key = f"PRJ{i}"
+                test_case_key = f"{project_key}-T{ti}"
+                response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}")
+                assert response.status_code == 200
+
+                # Upgrade test case
+                title_updated = f"Test Case title {project_key}-T{ti} ++++"
+                response = requests.put(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}",
+                                        json={"title": title_updated})
+                assert response.status_code == 200
+
+                # Verify test case updated
+                response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}")
+                assert response.status_code == 200
+                assert response.json()["title"] == title_updated
+
+                # TODO: add delete test
+
+        # Delete all test cases for project PRJ0
+        prj_key = "PRJ0"
+        response = requests.delete(f"{self.__class__.url}/projects/{prj_key}/test-cases/")
+        assert response.status_code == 204
+
+        # Verify test cases deleted
+        response = requests.get(f"{self.__class__.url}/test-cases")
+        assert response.status_code == 200
+        assert len(response.json()) == n * k - k
+
+        self.__class__.clean_up_db()
+        logging.info(f"--- Test: {self._testMethodName} Complete ---")
+
     # @pytest.mark.order(3)
     # def test_executions(self):
     #     """ Test: Executions """
