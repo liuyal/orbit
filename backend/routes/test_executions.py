@@ -43,7 +43,7 @@ async def get_all_executions_for_test_case(request: Request,
         return response
 
     # Check if test_case_key exists
-    response = await get_test_case_by_key(request, test_case_key)
+    response = await get_test_case_by_key(request, project_key, test_case_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
@@ -73,7 +73,7 @@ async def create_execution_for_test_case(request: Request,
         return response
 
     # Check if test_case_key exists
-    response = await get_test_case_by_key(request, test_case_key)
+    response = await get_test_case_by_key(request, project_key, test_case_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
@@ -124,7 +124,7 @@ async def delete_all_execution_for_test_case(request: Request,
         return response
 
     # Check if test_case_key exists
-    response = await get_test_case_by_key(request, test_case_key)
+    response = await get_test_case_by_key(request, project_key, test_case_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
