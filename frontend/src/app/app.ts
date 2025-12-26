@@ -1,12 +1,27 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <button (click)="refresh()">Refresh</button>
+    @if (data$ | async; as data) {
+      <p>{{ data | json }}</p>
+    } @else {
+      <p>Loading...</p>
+    }
+  `
 })
+
 export class App {
-  protected readonly title = signal('orbit-app');
+  http = inject(HttpClient);
+  data$: Observable<any[]> = this.http.get<any[]>('api/projects');
+  refresh() {
+    this.data$ = this.http.get<any[]>('api/projects');
+  }
 }
+
