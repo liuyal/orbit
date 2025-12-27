@@ -32,7 +32,5 @@ ENV MONGODB_HOST=db-app
 
 RUN pip install --no-cache-dir --break-system-packages -r /home/orbit/poetry-env/requirements.txt
 
-#CMD ["python3", "/home/orbit/backend/index.py"]
-
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
