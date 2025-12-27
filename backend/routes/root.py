@@ -19,12 +19,20 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.get("/", tags=["root"])
+@router.get(f"/", tags=["root"])
 async def root(request: Request):
     """ Root endpoint to check service status. """
 
     logger.info(f"root endpoint")
     logger.debug("root endpoint DEBUG")
+
+    # TODO add service status info
+    return RedirectResponse(url="/docs")
+
+
+@router.get(f"/api/{API_VERSION}", tags=["root"])
+async def root_api(request: Request):
+    """ Root api endpoint to check service status. """
 
     # TODO add service status info
     return RedirectResponse(url="/docs")
