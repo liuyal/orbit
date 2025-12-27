@@ -19,9 +19,9 @@ import { Observable } from 'rxjs';
 
 export class App {
   http = inject(HttpClient);
-  data$: Observable<any[]> = this.http.get<any[]>('api/projects');
+  data$: Observable<any[]> = this.http.get<any[]>('api/tm/projects');
   refresh() {
-    this.data$ = this.http.get<any[]>('api/projects');
+    this.data$ = this.http.get<any[]>('api/tm/projects');
   }
 }
 
