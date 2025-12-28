@@ -14,17 +14,17 @@ services:
     image: backend-app:latest
     container_name: backend-app
     environment:
-      - MONGODB_HOST=db-app
+      - MONGODB_HOST=mongodb-app
     depends_on:
-      - db-app
+      - mongodb-app
     ports:
       - "8000:8000"
-  db-app:
+  mongodb-app:
     build:
       context: .
       dockerfile: Dockerfile_mongodb
-    image: db-app:latest
-    container_name: db-app
+    image: mongodb-app:latest
+    container_name: mongodb-app
     ports:
       - "27017:27017"
     #volumes:
