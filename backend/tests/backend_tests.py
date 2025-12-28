@@ -28,6 +28,8 @@ class OrbitBackendSanityTest(unittest.TestCase):
         cls.protocol = pytest.options['protocol']
         cls.url = f"{cls.protocol}://{cls.host}:{cls.port}/api/v1/tm"
 
+        cls.generate = pytest.options['generate']
+
         # Check if the server is up
         response = requests.get(f"{cls.protocol}://{cls.host}:{cls.port}/")
         assert response.status_code == 200
@@ -37,22 +39,23 @@ class OrbitBackendSanityTest(unittest.TestCase):
         """ Teardown device """
 
         logging.info(f"Teardown tests...")
-        cls.clean_up_db()
+        cls.clean_up_db(cls.generate)
 
     @classmethod
-    def clean_up_db(cls):
+    def clean_up_db(cls, generate=False):
         """ Clean up sb after tests """
 
         # Cleanup existing db
-        response = requests.post(f"{cls.url}/reset")
-        assert response.status_code == 204
+        if not generate:
+            response = requests.post(f"{cls.url}/reset")
+            assert response.status_code == 204
 
     @pytest.mark.order(1)
     def test_projects(self):
         """ Test: Projects """
 
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.clean_up_db(False)
 
         # Verify no projects exist after cleanup
         response = requests.get(f"{self.__class__.url}/projects")
@@ -103,7 +106,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 0
 
-        self.__class__.clean_up_db()
+        self.__class__.clean_up_db(self.__class__.generate)
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
     @pytest.mark.order(2)
@@ -111,7 +114,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         """ Test: Test Cases """
 
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.clean_up_db(False)
 
         n = 3
         k = 10
@@ -176,7 +179,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert response.status_code == 200
         assert len(response.json()) == n * k - k
 
-        self.__class__.clean_up_db()
+        self.__class__.clean_up_db(self.__class__.generate)
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
     @pytest.mark.order(3)
@@ -184,7 +187,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         """ Test: Executions """
 
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.clean_up_db(False)
 
         n = 2
         for i in range(0, n):
@@ -236,70 +239,150 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert response.status_code == 200
         assert len(response.json()) == n
 
-        # self.__class__.clean_up_db()
+        self.__class__.clean_up_db(self.__class__.generate)
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
-    # @pytest.mark.order(4)
-    # def test_cycles(self):
-    #     """ Test: Cycle """
-    #
-    #     logging.info(f"--- Starting test: {self._testMethodName} ---")
-    #     self.__class__.clean_up_db()
-    #
-    #     n = 1
-    #     for i in range(0, n):
-    #         payload = {"project_key": f"PRJ{i}", "description": f"Project #{i}"}
-    #         response = requests.post(f"{self.__class__.url}/projects", json=payload)
-    #         assert response.status_code == 201
-    #     response = requests.get(f"{self.__class__.url}/projects")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n
-    #
-    #     n = 10
-    #     project_key = "PRJ0"
-    #     for i in range(0, n):
-    #         payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
-    #         response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json=payload)
-    #         assert response.status_code == 201
-    #     response = requests.get(f"{self.__class__.url}/test-cases")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n
-    #
-    #     n = 5
-    #     project_key = "PRJ0"
-    #     test_case_key = f"{project_key}-T1"
-    #     for i in range(0, n):
-    #         payload = {"execution_key": f"{project_key}-E{i}"}
-    #         response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
-    #         assert response.status_code == 201
-    #     response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n
-    #
-    #     n = 5
-    #     project_key = "PRJ0"
-    #     test_case_key = f"{project_key}-T2"
-    #     for i in range(n, n * 2):
-    #         payload = {"execution_key": f"{project_key}-E{i}"}
-    #         response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
-    #         assert response.status_code == 201
-    #     response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n
-    #
-    #     n = 5
-    #     project_key = "PRJ0"
-    #     test_case_key = f"{project_key}-T3"
-    #     for i in range(n * 2, n * 3):
-    #         payload = {"execution_key": f"{project_key}-E{i}"}
-    #         response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
-    #         assert response.status_code == 201
-    #     response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
-    #     assert response.status_code == 200
-    #     assert len(response.json()) == n
-    #
-    #     # self.__class__.clean_up_db()
-    #     logging.info(f"--- Test: {self._testMethodName} Complete ---")
+    @pytest.mark.order(4)
+    def test_cycles(self):
+        """ Test: Cycle """
+
+        logging.info(f"--- Starting test: {self._testMethodName} ---")
+        self.__class__.clean_up_db(False)
+
+        # Generate 1 project
+        n = 1
+        for i in range(0, n):
+            payload = {"project_key": f"PRJ{i}", "description": f"Project #{i}"}
+            response = requests.post(f"{self.__class__.url}/projects", json=payload)
+            assert response.status_code == 201
+        response = requests.get(f"{self.__class__.url}/projects")
+        assert response.status_code == 200
+        assert len(response.json()) == n
+
+        # Generate test cases for project PRJ0
+        n = 10
+        project_key = "PRJ0"
+        for i in range(0, n):
+            payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
+            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json=payload)
+            assert response.status_code == 201
+        response = requests.get(f"{self.__class__.url}/test-cases")
+        assert response.status_code == 200
+        assert len(response.json()) == n
+
+        # Generate executions for 3 test cases
+        n = 5
+        project_key = "PRJ0"
+        test_case_key = f"{project_key}-T1"
+        for i in range(0, n):
+            payload = {"execution_key": f"{project_key}-E{i}"}
+            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
+            assert response.status_code == 201
+        response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
+        assert response.status_code == 200
+        assert len(response.json()) == n
+
+        test_case_key = f"{project_key}-T2"
+        for i in range(n, n * 2):
+            payload = {"execution_key": f"{project_key}-E{i}"}
+            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
+            assert response.status_code == 201
+        response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
+        assert response.status_code == 200
+        assert len(response.json()) == n
+
+        test_case_key = f"{project_key}-T3"
+        for i in range(n * 2, n * 3):
+            payload = {"execution_key": f"{project_key}-E{i}"}
+            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
+            assert response.status_code == 201
+        response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
+        assert response.status_code == 200
+        assert len(response.json()) == n
+
+        # Check no cycle exists
+        response = requests.get(f"{self.__class__.url}/projects/{project_key}/cycles")
+        assert response.status_code == 200
+        assert len(response.json()) == 0
+
+        # Create cycle & Check cycle created
+        cycle_key = f"{project_key}-C{0}"
+        payload = {"test_cycle_key": cycle_key}
+        response = requests.post(f"{self.__class__.url}/projects/{project_key}/cycles", json=payload)
+        assert response.status_code == 201
+        cycle_key = f"{project_key}-C{1}"
+        payload = {"test_cycle_key": cycle_key}
+        response = requests.post(f"{self.__class__.url}/projects/{project_key}/cycles", json=payload)
+        assert response.status_code == 201
+        response = requests.get(f"{self.__class__.url}/projects/{project_key}/cycles")
+        assert response.status_code == 200
+        assert len(response.json()) == 2
+
+        # Get cycle by key
+        cycle_key = f"{project_key}-C{0}"
+        response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}")
+        assert response.status_code == 200
+        assert response.json()["test_cycle_key"] == cycle_key
+        cycle_key = f"{project_key}-C{1}"
+        response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}")
+        assert response.status_code == 200
+        assert response.json()["test_cycle_key"] == cycle_key
+
+        # Update cycle details
+        cycle_key = f"{project_key}-C{1}"
+        payload = {"title": "CYCLE1"}
+        response = requests.put(f"{self.__class__.url}/cycles/{cycle_key}", json=payload)
+        assert response.status_code == 200
+        assert response.json()["test_cycle_key"] == cycle_key
+        response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}")
+        assert response.status_code == 200
+        assert response.json()["test_cycle_key"] == cycle_key
+        assert response.json()["title"] == payload["title"]
+
+        # Get cycle executions
+        cycle_key = f"{project_key}-C{1}"
+        response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}/executions")
+        assert response.status_code == 200
+        assert len(response.json()) == 0
+
+        # Add executions to cycle
+        cycle_key = f"{project_key}-C{0}"
+        for i in range(0, 3):
+            execution_key = f"{project_key}-E{i}"
+            response = requests.post(f"{self.__class__.url}/cycles/{cycle_key}/executions?execution_key={execution_key}")
+            assert response.status_code == 200
+        response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}/executions")
+        assert response.status_code == 200
+        assert len(response.json()) == 3
+
+        cycle_key = f"{project_key}-C{1}"
+        for i in range(0, 3):
+            execution_key = f"{project_key}-E{i}"
+            response = requests.post(f"{self.__class__.url}/cycles/{cycle_key}/executions?execution_key={execution_key}")
+            assert response.status_code == 200
+        response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}/executions")
+        assert response.status_code == 200
+        assert len(response.json()) == 3
+
+        # Delete existing cycle execution
+        cycle_key = f"{project_key}-C{1}"
+        execution_key = f"{project_key}-E{0}"
+        response = requests.delete(f"{self.__class__.url}/cycles/{cycle_key}/executions/{execution_key}")
+        assert response.status_code == 200
+        response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}/executions")
+        assert response.status_code == 200
+        assert len(response.json()) == 2
+
+        # Delete cycle
+        cycle_key = f"{project_key}-C{1}"
+        response = requests.delete(f"{self.__class__.url}/cycles/{cycle_key}")
+        assert response.status_code == 204
+        response = requests.get(f"{self.__class__.url}/projects/{project_key}/cycles")
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+        self.__class__.clean_up_db(self.__class__.generate)
+        logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
 
 if __name__ == "__main__":

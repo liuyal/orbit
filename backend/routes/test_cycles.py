@@ -209,7 +209,7 @@ async def get_cycle_executions(request: Request,
 
 @router.post(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}/executions",
              tags=[DB_COLLECTION_TCY],
-             status_code=status.HTTP_204_NO_CONTENT)
+             status_code=status.HTTP_200_OK)
 async def add_execution_to_cycle(request: Request,
                                  test_cycle_key: str,
                                  execution_key: str):
@@ -229,9 +229,10 @@ async def add_execution_to_cycle(request: Request,
 
     # Check execution not already in cycle
     if execution_key in cycle_data["executions"]:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
-                            content={"error": f"Execution {execution_key} "
-                                              f"already in cycle {test_cycle_key}"})
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": f"Execution {execution_key} "
+                              f"already in cycle {test_cycle_key}"})
 
     # Add execution to cycle
     db = request.app.state.db
@@ -256,7 +257,7 @@ async def add_execution_to_cycle(request: Request,
 
 @router.delete(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}/executions/{{execution_key}}",
                tags=[DB_COLLECTION_TCY],
-               status_code=status.HTTP_204_NO_CONTENT)
+               status_code=status.HTTP_200_OK)
 async def remove_executions_from_cycle(request: Request,
                                        test_cycle_key: str,
                                        execution_key: str):

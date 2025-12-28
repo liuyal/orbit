@@ -39,7 +39,7 @@ async def root_api(request: Request):
 
 
 @router.post(f"/api/{API_VERSION}/tm/reset", tags=["root"])
-async def reset_server(request: Request):
+async def reset_tm_server(request: Request):
     """ Root endpoint to reset server. """
 
     db = request.app.state.db

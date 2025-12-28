@@ -34,6 +34,13 @@ def pytest_addoption(parser):
         help='Protocol to connect to the backend server'
     )
     parser.addoption(
+        '--generate',
+        dest='generate',
+        action="store_true",
+        default=False,
+        help='Generate data in db at end of tests'
+    )
+    parser.addoption(
         '--loglevel',
         dest='loglevel',
         default='INFO',
@@ -49,6 +56,7 @@ def pytest_configure(config):
     option_names = ['host',
                     'port',
                     'protocol',
+                    'generate',
                     'loglevel',]
 
     pytest.options = {opt: config.getoption(opt, None) for opt in option_names}
