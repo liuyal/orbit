@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -322,6 +323,17 @@ import { Observable } from 'rxjs';
       color: #e0e0e0;
       font-size: 15px;
     }
+    .project-key-link {
+      color: #4da6ff;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: bold;
+      transition: color 0.2s;
+    }
+    .project-key-link:hover {
+      color: #0057adff;
+      text-decoration: underline;
+    }
     .prj-table td:last-child {
       text-align: right;
       width: 200px;
@@ -401,6 +413,37 @@ import { Observable } from 'rxjs';
       background-color: #c82333;
       transform: translateY(-1px);
     }
+    .loading-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 100px;
+      color: #999;
+    }
+    .spinner {
+      border: 4px solid #333;
+      border-top: 4px solid #0057adff;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-right: 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .empty-state {
+      text-align: center;
+      padding: 100px;
+      color: #999;
+      font-size: 16px;
+    }
+    .empty-state i {
+      font-size: 64px;
+      color: #444;
+      margin-bottom: 20px;
+    }
   `],
   template: `
     <nav class="navbar">
@@ -408,27 +451,9 @@ import { Observable } from 'rxjs';
         <i class="fa-solid fa-rocket"></i>
         <span>ORBIT</span>
       </div>
-      <!-- <div class="navbar-menu">
-        <a href="/projects" class="nav-link active">
-          <i class="fa-solid fa-folder-open"></i>
-          Projects
-        </a>
-        <a href="#" class="nav-link">
-          <i class="fa-solid fa-flask"></i>
-          Test Cases
-        </a>
-        <a href="#" class="nav-link">
-          <i class="fa-solid fa-rotate"></i>
-          Test Cycles
-        </a>
-        <a href="#" class="nav-link">
-          <i class="fa-solid fa-play"></i>
-          Executions
-        </a>
-      </div> -->
     </nav>
 
-    <div style="margin: 50px;">
+    <div style="margin: 40px;">
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
         <button class="prj-refresh-btn" (click)="refresh()">
           <i class="fa-solid fa-arrows-rotate"></i>
@@ -438,7 +463,18 @@ import { Observable } from 'rxjs';
         </button>
       </div>
 
-      @if (data$ | async; as data) {
+      @if (isLoading) {
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <span>Loading Projects...</span>
+        </div>
+      } @else if (projects.length === 0) {
+        <div class="empty-state">
+          <i class="fa-solid fa-folder-open"></i>
+          <p>No projects found</p>
+          <p style="font-size: 14px; margin-top: 10px;">Click the + button to create your first project</p>
+        </div>
+      } @else {
         <table class="prj-table">
           <thead>
             <tr>
@@ -449,9 +485,13 @@ import { Observable } from 'rxjs';
             </tr>
           </thead>
           <tbody>
-            @for (item of data; track item.project_key) {
+            @for (item of projects; track item.project_key) {
               <tr>
-                <td><strong>{{ item.project_key }}</strong></td>
+                <td>
+                  <span class="project-key-link" (click)="navigateToTestCases(item.project_key)">
+                    {{ item.project_key }}
+                  </span>
+                </td>
                 <td>{{ item.description }}</td>
                 <td>
                   @if (item.is_active == true ) {
@@ -482,7 +522,7 @@ import { Observable } from 'rxjs';
             }
           </tbody>
         </table>
-      } @else {}
+      }
     </div>
 
     <!-- Create Project Modal -->
@@ -627,7 +667,9 @@ import { Observable } from 'rxjs';
 export class Project {
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
-  data$: Observable<any[]> = this.http.get<any[]>('/api/projects');
+  router = inject(Router);
+  projects: any[] = [];
+  isLoading = true;
   showCreateModal = false;
   showEditModal = false;
   newProject = {
@@ -646,9 +688,30 @@ export class Project {
   };
   apiError = '';
 
+  ngOnInit() {
+    this.loadProjects();
+  }
+
+  loadProjects() {
+    this.isLoading = true;
+    this.http.get<any[]>('/api/projects').subscribe({
+      next: (data) => {
+        this.projects = data;
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error loading projects:', error);
+        this.projects = [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   refresh() {
     console.log('Refresh project clicked');
-    this.data$ = this.http.get<any[]>('/api/projects');
+    this.loadProjects();
   }
 
   create() {
@@ -702,7 +765,7 @@ export class Project {
       next: (response) => {
         console.log('Project created successfully:', response);
         this.closeModal();
-        window.location.reload();
+        this.loadProjects();
       },
       error: (error) => {
         console.error('Error creating project:', error);
@@ -782,7 +845,7 @@ export class Project {
       next: (response) => {
         console.log('Project updated successfully:', response);
         this.closeEditModal();
-        window.location.reload();
+        this.loadProjects();
       },
       error: (error) => {
         console.error('Error updating project:', error);
@@ -815,27 +878,22 @@ export class Project {
   deleteProject(project: any) {
     if (confirm(`Are you sure you want to delete project "${project.project_key}"?`)) {
       const url = `/api/projects/${project.project_key}`;
-      console.log('=== DELETE REQUEST INFO ===');
-      console.log('Project object:', JSON.stringify(project, null, 2));
-      console.log('Project key:', project.project_key);
-      console.log('Delete URL:', url);
-      
       this.http.delete(url, { body: { "force": true } }).subscribe({
         next: (response) => {
           console.log('Project deleted successfully:', response);
-          window.location.reload();
+          this.loadProjects();
         },
         error: (error) => {
           console.error('=== DELETE ERROR ===');
-          console.error('Full error object:', error);
-          console.error('Status:', error.status);
-          console.error('Status text:', error.statusText);
-          console.error('URL that failed:', error.url);
-          console.error('Error message:', error.message);
-          console.error('Error body:', error.error);
+          console.error('Error object:', error);
           alert(`Failed to delete project.\nStatus: ${error.status}\nURL: ${error.url}\nMessage: ${error.message || error.statusText}`);
         }
       });
     }
+  }
+
+  navigateToTestCases(projectKey: string) {
+    console.log('Navigating to test cases for project:', projectKey);
+    this.router.navigate(['/test-cases', projectKey]);
   }
 }
