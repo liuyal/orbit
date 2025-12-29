@@ -1,10 +1,12 @@
 services:
   frontend-app:
     build:
-      context: .
-      dockerfile: Dockerfile_frontend
+      context: ..
+      dockerfile: docker/Dockerfile_frontend
     image: frontend-app:latest
     container_name: frontend-app
+    depends_on:
+      - backend-app
     ports:
       - "80:80"
   backend-app:
