@@ -24,8 +24,8 @@ def build_parser():
     parser.add_argument(
         '-p', '--port',
         dest='port',
-        default=8000,
-        help='Set server listening port (default: 8000)'
+        default=5000,
+        help='Set server listening port (default: 5000)'
     )
     parser.add_argument(
         '--db',

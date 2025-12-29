@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://mushi:8000/api/v1/tm/",
+    "target": "http://mushi:5000/api/v1/tm/",
     "secure": false,
     "pathRewrite": {
       "^/api": ""
