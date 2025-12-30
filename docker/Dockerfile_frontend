@@ -1,6 +1,7 @@
 # Stage 1: Build the Angular application
 FROM node:alpine AS build
 
+# Maintainer information
 LABEL maintainer="jerry"
 WORKDIR /app
 

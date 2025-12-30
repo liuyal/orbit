@@ -1,0 +1,43 @@
+# Dockerfile for Apache server with additional tools
+FROM httpd:latest
+
+# Maintainer information
+LABEL maintainer="jerry"
+WORKDIR /usr/local/apache2/
+
+# Install additional tools
+RUN apt-get update && \
+    apt-get install -y \
+    curl  \
+    python3  \
+    net-tools  \
+    vim \
+    git && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Apache Directory Listing
+RUN cd /tmp && \
+    git clone https://github.com/ramlmn/Apache-Directory-Listing.git && \
+    cp -r Apache-Directory-Listing/directory-listing /usr/local/apache2/htdocs/ && \
+    cp Apache-Directory-Listing/htaccess.txt /usr/local/apache2/htdocs/.htaccess && \
+    sed -i 's/{LISTING_DIRECTORY}/\/directory-listing/g' /usr/local/apache2/htdocs/.htaccess && \
+    sed -i 's/{LISTING_STYLE}/table-darkmode/g' /usr/local/apache2/htdocs/.htaccess && \
+    rm -rf /tmp/Apache-Directory-Listing
+
+# Enable .htaccess support
+RUN sed -i '/<Directory "\/usr\/local\/apache2\/htdocs">/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /usr/local/apache2/conf/httpd.conf && \
+    sed -i 's/#LoadModule rewrite_module/LoadModule rewrite_module/' /usr/local/apache2/conf/httpd.conf
+
+# Remove default index.html and create custom redirect
+RUN rm -f /usr/local/apache2/htdocs/index.html && \
+    echo '<!DOCTYPE html>' > /usr/local/apache2/htdocs/index.html && \
+    echo '<html lang="en">' >> /usr/local/apache2/htdocs/index.html && \
+    echo '<head>' >> /usr/local/apache2/htdocs/index.html && \
+    echo '    <meta charset="UTF-8">' >> /usr/local/apache2/htdocs/index.html && \
+    echo '    <meta http-equiv="refresh" content="0; url=http://localhost:80">' >> /usr/local/apache2/htdocs/index.html && \
+    echo '    <title>Redirecting...</title>' >> /usr/local/apache2/htdocs/index.html && \
+    echo '</head>' >> /usr/local/apache2/htdocs/index.html && \
+    echo '<body>' >> /usr/local/apache2/htdocs/index.html && \
+    echo '    <p>Redirecting to port 80...</p>' >> /usr/local/apache2/htdocs/index.html && \
+    echo '</body>' >> /usr/local/apache2/htdocs/index.html && \
+    echo '</html>' >> /usr/local/apache2/htdocs/index.html

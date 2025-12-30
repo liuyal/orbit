@@ -31,3 +31,17 @@ services:
       - "27017:27017"
     #volumes:
     #  - ./data:/data/db
+  fileserver-app:
+    build:
+      context: .
+      dockerfile: Dockerfile_apache
+    image: apache-app:latest
+    container_name: apache-app
+    volumes:
+      - type: bind
+        source: ..
+        target: /usr/local/apache2/htdocs/files
+        # source: /datadrive/sftp_user/tm4j_solar
+        # target: /usr/local/apache2/htdocs/tm4j_solar
+    ports:
+      - "8080:80"
