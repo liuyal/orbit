@@ -1,13 +1,4 @@
-<nav class="navbar">
-  <a class="navbar-brand" routerLink="/">
-    <i class="fa-solid fa-rocket"></i>
-    <span>ORBIT</span>
-  </a>
-  <button class="back-button" (click)="goBack()">
-    <i class="fa-solid fa-arrow-left"></i>
-    Back to Projects
-  </button>
-</nav>
+<app-navbar [showBackButton]="true" [backButtonText]="'Back to Projects'" [backButtonAction]="goBack.bind(this)"></app-navbar>
 
 <div class="content">
   <div class="tabs-container">

@@ -2,12 +2,13 @@ import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
+import { NavbarComponent } from './navbar/navbar';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, NavbarComponent],
   styleUrls: ['./projects.css'],
   templateUrl: './projects.html'
 })
@@ -60,7 +61,7 @@ export class Project {
         this.cdr.detectChanges();
       }
     });
-    
+
     // Add a safety timeout to prevent infinite loading
     setTimeout(() => {
       if (this.isLoading) {
@@ -132,10 +133,10 @@ export class Project {
       error: (error) => {
         console.error('Error creating project:', error);
         console.log('Error object:', JSON.stringify(error, null, 2));
-        
+
         // Extract error message from API response
         let errorMessage = 'Failed to create project. Please try again.';
-        
+
         if (error.error) {
           // If error.error is a string, use it directly
           if (typeof error.error === 'string') {
@@ -143,8 +144,8 @@ export class Project {
           }
           // If error.error is an object, try to extract the message
           else if (typeof error.error === 'object') {
-            errorMessage = error.error.message 
-              || error.error.detail 
+            errorMessage = error.error.message
+              || error.error.detail
               || error.error.error
               || JSON.stringify(error.error);
           }
@@ -196,7 +197,7 @@ export class Project {
 
     console.log('Submitting edited project:', this.editProjectData);
     const url = `/api/tm/projects/${this.editProjectData.project_key}`;
-    
+
     // Prepare the update payload (only description and is_active)
     const updatePayload = {
       description: this.editProjectData.description,
@@ -212,17 +213,17 @@ export class Project {
       error: (error) => {
         console.error('Error updating project:', error);
         console.log('Error object:', JSON.stringify(error, null, 2));
-        
+
         // Extract error message from API response
         let errorMessage = 'Failed to update project. Please try again.';
-        
+
         if (error.error) {
           if (typeof error.error === 'string') {
             errorMessage = error.error;
           }
           else if (typeof error.error === 'object') {
-            errorMessage = error.error.message 
-              || error.error.detail 
+            errorMessage = error.error.message
+              || error.error.detail
               || error.error.error
               || JSON.stringify(error.error);
           }
