@@ -24,9 +24,22 @@ RUN cd /tmp && \
     sed -i 's/{LISTING_STYLE}/table-darkmode/g' /usr/local/apache2/htdocs/.htaccess && \
     rm -rf /tmp/Apache-Directory-Listing
 
-# Enable .htaccess support
+# Enable .htaccess support and SSL
 RUN sed -i '/<Directory "\/usr\/local\/apache2\/htdocs">/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /usr/local/apache2/conf/httpd.conf && \
-    sed -i 's/#LoadModule rewrite_module/LoadModule rewrite_module/' /usr/local/apache2/conf/httpd.conf
+    sed -i 's/#LoadModule rewrite_module/LoadModule rewrite_module/' /usr/local/apache2/conf/httpd.conf && \
+    sed -i 's/#LoadModule ssl_module/LoadModule ssl_module/' /usr/local/apache2/conf/httpd.conf && \
+    sed -i 's/#LoadModule socache_shmcb_module/LoadModule socache_shmcb_module/' /usr/local/apache2/conf/httpd.conf && \
+    sed -i 's/#Include conf\/extra\/httpd-ssl.conf/Include conf\/extra\/httpd-ssl.conf/' /usr/local/apache2/conf/httpd.conf
+
+# Copy SSL certificates
+COPY ssl/nginx.crt /usr/local/apache2/conf/server.crt
+COPY ssl/nginx.key /usr/local/apache2/conf/server.key
+
+# Configure SSL in httpd-ssl.conf
+RUN sed -i 's/ServerName www.example.com:443/ServerName localhost:443/' /usr/local/apache2/conf/extra/httpd-ssl.conf && \
+    sed -i 's|SSLCertificateFile "/usr/local/apache2/conf/server.crt"|SSLCertificateFile "/usr/local/apache2/conf/server.crt"|' /usr/local/apache2/conf/extra/httpd-ssl.conf && \
+    sed -i 's|SSLCertificateKeyFile "/usr/local/apache2/conf/server.key"|SSLCertificateKeyFile "/usr/local/apache2/conf/server.key"|' /usr/local/apache2/conf/extra/httpd-ssl.conf && \
+    sed -i '/<Directory "\/usr\/local\/apache2\/htdocs">/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 # Remove default index.html and create custom redirect
 RUN rm -f /usr/local/apache2/htdocs/index.html && \
@@ -34,9 +47,12 @@ RUN rm -f /usr/local/apache2/htdocs/index.html && \
     echo '<html lang="en">' >> /usr/local/apache2/htdocs/index.html && \
     echo '<head>' >> /usr/local/apache2/htdocs/index.html && \
     echo '    <meta charset="UTF-8">' >> /usr/local/apache2/htdocs/index.html && \
-    echo '    <meta http-equiv="refresh" content="0; url=http://localhost:8080/files">' >> /usr/local/apache2/htdocs/index.html && \
+    echo '    <meta http-equiv="refresh" content="0; url=https://localhost:8443/files">' >> /usr/local/apache2/htdocs/index.html && \
     echo '    <title>Redirecting...</title>' >> /usr/local/apache2/htdocs/index.html && \
     echo '</head>' >> /usr/local/apache2/htdocs/index.html && \
     echo '<body>' >> /usr/local/apache2/htdocs/index.html && \
     echo '</body>' >> /usr/local/apache2/htdocs/index.html && \
     echo '</html>' >> /usr/local/apache2/htdocs/index.html
+
+# Expose both HTTP and HTTPS ports
+EXPOSE 80 443

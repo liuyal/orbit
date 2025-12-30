@@ -12,8 +12,8 @@ import { RouterLink } from '@angular/router';
 export class Landing {
   getFileServerUrl(): string {
     if (typeof window !== 'undefined') {
-      return `${window.location.protocol}//${window.location.hostname}:8080/files/`;
+      return `${window.location.protocol}//${window.location.hostname}:8443/files/`;
     }
-    return '//:8080/files/';
+    return '//:8443/files/';
   }
 }
