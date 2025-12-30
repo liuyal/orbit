@@ -32,7 +32,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
 
         # Check if the server is up
         response = requests.get(f"{cls.protocol}://{cls.host}:{cls.port}/")
-        assert response.status_code == 200
+        assert response.status_code == 204
 
     @classmethod
     def tearDownClass(cls):
