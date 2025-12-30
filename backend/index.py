@@ -12,7 +12,6 @@ parser = build_parser()
 args = parser.parse_args()
 
 import logging.config
-import os
 import pathlib
 from contextlib import asynccontextmanager
 
@@ -24,6 +23,7 @@ from backend.db.db import DBType
 from backend.db.mongodb import MongoClient
 from backend.db.sqlite import SqliteClient
 from backend.routes import routers
+from backend.app_def.app_def import API_VERSION
 
 logger = logging.getLogger(__name__)
 
@@ -73,6 +73,9 @@ def configure_logging_file(debug: bool = False) -> str:
 app = FastAPI(title="ORBIT",
               description="API spec for Orbit application",
               version="0.1.0",
+              docs_url=f"/api/{API_VERSION}/docs",
+              redoc_url=f"/api/{API_VERSION}/redoc",
+              openapi_url=f"/api/{API_VERSION}/openapi.json",
               debug=args.debug,
               lifespan=lifespan)
 

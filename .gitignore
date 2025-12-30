@@ -3,4 +3,5 @@
 .pytest_cache/
 **/data
 **/tmp
+**/ssl
 __pycache__
