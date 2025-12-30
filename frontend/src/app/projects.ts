@@ -694,7 +694,7 @@ export class Project {
 
   loadProjects() {
     this.isLoading = true;
-    this.http.get<any[]>('/api/projects').subscribe({
+    this.http.get<any[]>('/api/tm/projects').subscribe({
       next: (data) => {
         this.projects = data;
         this.isLoading = false;
@@ -761,7 +761,7 @@ export class Project {
 
     this.apiError = '';
     console.log('Submitting project:', this.newProject);
-    this.http.post('/api/projects', this.newProject).subscribe({
+    this.http.post('/api/tm/projects', this.newProject).subscribe({
       next: (response) => {
         console.log('Project created successfully:', response);
         this.closeModal();
@@ -833,7 +833,7 @@ export class Project {
     this.apiError = '';
 
     console.log('Submitting edited project:', this.editProjectData);
-    const url = `/api/projects/${this.editProjectData.project_key}`;
+    const url = `/api/tm/projects/${this.editProjectData.project_key}`;
     
     // Prepare the update payload (only description and is_active)
     const updatePayload = {
@@ -877,7 +877,7 @@ export class Project {
 
   deleteProject(project: any) {
     if (confirm(`Are you sure you want to delete project "${project.project_key}"?`)) {
-      const url = `/api/projects/${project.project_key}`;
+      const url = `/api/tm/projects/${project.project_key}`;
       this.http.delete(url, { body: { "force": true } }).subscribe({
         next: (response) => {
           console.log('Project deleted successfully:', response);

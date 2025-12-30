@@ -1,9 +1,9 @@
 {
   "/api": {
-    "target": "http://mushi:5000/api/v1/tm/",
+    "target": "http://localhost:5000",
     "secure": false,
     "pathRewrite": {
-      "^/api": ""
+      "^/api": "/api/v1"
     },
     "changeOrigin": true,
     "logLevel": "debug"
