@@ -17,7 +17,50 @@
   <div class="tab-content">
     @if (activeTab === 'test-cases') {
     <div>
-      <p style="color: #999;">Test cases functionality coming soon...</p>
+      @if (loading) {
+      <p style="color: #999;">Loading test cases...</p>
+      } @else if (error) {
+      <p style="color: #f44336;">{{ error }}</p>
+      } @else if (testCases.length === 0) {
+      <p style="color: #999;">No test cases found for this project.</p>
+      } @else {
+      <div class="test-cases-list">
+        <table>
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (testCase of testCases; track testCase._id) {
+            <tr>
+              <td>{{ testCase.test_case_key }}</td>
+              <td>{{ testCase.title || 'Untitled' }}</td>
+              <td>
+                <span class="status-badge" [attr.data-status]="testCase.status">
+                  {{ testCase.status || 'N/A' }}
+                </span>
+              </td>
+              <td>
+                <span class="priority-badge" [attr.data-priority]="testCase.priority">
+                  {{ testCase.priority || 'N/A' }}
+                </span>
+              </td>
+              <td>
+                <span class="result-badge" [attr.data-result]="testCase.last_result">
+                  {{ testCase.last_result || 'N/A' }}
+                </span>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
     </div>
     } @else if (activeTab === 'test-cycles') {
     <div>

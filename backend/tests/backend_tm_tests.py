@@ -260,7 +260,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert len(response.json()) == n
 
         # Generate test cases for project PRJ0
-        n = 10
+        n = 50
         project_key = "PRJ0"
         for i in range(0, n):
             payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}

@@ -17,7 +17,7 @@
 }
 
 .tabs-container {
-  margin-top: 30px;
+  margin-top: 40px;
   background-color: #1e1e1e;
   border-radius: 5px 5px 0 0;
   border-bottom: 2px solid #333;
@@ -61,4 +61,124 @@
   background-color: #1e1e1e;
   border-radius: 0 0 5px 5px;
   min-height: 400px;
+  max-height: calc(100vh - 200px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-content > div {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.test-cases-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.test-cases-list table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #2a2a2a;
+}
+
+.test-cases-list thead {
+  background-color: #333;
+}
+
+.test-cases-list th {
+  padding: 12px 15px;
+  text-align: left;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.test-cases-list td {
+  padding: 12px 15px;
+  border-top: 1px solid #333;
+  color: #e0e0e0;
+  font-size: 14px;
+}
+
+.test-cases-list tbody tr {
+  transition: background-color 0.2s;
+}
+
+.test-cases-list tbody tr:hover {
+  background-color: #333;
+  cursor: pointer;
+}
+
+.status-badge,
+.priority-badge,
+.result-badge {
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-badge[data-status="active"],
+.status-badge[data-status="Active"] {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.status-badge[data-status="draft"],
+.status-badge[data-status="Draft"] {
+  background-color: #ff9800;
+  color: #fff;
+}
+
+.status-badge[data-status="deprecated"],
+.status-badge[data-status="Deprecated"] {
+  background-color: #757575;
+  color: #fff;
+}
+
+.priority-badge[data-priority="high"],
+.priority-badge[data-priority="High"] {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.priority-badge[data-priority="medium"],
+.priority-badge[data-priority="Medium"] {
+  background-color: #ff9800;
+  color: #fff;
+}
+
+.priority-badge[data-priority="low"],
+.priority-badge[data-priority="Low"] {
+  background-color: #2196f3;
+  color: #fff;
+}
+
+.result-badge[data-result="pass"],
+.result-badge[data-result="Pass"],
+.result-badge[data-result="passed"],
+.result-badge[data-result="Passed"] {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.result-badge[data-result="fail"],
+.result-badge[data-result="Fail"],
+.result-badge[data-result="failed"],
+.result-badge[data-result="Failed"] {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.result-badge[data-result="blocked"],
+.result-badge[data-result="Blocked"] {
+  background-color: #ff9800;
+  color: #fff;
 }
