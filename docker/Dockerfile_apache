@@ -34,10 +34,9 @@ RUN rm -f /usr/local/apache2/htdocs/index.html && \
     echo '<html lang="en">' >> /usr/local/apache2/htdocs/index.html && \
     echo '<head>' >> /usr/local/apache2/htdocs/index.html && \
     echo '    <meta charset="UTF-8">' >> /usr/local/apache2/htdocs/index.html && \
-    echo '    <meta http-equiv="refresh" content="0; url=http://localhost:80">' >> /usr/local/apache2/htdocs/index.html && \
+    echo '    <meta http-equiv="refresh" content="0; url=http://localhost:8080/files">' >> /usr/local/apache2/htdocs/index.html && \
     echo '    <title>Redirecting...</title>' >> /usr/local/apache2/htdocs/index.html && \
     echo '</head>' >> /usr/local/apache2/htdocs/index.html && \
     echo '<body>' >> /usr/local/apache2/htdocs/index.html && \
-    echo '    <p>Redirecting to port 80...</p>' >> /usr/local/apache2/htdocs/index.html && \
     echo '</body>' >> /usr/local/apache2/htdocs/index.html && \
     echo '</html>' >> /usr/local/apache2/htdocs/index.html

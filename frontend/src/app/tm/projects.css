@@ -6,7 +6,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -20,6 +19,13 @@
   font-weight: 700;
   color: #ffffff;
   padding: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.navbar-brand:hover {
+  opacity: 0.8;
 }
 
 .navbar-brand i {
@@ -108,7 +114,6 @@
   min-width: 600px;
   max-width: 800px;
   width: 90%;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   color: #e0e0e0;
   border: 1px solid #333;
 }
@@ -239,7 +244,6 @@
 .btn-primary:hover {
   background-color: #004090;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 87, 173, 0.4);
 }
 
 .btn-secondary {
@@ -306,10 +310,6 @@
   background-color: white;
 }
 
-.toggle-switch input:focus + .toggle-slider {
-  box-shadow: 0 0 1px #0057adff;
-}
-
 .toggle-label {
   font-size: 15px;
   color: #e0e0e0;
@@ -322,7 +322,6 @@
   border-spacing: 0;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   background-color: #1e1e1e;
 }
 

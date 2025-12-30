@@ -2,12 +2,12 @@ import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   styleUrls: ['./projects.css'],
   templateUrl: './projects.html'
 })
@@ -53,8 +53,22 @@ export class Project {
         this.projects = [];
         this.isLoading = false;
         this.cdr.detectChanges();
+      },
+      complete: () => {
+        // Ensure loading state is cleared even if something unexpected happens
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
+    
+    // Add a safety timeout to prevent infinite loading
+    setTimeout(() => {
+      if (this.isLoading) {
+        console.warn('Loading projects timed out after 10 seconds');
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    }, 10000);
   }
 
   refresh() {

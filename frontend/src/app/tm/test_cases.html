@@ -1,8 +1,8 @@
 <nav class="navbar">
-  <div class="navbar-brand">
+  <a class="navbar-brand" routerLink="/">
     <i class="fa-solid fa-rocket"></i>
     <span>ORBIT</span>
-  </div>
+  </a>
   <button class="back-button" (click)="goBack()">
     <i class="fa-solid fa-arrow-left"></i>
     Back to Projects
@@ -12,17 +12,11 @@
 <div class="content">
   <div class="tabs-container">
     <div class="tabs">
-      <button 
-        class="tab" 
-        [class.active]="activeTab === 'test-cases'"
-        (click)="activeTab = 'test-cases'">
+      <button class="tab" [class.active]="activeTab === 'test-cases'" (click)="activeTab = 'test-cases'">
         <i class="fa-solid fa-flask"></i>
         Test Cases
       </button>
-      <button 
-        class="tab" 
-        [class.active]="activeTab === 'test-cycles'"
-        (click)="activeTab = 'test-cycles'">
+      <button class="tab" [class.active]="activeTab === 'test-cycles'" (click)="activeTab = 'test-cycles'">
         <i class="fa-regular fa-rectangle-list"></i>
         Test Cycles
       </button>
@@ -31,13 +25,13 @@
 
   <div class="tab-content">
     @if (activeTab === 'test-cases') {
-      <div>
-        <p style="color: #999;">Test cases functionality coming soon...</p>
-      </div>
+    <div>
+      <p style="color: #999;">Test cases functionality coming soon...</p>
+    </div>
     } @else if (activeTab === 'test-cycles') {
-      <div>
-        <p style="color: #999;">Test cycles functionality coming soon...</p>
-      </div>
+    <div>
+      <p style="color: #999;">Test cycles functionality coming soon...</p>
+    </div>
     }
   </div>
 </div>
