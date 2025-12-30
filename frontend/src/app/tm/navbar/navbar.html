@@ -1,0 +1,12 @@
+<nav class="navbar">
+  <a class="navbar-brand" routerLink="/">
+    <i class="fa-solid fa-rocket"></i>
+    <span>ORBIT</span>
+  </a>
+  @if (showBackButton) {
+    <button class="back-button" (click)="handleBackClick()">
+      <i class="fa-solid fa-arrow-left"></i>
+      {{ backButtonText }}
+    </button>
+  }
+</nav>
