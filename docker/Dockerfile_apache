@@ -31,9 +31,11 @@ RUN sed -i '/<Directory "\/usr\/local\/apache2\/htdocs">/,/<\/Directory>/ s/Allo
     sed -i 's/#LoadModule socache_shmcb_module/LoadModule socache_shmcb_module/' /usr/local/apache2/conf/httpd.conf && \
     sed -i 's/#Include conf\/extra\/httpd-ssl.conf/Include conf\/extra\/httpd-ssl.conf/' /usr/local/apache2/conf/httpd.conf
 
-# Copy SSL certificates
-COPY ssl/nginx.crt /usr/local/apache2/conf/server.crt
-COPY ssl/nginx.key /usr/local/apache2/conf/server.key
+# Generate self-signed SSL certificates
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /usr/local/apache2/conf/server.key \
+    -out /usr/local/apache2/conf/server.crt \
+    -subj "/C=US/ST=State/L=City/O=Organization/CN=localhost"
 
 # Configure SSL in httpd-ssl.conf
 RUN sed -i 's/ServerName www.example.com:443/ServerName localhost:443/' /usr/local/apache2/conf/extra/httpd-ssl.conf && \
