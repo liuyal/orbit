@@ -1,5 +1,6 @@
 .vscode/
 .idea/
+.pytest_cache/
 **/data
 **/tmp
 __pycache__
