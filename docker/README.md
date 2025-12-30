@@ -1,5 +1,4 @@
 # Container Setup
-![Alt](assets/orbit.drawio.svg)
 
 Run ssl generate scripts
 ```
