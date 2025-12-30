@@ -59,7 +59,10 @@
         },
         "serve": {
           "options": {
-            "proxyConfig": "src/proxy.conf.json"
+            "proxyConfig": "src/proxy.conf.json",
+            "ssl": true,
+            "sslCert": "../docker/ssl/nginx.crt",
+            "sslKey": "../docker/ssl/nginx.key"
           },
           "builder": "@angular/build:dev-server",
           "configurations": {

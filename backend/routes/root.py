@@ -27,15 +27,17 @@ async def root(request: Request):
     logger.debug("root endpoint DEBUG")
 
     # TODO add service status info
-    return RedirectResponse(url=f"/api/{API_VERSION}/docs")
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get(f"/api/{API_VERSION}", tags=["root"])
 async def root_api(request: Request):
     """ Root api endpoint to check service status. """
 
-    # TODO add service status info
-    return RedirectResponse(url=f"/api/{API_VERSION}/docs")
+    logger.debug(f"/api/{API_VERSION} path redirecting to docs pages")
+
+    base_url = f"{request.url.scheme}://{request.url.netloc}"
+    return RedirectResponse(url=f"{base_url}/api/{API_VERSION}/docs")
 
 
 @router.post(f"/api/{API_VERSION}/tm/reset", tags=["root"])
