@@ -13,10 +13,18 @@ export class NavbarComponent {
   @Input() showBackButton: boolean = false;
   @Input() backButtonText: string = 'Back';
   @Input() backButtonAction?: () => void;
+  @Input() showCreateButton: boolean = false;
+  @Input() createButtonAction?: () => void;
 
   handleBackClick() {
     if (this.backButtonAction) {
       this.backButtonAction();
+    }
+  }
+
+  handleCreateClick() {
+    if (this.createButtonAction) {
+      this.createButtonAction();
     }
   }
 }

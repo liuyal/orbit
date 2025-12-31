@@ -9,4 +9,9 @@
       {{ backButtonText }}
     </button>
   }
+  @if (showCreateButton) {
+    <button class="create-button" (click)="handleCreateClick()">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+  }
 </nav>

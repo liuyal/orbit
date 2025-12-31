@@ -23,8 +23,8 @@ export class TestCaseCreate implements OnInit {
     title: '',
     description: '',
     folder: '',
-    status: 'Draft',
-    priority: 'Medium',
+    status: 'DRAFT',
+    priority: 'MEDIUM',
     test_frequency: '',
     labels: '',
     links: ''
@@ -68,13 +68,41 @@ export class TestCaseCreate implements OnInit {
     this.apiError = '';
     console.log('Submitting test case:', this.newTestCase);
     
-    const payload = {
-      ...this.newTestCase,
+    const payload: any = {
       project_key: this.projectKey,
-      test_frequency: this.newTestCase.test_frequency ? this.newTestCase.test_frequency.split(',').map(s => s.trim()).filter(s => s) : null,
-      labels: this.newTestCase.labels ? this.newTestCase.labels.split(',').map(s => s.trim()).filter(s => s) : null,
-      links: this.newTestCase.links ? this.newTestCase.links.split(',').map(s => s.trim()).filter(s => s) : null
+      title: this.newTestCase.title,
+      description: this.newTestCase.description,
+      folder: this.newTestCase.folder,
+      status: this.newTestCase.status,
+      priority: this.newTestCase.priority
     };
+
+    // Only include test_case_key if it has a value
+    if (this.newTestCase.test_case_key && this.newTestCase.test_case_key.trim()) {
+      payload.test_case_key = this.newTestCase.test_case_key;
+    }
+
+    // Only include test_frequency, labels, and links if they have values
+    if (this.newTestCase.test_frequency && this.newTestCase.test_frequency.trim()) {
+      const freqArray = this.newTestCase.test_frequency.split(',').map(s => s.trim()).filter(s => s);
+      if (freqArray.length > 0) {
+        payload.test_frequency = freqArray;
+      }
+    }
+
+    if (this.newTestCase.labels && this.newTestCase.labels.trim()) {
+      const labelsArray = this.newTestCase.labels.split(',').map(s => s.trim()).filter(s => s);
+      if (labelsArray.length > 0) {
+        payload.labels = labelsArray;
+      }
+    }
+
+    if (this.newTestCase.links && this.newTestCase.links.trim()) {
+      const linksArray = this.newTestCase.links.split(',').map(s => s.trim()).filter(s => s);
+      if (linksArray.length > 0) {
+        payload.links = linksArray;
+      }
+    }
 
     this.http.post(`/api/tm/projects/${this.projectKey}/test-cases`, payload).subscribe({
       next: (response) => {

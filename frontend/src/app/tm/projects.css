@@ -322,6 +322,7 @@
   letter-spacing: 0.5px;
   text-transform: uppercase;
   border-bottom: 2px solid #004090;
+  width: 33.33%;
 }
 
 .prj-table th:last-child {

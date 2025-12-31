@@ -12,6 +12,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  gap: 15px;
 }
 
 .navbar-brand {
@@ -53,4 +54,27 @@
 .back-button:hover {
   background-color: #0057adff;
   color: white;
+}
+
+.create-button {
+  background-color: #28a745;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+
+.create-button:hover {
+  background-color: #218838;
+}
+
+.create-button i {
+  font-size: 16px;
 }

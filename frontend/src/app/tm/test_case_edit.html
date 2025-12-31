@@ -2,6 +2,11 @@
     [backButtonAction]="goBack.bind(this)"></app-navbar>
 
 <div class="content">
+    @if (loading) {
+    <div class="loading-container">
+        <div class="spinner"></div>
+    </div>
+    } @else {
     <div class="form-container">
         <form (ngSubmit)="submitTestCase()">
             @if (apiError) {
@@ -11,20 +16,17 @@
             }
 
             <div class="page-header">
-                <h1>Create New Test Case</h1>
+                <h1>Edit Test Case</h1>
             </div>
             <hr>
             <div class="form-group">
                 <label for="test_case_key">Test Case Key</label>
-                <input type="text" id="test_case_key" [(ngModel)]="newTestCase.test_case_key" name="test_case_key"
-                    placeholder="Enter test case key" required [class.error]="errors.test_case_key" />
-                @if (errors.test_case_key) {
-                <span class="error-message">{{ errors.test_case_key }}</span>
-                }
+                <input type="text" id="test_case_key" [(ngModel)]="testCase.test_case_key" name="test_case_key"
+                    disabled />
             </div>
             <div class="form-group">
                 <label for="title">Title</label>
-                <input type="text" id="title" [(ngModel)]="newTestCase.title" name="title"
+                <input type="text" id="title" [(ngModel)]="testCase.title" name="title"
                     placeholder="Enter test case title" required [class.error]="errors.title" />
                 @if (errors.title) {
                 <span class="error-message">{{ errors.title }}</span>
@@ -32,17 +34,17 @@
             </div>
             <div class="form-group">
                 <label for="description">Description</label>
-                <textarea id="description" [(ngModel)]="newTestCase.description" name="description"
+                <textarea id="description" [(ngModel)]="testCase.description" name="description"
                     placeholder="Enter test case description" rows="4"></textarea>
             </div>
             <div class="form-group">
                 <label for="folder">Folder</label>
-                <input type="text" id="folder" [(ngModel)]="newTestCase.folder" name="folder"
+                <input type="text" id="folder" [(ngModel)]="testCase.folder" name="folder"
                     placeholder="Enter folder path" />
             </div>
             <div class="form-group">
                 <label for="status">Status</label>
-                <select id="status" [(ngModel)]="newTestCase.status" name="status">
+                <select id="status" [(ngModel)]="testCase.status" name="status">
                     <option value="DRAFT">DRAFT</option>
                     <option value="APPROVED">APPROVED</option>
                     <option value="DEPRECATED">DEPRECATED</option>
@@ -50,7 +52,7 @@
             </div>
             <div class="form-group">
                 <label for="priority">Priority</label>
-                <select id="priority" [(ngModel)]="newTestCase.priority" name="priority">
+                <select id="priority" [(ngModel)]="testCase.priority" name="priority">
                     <option value="LOW">LOW</option>
                     <option value="MEDIUM">MEDIUM</option>
                     <option value="HIGH">HIGH</option>
@@ -58,23 +60,24 @@
             </div>
             <div class="form-group">
                 <label for="test_frequency">Test Frequency</label>
-                <input type="text" id="test_frequency" [(ngModel)]="newTestCase.test_frequency" name="test_frequency"
-                    placeholder="Enter frequencies" />
+                <input type="text" id="test_frequency" [(ngModel)]="testCase.test_frequency" name="test_frequency"
+                    placeholder="Enter frequencies separated by commas (e.g., Daily, Weekly)" />
             </div>
             <div class="form-group">
                 <label for="labels">Labels</label>
-                <input type="text" id="labels" [(ngModel)]="newTestCase.labels" name="labels"
-                    placeholder="Enter labels" />
+                <input type="text" id="labels" [(ngModel)]="testCase.labels" name="labels"
+                    placeholder="Enter labels separated by commas" />
             </div>
             <div class="form-group">
                 <label for="links">Links</label>
-                <input type="text" id="links" [(ngModel)]="newTestCase.links" name="links"
-                    placeholder="Enter links" />
+                <input type="text" id="links" [(ngModel)]="testCase.links" name="links"
+                    placeholder="Enter links separated by commas" />
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create</button>
+                <button type="submit" class="btn btn-primary">Update</button>
             </div>
         </form>
     </div>
+    }
 </div>

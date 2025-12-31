@@ -80,8 +80,7 @@ export class TestCases implements OnInit {
   }
 
   editTestCase(testCase: TestCase) {
-    console.log('Edit test case:', testCase);
-    // TODO: Implement edit functionality
+    this.router.navigate(['/test-cases', this.projectKey, 'edit', testCase.test_case_key]);
   }
 
   createTestCase() {

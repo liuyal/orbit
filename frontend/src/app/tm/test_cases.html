@@ -40,7 +40,7 @@
           </thead>
           <tbody>
             @for (testCase of testCases; track testCase._id) {
-            <tr>
+            <tr (click)="editTestCase(testCase)">
               <td>{{ testCase.test_case_key }}</td>
               <td>{{ testCase.title || 'Untitled' }}</td>
               <td>
@@ -60,10 +60,10 @@
               </td>
               <td>
                 <div class="action-buttons">
-                  <button class="action-btn edit" (click)="editTestCase(testCase)">
+                  <button class="action-btn edit" (click)="$event.stopPropagation(); editTestCase(testCase)">
                     <i class="fa-solid fa-pen-to-square"></i>
                   </button>
-                  <button class="action-btn delete" (click)="deleteTestCase(testCase)">
+                  <button class="action-btn delete" (click)="$event.stopPropagation(); deleteTestCase(testCase)">
                     <i class="fa-solid fa-trash"></i>
                   </button>
                 </div>

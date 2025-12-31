@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+<app-navbar [showCreateButton]="true" [createButtonAction]="create.bind(this)"></app-navbar>
 
 <div class="projects-container">
   @if (isLoading) {
@@ -20,11 +20,7 @@
             <th>PROJECT</th>
             <th>DESCRIPTION</th>
             <th>STATUS</th>
-            <th>
-              <button class="prj-create-btn" (click)="create()">
-                <i class="fa-solid fa-plus"></i>
-              </button>
-            </th>
+            <th></th>
 
         </tr>
       </thead>
