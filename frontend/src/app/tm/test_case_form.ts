@@ -1,0 +1,191 @@
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { NavbarComponent } from './navbar/navbar';
+import { TestCaseForm } from './test_cases';
+
+@Component({
+  selector: 'test-case-form',
+  standalone: true,
+  imports: [CommonModule, FormsModule, NavbarComponent],
+  styleUrls: ['./test_case_form.css'],
+  templateUrl: './test_case_form.html'
+})
+
+export class TestCaseFormComponent implements OnInit {
+  route = inject(ActivatedRoute);
+  router = inject(Router);
+  http = inject(HttpClient);
+  cdr = inject(ChangeDetectorRef);
+  
+  projectKey = '';
+  testCaseKey = '';
+  isEditMode = false;
+  loading = false;
+  activeTab: 'details' | 'script' | 'links' = 'details';
+  
+  testCase: TestCaseForm = {
+    test_case_key: '',
+    title: '',
+    description: '',
+    test_script: '',
+    folder: '',
+    status: 'DRAFT',
+    priority: 'MEDIUM',
+    test_frequency: '',
+    labels: '',
+    links: ''
+  };
+  
+  apiError = '';
+  errors = {
+    test_case_key: '',
+    title: ''
+  };
+
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      this.projectKey = params['projectKey'];
+      this.testCaseKey = params['testCaseKey'];
+      this.isEditMode = !!this.testCaseKey;
+      
+      if (this.isEditMode) {
+        console.log('Edit mode - test case:', this.testCaseKey, 'for project:', this.projectKey);
+        this.loadTestCase();
+      } else {
+        console.log('Create mode - project:', this.projectKey);
+      }
+    });
+  }
+
+  loadTestCase() {
+    this.loading = true;
+    const url = `/api/tm/projects/${this.projectKey}/test-cases/${this.testCaseKey}`;
+    console.log('Loading test case from URL:', url);
+    
+    this.http.get<any>(url).subscribe({
+      next: (data) => {
+        console.log('Test case loaded:', data);
+        try {
+          this.testCase.test_case_key = data.test_case_key || '';
+          this.testCase.title = data.title || '';
+          this.testCase.description = data.description || '';
+          this.testCase.test_script = data.test_script || '';
+          this.testCase.folder = data.folder || '';
+          this.testCase.status = data.status || 'DRAFT';
+          this.testCase.priority = data.priority || 'MEDIUM';
+          this.testCase.test_frequency = (data.test_frequency && Array.isArray(data.test_frequency)) ? data.test_frequency.join(', ') : '';
+          this.testCase.labels = (data.labels && Array.isArray(data.labels)) ? data.labels.join(', ') : '';
+          this.testCase.links = (data.links && Array.isArray(data.links)) ? data.links.join(', ') : '';
+          console.log('Test case data processed successfully');
+        } catch (error) {
+          console.error('Error processing test case data:', error);
+          this.apiError = 'Error processing test case data';
+        } finally {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error('Error loading test case:', err);
+        this.apiError = `Failed to load test case: ${err.status} ${err.statusText || err.message}`;
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  goBack() {
+    this.router.navigate(['/test-cases', this.projectKey]);
+  }
+
+  cancel() {
+    this.router.navigate(['/test-cases', this.projectKey]);
+  }
+
+  validateForm(): boolean {
+    this.errors = {
+      test_case_key: '',
+      title: ''
+    };
+    return true;
+  }
+
+  submitTestCase() {
+    if (!this.validateForm()) {
+      console.log('Validation failed');
+      return;
+    }
+
+    this.apiError = '';
+    console.log(this.isEditMode ? 'Updating test case:' : 'Creating test case:', this.testCase);
+    
+    const payload: any = {
+      title: this.testCase.title,
+      description: this.testCase.description,
+      test_script: this.testCase.test_script,
+      folder: this.testCase.folder,
+      status: this.testCase.status,
+      priority: this.testCase.priority
+    };
+
+    // For create mode, include project_key and optional test_case_key
+    if (!this.isEditMode) {
+      payload.project_key = this.projectKey;
+      if (this.testCase.test_case_key && this.testCase.test_case_key.trim()) {
+        payload.test_case_key = this.testCase.test_case_key;
+      }
+    }
+
+    // Only include test_frequency, labels, and links if they have values
+    if (this.testCase.test_frequency && this.testCase.test_frequency.trim()) {
+      const freqArray = this.testCase.test_frequency.split(',').map((s: string) => s.trim()).filter((s: string) => s);
+      if (freqArray.length > 0) {
+        payload.test_frequency = freqArray;
+      }
+    }
+
+    if (this.testCase.labels && this.testCase.labels.trim()) {
+      const labelsArray = this.testCase.labels.split(',').map((s: string) => s.trim()).filter((s: string) => s);
+      if (labelsArray.length > 0) {
+        payload.labels = labelsArray;
+      }
+    }
+
+    if (this.testCase.links && this.testCase.links.trim()) {
+      const linksArray = this.testCase.links.split(',').map((s: string) => s.trim()).filter((s: string) => s);
+      if (linksArray.length > 0) {
+        payload.links = linksArray;
+      }
+    }
+
+    // Use POST for create, PUT for edit
+    const request = this.isEditMode
+      ? this.http.put(`/api/tm/projects/${this.projectKey}/test-cases/${this.testCaseKey}`, payload)
+      : this.http.post(`/api/tm/projects/${this.projectKey}/test-cases`, payload);
+
+    request.subscribe({
+      next: (response) => {
+        console.log(`Test case ${this.isEditMode ? 'updated' : 'created'} successfully:`, response);
+        this.router.navigate(['/test-cases', this.projectKey]);
+      },
+      error: (error) => {
+        console.error(`Error ${this.isEditMode ? 'updating' : 'creating'} test case:`, error);
+        let errorMessage = `Failed to ${this.isEditMode ? 'update' : 'create'} test case. Please try again.`;
+        if (error.error) {
+          if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (typeof error.error === 'object') {
+            errorMessage = error.error.message
+              || error.error.detail
+              || error.error.error
+              || JSON.stringify(error.error);
+          }
+        }
+        this.apiError = errorMessage;
+      }
+    });
+  }
+}

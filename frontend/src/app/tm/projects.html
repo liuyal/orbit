@@ -26,9 +26,9 @@
       </thead>
       <tbody>
         @for (item of projects; track item.project_key) {
-          <tr>
+          <tr (mousedown)="onProjectClick($event, item.project_key)" class="clickable-row">
             <td>
-              <span class="project-key-link" (mousedown)="onProjectClick($event, item.project_key)">
+              <span class="project-key-link">
                 {{ item.project_key }}
               </span>
             </td>
