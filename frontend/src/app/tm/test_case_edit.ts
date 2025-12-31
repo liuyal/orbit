@@ -4,6 +4,20 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from './navbar/navbar';
+import { TestCase } from './test_cases';
+
+interface TestCaseForm {
+  test_case_key: string;
+  title: string;
+  description: string;
+  test_script: string;
+  folder: string;
+  status: string;
+  priority: string;
+  test_frequency: string;
+  labels: string;
+  links: string;
+}
 
 @Component({
   selector: 'test-case-edit',
@@ -21,10 +35,11 @@ export class TestCaseEdit implements OnInit {
   projectKey = '';
   testCaseKey = '';
   loading = true;
-  testCase = {
+  testCase: TestCaseForm = {
     test_case_key: '',
     title: '',
     description: '',
+    test_script: '',
     folder: '',
     status: 'DRAFT',
     priority: 'MEDIUM',
@@ -58,6 +73,7 @@ export class TestCaseEdit implements OnInit {
             this.testCase.test_case_key = data.test_case_key || '';
             this.testCase.title = data.title || '';
             this.testCase.description = data.description || '';
+            this.testCase.test_script = data.test_script || '';
             this.testCase.folder = data.folder || '';
             this.testCase.status = data.status || 'DRAFT';
             this.testCase.priority = data.priority || 'MEDIUM';
@@ -110,6 +126,7 @@ export class TestCaseEdit implements OnInit {
     const payload: any = {
       title: this.testCase.title,
       description: this.testCase.description,
+      test_script: this.testCase.test_script,
       folder: this.testCase.folder,
       status: this.testCase.status,
       priority: this.testCase.priority

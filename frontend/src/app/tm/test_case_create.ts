@@ -4,6 +4,20 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from './navbar/navbar';
+import { TestCase } from './test_cases';
+
+interface TestCaseForm {
+  test_case_key: string;
+  title: string;
+  description: string;
+  test_script: string;
+  folder: string;
+  status: string;
+  priority: string;
+  test_frequency: string;
+  labels: string;
+  links: string;
+}
 
 @Component({
   selector: 'test-case-create',
@@ -18,10 +32,11 @@ export class TestCaseCreate implements OnInit {
   router = inject(Router);
   http = inject(HttpClient);
   projectKey = '';
-  newTestCase = {
+  newTestCase: TestCaseForm = {
     test_case_key: '',
     title: '',
     description: '',
+    test_script: '',
     folder: '',
     status: 'DRAFT',
     priority: 'MEDIUM',
@@ -72,6 +87,7 @@ export class TestCaseCreate implements OnInit {
       project_key: this.projectKey,
       title: this.newTestCase.title,
       description: this.newTestCase.description,
+      test_script: this.newTestCase.test_script,
       folder: this.newTestCase.folder,
       status: this.newTestCase.status,
       priority: this.newTestCase.priority

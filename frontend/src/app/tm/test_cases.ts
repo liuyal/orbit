@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NavbarComponent } from './navbar/navbar';
 
-interface TestCase {
+export interface TestCase {
   _id: string;
   test_case_key: string;
   project_key: string;

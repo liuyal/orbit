@@ -24,16 +24,6 @@
   font-family: 'Kanit', sans-serif;
 }
 
-.subtitle {
-  font-size: 1.5rem;
-  margin: 0 0 2rem 0;
-  opacity: 0.95;
-}
-
-.cta-buttons {
-  margin-top: 2rem;
-}
-
 .features-section {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -68,11 +58,4 @@
   font-size: 1.25rem;
   margin: 0 0 0 0;
   font-family: 'Kanit', sans-serif;
-}
-
-.feature-card p {
-  color: #666;
-  font-size: 1rem;
-  line-height: 1;
-  margin: 0;
 }

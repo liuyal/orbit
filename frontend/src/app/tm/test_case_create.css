@@ -15,11 +15,6 @@
   font-size: 24px;
 }
 
-.project-info {
-  font-size: 16px;
-  color: #999;
-}
-
 .form-container {
   background-color: #1e1e1e;
   padding: 30px;
@@ -32,6 +27,9 @@
    FORMS
    ======================================== */
 
+.form-group {
+  margin-bottom: 20px;
+}
 
 .form-group label {
   display: block;
@@ -109,7 +107,7 @@
   font-size: 15px;
   font-weight: 500;
   transition: all 0.2s;
-  min-width: 120px;
+  width: 120px;
 }
 
 .btn-primary {

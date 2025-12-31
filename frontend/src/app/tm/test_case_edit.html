@@ -38,6 +38,11 @@
                     placeholder="Enter test case description" rows="4"></textarea>
             </div>
             <div class="form-group">
+                <label for="test_script">Test Script</label>
+                <textarea id="test_script" [(ngModel)]="testCase.test_script" name="test_script"
+                    placeholder="Enter test script steps" rows="6"></textarea>
+            </div>
+            <div class="form-group">
                 <label for="folder">Folder</label>
                 <input type="text" id="folder" [(ngModel)]="testCase.folder" name="folder"
                     placeholder="Enter folder path" />
@@ -61,17 +66,17 @@
             <div class="form-group">
                 <label for="test_frequency">Test Frequency</label>
                 <input type="text" id="test_frequency" [(ngModel)]="testCase.test_frequency" name="test_frequency"
-                    placeholder="Enter frequencies separated by commas (e.g., Daily, Weekly)" />
+                    placeholder="Enter frequencies" />
             </div>
             <div class="form-group">
                 <label for="labels">Labels</label>
                 <input type="text" id="labels" [(ngModel)]="testCase.labels" name="labels"
-                    placeholder="Enter labels separated by commas" />
+                    placeholder="Enter labels" />
             </div>
             <div class="form-group">
                 <label for="links">Links</label>
                 <input type="text" id="links" [(ngModel)]="testCase.links" name="links"
-                    placeholder="Enter links separated by commas" />
+                    placeholder="Enter links" />
             </div>
             <div class="form-actions">
                 <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
