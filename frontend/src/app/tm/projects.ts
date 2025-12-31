@@ -72,11 +72,6 @@ export class Project {
     }, 10000);
   }
 
-  refresh() {
-    console.log('Refresh project clicked');
-    this.loadProjects();
-  }
-
   create() {
     console.log('Create project clicked');
     this.showCreateModal = true;
@@ -258,5 +253,17 @@ export class Project {
   navigateToTestCases(projectKey: string) {
     console.log('Navigating to test cases for project:', projectKey);
     this.router.navigate(['/test-cases', projectKey]);
+  }
+
+  onProjectClick(event: MouseEvent, projectKey: string) {
+    if (event.button === 1) { // Middle mouse button
+      event.preventDefault();
+      const url = this.router.serializeUrl(
+        this.router.createUrlTree(['/test-cases', projectKey])
+      );
+      window.open(url, '_blank');
+    } else if (event.button === 0) { // Left mouse button
+      this.navigateToTestCases(projectKey);
+    }
   }
 }

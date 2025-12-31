@@ -78,4 +78,31 @@ export class TestCases implements OnInit {
   goBack() {
     this.router.navigate(['/projects']);
   }
+
+  editTestCase(testCase: TestCase) {
+    console.log('Edit test case:', testCase);
+    // TODO: Implement edit functionality
+  }
+
+  createTestCase() {
+    this.router.navigate(['/test-cases', this.projectKey, 'create']);
+  }
+
+  deleteTestCase(testCase: TestCase) {
+    if (confirm(`Are you sure you want to delete test case ${testCase.test_case_key}?`)) {
+      console.log('Delete test case:', testCase);
+      this.http.delete(`/api/tm/projects/${this.projectKey}/test-cases/${testCase.test_case_key}`)
+        .subscribe({
+          next: () => {
+            console.log('Test case deleted successfully');
+            this.loadTestCases();
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            console.error('Error deleting test case:', err);
+            alert('Failed to delete test case. Please try again.');
+          }
+        });
+    }
+  }
 }

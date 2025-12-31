@@ -1,15 +1,18 @@
 <app-navbar [showBackButton]="true" [backButtonText]="'Back to Projects'" [backButtonAction]="goBack.bind(this)"></app-navbar>
 
 <div class="content">
-  <div class="tabs-container">
-    <div class="tabs">
-      <button class="tab" [class.active]="activeTab === 'test-cases'" (click)="activeTab = 'test-cases'">
-        <i class="fa-solid fa-flask"></i>
-        Test Cases
+<div class="tabs-container">
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'test-cases'" (click)="activeTab = 'test-cases'">
+      <i class="fa-solid fa-flask"></i>
+      Test Cases
+    </button>
+    <button class="tab" [class.active]="activeTab === 'test-cycles'" (click)="activeTab = 'test-cycles'">
+      <i class="fa-regular fa-rectangle-list"></i>
+      Test Cycles
       </button>
-      <button class="tab" [class.active]="activeTab === 'test-cycles'" (click)="activeTab = 'test-cycles'">
-        <i class="fa-regular fa-rectangle-list"></i>
-        Test Cycles
+      <button class="create-btn-tab" (click)="createTestCase()">
+        <i class="fa-solid fa-plus"></i>
       </button>
     </div>
   </div>
@@ -18,7 +21,6 @@
     @if (activeTab === 'test-cases') {
     <div>
       @if (loading) {
-      <p style="color: #999;">Loading test cases...</p>
       } @else if (error) {
       <p style="color: #f44336;">{{ error }}</p>
       } @else if (testCases.length === 0) {
@@ -33,6 +35,7 @@
               <th>Status</th>
               <th>Priority</th>
               <th>Result</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -54,6 +57,16 @@
                 <span class="result-badge" [attr.data-result]="testCase.last_result">
                   {{ testCase.last_result || 'N/A' }}
                 </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button class="action-btn edit" (click)="editTestCase(testCase)">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                  <button class="action-btn delete" (click)="deleteTestCase(testCase)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
               </td>
             </tr>
             }
