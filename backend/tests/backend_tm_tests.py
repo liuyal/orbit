@@ -249,8 +249,8 @@ class OrbitBackendSanityTest(unittest.TestCase):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
         self.__class__.clean_up_db(False)
 
-        # Generate 1 project
-        n = 1
+        # Generate 50 project
+        n = 50
         for i in range(0, n):
             payload = {"project_key": f"PRJ{i}", "description": f"Project #{i}"}
             response = requests.post(f"{self.__class__.url}/projects", json=payload)
@@ -260,7 +260,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert len(response.json()) == n
 
         # Generate test cases for project PRJ0
-        n = 50
+        n = 120
         project_key = "PRJ0"
         for i in range(0, n):
             payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
@@ -271,7 +271,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert len(response.json()) == n
 
         # Generate executions for 3 test cases
-        n = 5
+        n = 25
         project_key = "PRJ0"
         test_case_key = f"{project_key}-T1"
         for i in range(0, n):

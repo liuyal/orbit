@@ -1,7 +1,7 @@
 <app-navbar></app-navbar>
 
-<div style="margin: 40px;">
-  <div style="display: flex; gap: 10px; justify-content: flex-end;">
+<div class="projects-container">
+  <div class="button-container">
     <button class="prj-refresh-btn" (click)="refresh()">
       <i class="fa-solid fa-arrows-rotate"></i>
     </button>
@@ -22,13 +22,15 @@
       <p style="font-size: 14px; margin-top: 10px;">Click the + button to create your first project</p>
     </div>
   } @else {
-    <table class="prj-table">
-      <thead>
-        <tr>
-          <th>PROJECT KEY</th>
-          <th>DESCRIPTION</th>
-          <th>STATUS</th>
-          <th></th>
+    <div class="table-wrapper">
+      <table class="prj-table">
+        <thead>
+          <tr>
+            <th>PROJECT</th>
+            <th>DESCRIPTION</th>
+            <th>STATUS</th>
+            <th></th>
+
         </tr>
       </thead>
       <tbody>
@@ -69,6 +71,7 @@
         }
       </tbody>
     </table>
+    </div>
   }
 </div>
 

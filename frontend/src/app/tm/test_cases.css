@@ -1,5 +1,9 @@
+/* ========================================
+   PAGE LAYOUT
+   ======================================== */
+
 .content {
-  margin: 40px;
+  margin: 30px;
 }
 
 .page-header {
@@ -16,19 +20,25 @@
   font-size: 20px;
 }
 
+
+/* ========================================
+   TABS
+   ======================================== */
+
 .tabs-container {
-  margin-top: 40px;
+  border-radius: 0;
   background-color: #1e1e1e;
-  border-radius: 5px 5px 0 0;
   border-bottom: 2px solid #333;
 }
 
 .tabs {
+  border-radius: 0;
   display: flex;
   gap: 0;
 }
 
 .tab {
+  border-radius: 0;
   padding: 15px 30px;
   background-color: #1e1e1e;
   border: none;
@@ -37,7 +47,6 @@
   font-weight: 500;
   cursor: pointer;
   border-bottom: 3px solid transparent;
-  border-radius: 5px 5px 0 0;
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -45,11 +54,13 @@
 }
 
 .tab:hover {
+  border-radius: 0;
   color: #e0e0e0;
   background-color: #252525;
 }
 
 .tab.active {
+  border-radius: 0;
   color: #ffffff;
   background-color: #2a2a2a;
   border-bottom-color: #0057adff;
@@ -59,20 +70,24 @@
   padding: 30px;
   color: #e0e0e0;
   background-color: #1e1e1e;
-  border-radius: 0 0 5px 5px;
   min-height: 400px;
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 180px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.tab-content > div {
+.tab-content>div {
   display: flex;
   flex-direction: column;
   flex: 1;
   overflow: hidden;
 }
+
+
+/* ========================================
+   TEST CASES TABLE
+   ======================================== */
 
 .test-cases-list {
   overflow-y: auto;
@@ -81,39 +96,75 @@
 
 .test-cases-list table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   background-color: #2a2a2a;
 }
 
 .test-cases-list thead {
-  background-color: #333;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1e1e1e 100%);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .test-cases-list th {
-  padding: 12px 15px;
+  padding: 10px 20px;
   text-align: left;
   color: #fff;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  border-bottom: 2px solid #0057adff;
+}
+
+.test-cases-list th:first-child {
+  padding-left: 24px;
+}
+
+.test-cases-list th:last-child {
+  padding-right: 24px;
 }
 
 .test-cases-list td {
-  padding: 12px 15px;
-  border-top: 1px solid #333;
+  padding: 10px 20px;
+  border-bottom: 1px solid #333;
   color: #e0e0e0;
   font-size: 14px;
+  vertical-align: middle;
+}
+
+.test-cases-list td:first-child {
+  padding-left: 24px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.test-cases-list td:last-child {
+  padding-right: 24px;
 }
 
 .test-cases-list tbody tr {
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .test-cases-list tbody tr:hover {
   background-color: #333;
   cursor: pointer;
+  transform: scale(1.001);
+  box-shadow: 0 2px 8px rgba(0, 87, 173, 0.2);
 }
+
+.test-cases-list tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* ========================================
+   BADGES
+   ======================================== */
 
 .status-badge,
 .priority-badge,
@@ -125,6 +176,7 @@
   text-transform: uppercase;
 }
 
+/* Status Badge Variants */
 .status-badge[data-status="active"],
 .status-badge[data-status="Active"] {
   background-color: #4caf50;
@@ -143,6 +195,7 @@
   color: #fff;
 }
 
+/* Priority Badge Variants */
 .priority-badge[data-priority="high"],
 .priority-badge[data-priority="High"] {
   background-color: #f44336;
@@ -161,6 +214,7 @@
   color: #fff;
 }
 
+/* Result Badge Variants */
 .result-badge[data-result="pass"],
 .result-badge[data-result="Pass"],
 .result-badge[data-result="passed"],
