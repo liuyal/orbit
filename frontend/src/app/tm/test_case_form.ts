@@ -24,7 +24,7 @@ export class TestCaseFormComponent implements OnInit {
   testCaseKey = '';
   isEditMode = false;
   loading = false;
-  activeTab: 'details' | 'script' | 'links' = 'details';
+  activeTab: 'details' | 'script' | 'links' | 'executions' = 'details';
   
   testCase: TestCaseForm = {
     test_case_key: '',

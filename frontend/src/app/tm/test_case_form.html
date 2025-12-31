@@ -25,6 +25,12 @@
                 <i class="fa-solid fa-link"></i>
                 Links
             </button>
+            @if (isEditMode) {
+            <button type="button" class="tab" [class.active]="activeTab === 'executions'" (click)="activeTab = 'executions'">
+                <i class="fa-solid fa-list-check"></i>
+                 Executions
+            </button>
+            }
         </div>
 
         <div class="tab-content">
@@ -36,7 +42,6 @@
                         {{ apiError }}
                     </div>
                     }
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="test_case_key">Test Case Key</label>
@@ -102,28 +107,39 @@
             </div>
             } @else if (activeTab === 'script') {
             <div class="form-container">
-                <div class="form-group">
-                    <label for="test_script">Test Script</label>
-                    <textarea id="test_script" [(ngModel)]="testCase.test_script" name="test_script"
-                        placeholder="Enter test script steps" rows="15"></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-                    <button type="button" class="btn btn-primary" (click)="submitTestCase()">{{ isEditMode ? 'Update' :
-                        'Create' }}</button>
-                </div>
+                <form (ngSubmit)="submitTestCase()">
+                    <div class="form-group">
+                        <label for="test_script">Test Script</label>
+                        <textarea id="test_script" [(ngModel)]="testCase.test_script" name="test_script"
+                            placeholder="Enter test script steps" style="min-height: 520px; resize: vertical;"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" (click)="submitTestCase()">{{ isEditMode ? 'Update' :
+                            'Create' }}</button>
+                    </div>
+                </form>
             </div>
             } @else if (activeTab === 'links') {
             <div class="form-container">
-                <div class="form-group">
-                    <label for="links">Links</label>
-                    <textarea id="links" [(ngModel)]="testCase.links" name="links"
-                        placeholder="Enter links (one per line or comma separated)" rows="15"></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-                    <button type="button" class="btn btn-primary" (click)="submitTestCase()">{{ isEditMode ? 'Update' :
-                        'Create' }}</button>
+                <form (ngSubmit)="submitTestCase()">
+                    <div class="form-group">
+                        <label for="links">Links</label>
+                        <textarea id="links" [(ngModel)]="testCase.links" name="links"
+                            placeholder="Enter links (one per line or comma separated)" style="min-height: 520px; resize: vertical;"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+                        <button type="submit" class="btn btn-primary" (click)="submitTestCase()">{{ isEditMode ? 'Update' :
+                            'Create' }}</button>
+                    </div>
+                </form>
+            </div>
+            } @else if (activeTab === 'executions') {
+            <div class="form-container">
+                <div style="padding: 20px; color: #999; text-align: center;">
+                    <i class="fa-solid fa-list-check" style="font-size: 48px; margin-bottom: 20px;"></i>
+                    <p>Test execution results will be displayed here.</p>
                 </div>
             </div>
             }
