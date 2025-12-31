@@ -34,8 +34,8 @@ class TestCase(BaseModel):
 
 
 class TestCaseCreate(BaseModel):
-    test_case_key: str
-    project_key: str
+    test_case_key: str = None
+    project_key: str = None
     title: str = None
     description: str = None
     folder: str = None

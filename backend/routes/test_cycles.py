@@ -8,6 +8,7 @@
 # routes/cycles.py
 
 import json
+import re
 
 from fastapi import (
     APIRouter,
@@ -20,6 +21,7 @@ from starlette.responses import JSONResponse
 from backend.app_def.app_def import (
     DB_COLLECTION_TE,
     DB_COLLECTION_TCY,
+    TCY_KEY_PREFIX,
     API_VERSION
 )
 from backend.models.test_cycles import (
@@ -31,7 +33,7 @@ from backend.models.test_cycles import (
 from backend.routes.projects import get_project_by_key
 from backend.routes.test_executions import (
     TestExecution,
-    get_execution
+    get_execution_by_key
 )
 from backend.tools.tools import get_current_utc_time
 
@@ -70,28 +72,50 @@ async def create_cycle_for_project(request: Request,
 
     current_time = get_current_utc_time()
 
-    # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
-
     # Prepare request data
     request_data = cycle.model_dump()
-    test_cycle_key = request_data["test_cycle_key"]
 
-    # Check if test_cycle already exists
-    response = await get_cycle_by_key(request, test_cycle_key)
-    if response.status_code != status.HTTP_404_NOT_FOUND:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": f"test cycle {test_cycle_key} already exists."})
+    # Determine test_cycle_key
+    test_cycle_key = request_data.get("test_cycle_key", None)
 
-    # Validate that test_case_key starts with project_key
-    if not test_cycle_key.startswith(project_key):
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": f"test_cycle_key  {test_cycle_key} "
-                              f"does not belong to project {project_key}"})
+    if test_cycle_key is None:
+        # Auto-generate test_cycle_key
+        # get list of test cycle in project to determine next key
+        response = await get_all_cycles_for_project(request, project_key)
+        cycle = json.loads(response.body.decode())
+        if len(cycle) < 1:
+            # no test cycle exist yet, start with 1
+            last_tcy = 1
+
+        else:
+            # extract numeric part of test_cycle_key to find last number
+            key_n = [int(c["_id"].split(TCY_KEY_PREFIX)[-1]) for c in cycle]
+            last_tcy = max(key_n) + 1
+
+        test_cycle_key = f"{project_key}-{TCY_KEY_PREFIX}{last_tcy}"
+        request_data["test_cycle_key"] = test_cycle_key
+
+    else:
+        # Check project exists
+        response = await get_project_by_key(request, project_key)
+        if response.status_code == status.HTTP_404_NOT_FOUND:
+            return response
+
+        # regex check for valid test_cycle_key format
+        # Must be PRJ_KEY-C###
+        pattern = rf"^{project_key}-{TCY_KEY_PREFIX}\d+$"
+        if not re.match(pattern, test_cycle_key):
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"test cycle key '{test_cycle_key}' is not valid. "
+                                  f"Must be in format {project_key}-{TCY_KEY_PREFIX}#"})
+
+        # Check if test_cycle already exists
+        response = await get_cycle_by_key(request, test_cycle_key)
+        if response.status_code != status.HTTP_404_NOT_FOUND:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"test cycle {test_cycle_key} already exists."})
 
     # Initialize counts and timestamps
     request_data["project_key"] = project_key
@@ -222,7 +246,7 @@ async def add_execution_to_cycle(request: Request,
         return response
 
     # Check execution exists
-    response = await get_execution(request, execution_key)
+    response = await get_execution_by_key(request, execution_key)
     execution_data = json.loads(response.body.decode())
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
@@ -270,7 +294,7 @@ async def remove_executions_from_cycle(request: Request,
         return response
 
     # Check execution exists
-    response = await get_execution(request, execution_key)
+    response = await get_execution_by_key(request, execution_key)
     execution_data = json.loads(response.body.decode())
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response

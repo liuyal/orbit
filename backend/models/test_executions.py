@@ -29,7 +29,7 @@ class TestExecution(BaseModel):
 
 
 class TestExecutionCreate(BaseModel):
-    execution_key: str
+    execution_key: str = None
     test_cycle_key: str = None
     result: str = None
     custom_fields: dict[str, str] = None

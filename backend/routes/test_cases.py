@@ -7,6 +7,9 @@
 
 # routes/test_cases.py
 
+import json
+import re
+
 from fastapi import (
     APIRouter,
     Request,
@@ -17,6 +20,7 @@ from starlette.responses import JSONResponse
 
 from backend.app_def.app_def import (
     DB_COLLECTION_TC,
+    TC_KEY_PREFIX,
     API_VERSION
 )
 from backend.models.test_cases import (
@@ -77,26 +81,48 @@ async def create_test_case_by_project(request: Request,
 
     # Prepare request data
     request_data = test_case.model_dump()
-    test_case_key = request_data["test_case_key"]
 
     # Check project exists
     response = await get_project_by_key(request, project_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
-    # Check if test_case_key already exists
-    response = await get_test_case_by_key(request, project_key, test_case_key)
-    if response.status_code != status.HTTP_404_NOT_FOUND:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": f"test case {test_case_key} already exists."})
+    # Determine test_case_key
+    test_case_key = request_data.get("test_case_key", None)
 
-    # Validate that test_case starts with project_key
-    if not request_data["test_case_key"].startswith(project_key):
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": f"Test case {test_case_key} "
-                              f"does not belong to project {project_key}"})
+    if test_case_key is None:
+        # Auto-generate test_case_key
+        # get list of test cases in project to determine next key
+        response = await get_all_test_cases_by_project(request, project_key)
+        cases = json.loads(response.body.decode())
+        if len(cases) < 1:
+            # no test cases exist yet, start with 1
+            last_tc = 1
+
+        else:
+            # extract numeric part of test_case_key to find last number
+            key_n = [int(case["_id"].split(TC_KEY_PREFIX)[-1]) for case in cases]
+            last_tc = max(key_n) + 1
+
+        test_case_key = f"{project_key}-{TC_KEY_PREFIX}{last_tc}"
+        request_data["test_case_key"] = test_case_key
+
+    else:
+        # Check if test_case_key already exists
+        response = await get_test_case_by_key(request, project_key, test_case_key)
+        if response.status_code != status.HTTP_404_NOT_FOUND:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"test case {test_case_key} already exists."})
+
+        # regex check for valid test_case_key format
+        # Must be PRJ_KEY-T###
+        pattern = rf"^{project_key}-{TC_KEY_PREFIX}\d+$"
+        if not re.match(pattern, test_case_key):
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"test case key '{test_case_key}' is not valid. "
+                                  f"Must be in format {project_key}-{TC_KEY_PREFIX}#"})
 
     # Initialize counts and timestamps
     request_data["project_key"] = project_key

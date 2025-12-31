@@ -27,7 +27,7 @@ class TestCycle(BaseModel):
 
 
 class TestCycleCreate(BaseModel):
-    test_cycle_key: str
+    test_cycle_key: str= None
     title: str = None
     description: str = None
     status: str = None
