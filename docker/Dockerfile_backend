@@ -7,16 +7,16 @@ WORKDIR /home
 
 # Install only essential packages
 RUN apk add --no-cache \
-        git \
         supervisor
 
-# Clone backend code
-RUN git clone https://github.com/liuyal/project_orbit.git orbit
+# Backend code will be mounted as a volume
 ENV PYTHONPATH=/home/orbit
 ENV MONGODB_HOST=db-app
 
-# Set up Python environment
-RUN pip install --no-cache-dir -r /home/orbit/poetry-env/requirements.txt
+# Copy requirements file and install dependencies
+# Note: requirements.txt should be copied or the entire backend mounted
+COPY ../poetry-env/requirements.txt /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Configure Supervisor to manage container services
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
