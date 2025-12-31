@@ -15,7 +15,7 @@ ENV MONGODB_HOST=db-app
 
 # Copy requirements file and install dependencies
 # Note: requirements.txt should be copied or the entire backend mounted
-COPY ../poetry-env/requirements.txt /tmp/requirements.txt
+COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 # Configure Supervisor to manage container services

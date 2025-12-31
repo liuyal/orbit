@@ -1,86 +1,80 @@
-<app-navbar [showBackButton]="true" [backButtonText]="'Back to Test Cases'" [backButtonAction]="goBack.bind(this)"></app-navbar>
+<app-navbar [showBackButton]="true" [backButtonText]="'Back to Test Cases'"
+    [backButtonAction]="goBack.bind(this)"></app-navbar>
 
 <div class="content">
-  <div class="page-header">
-    <h1>Create New Test Case</h1>
-    <p class="project-info">Project: {{ projectKey }}</p>
-  </div>
-  
-  <div class="form-container">
-    <form (ngSubmit)="submitTestCase()">
-      @if (apiError) {
-        <div class="alert-error">
-          {{ apiError }}
-        </div>
-      }
-      <div class="form-group">
-        <label for="test_case_key">Test Case Key *</label>
-        <input
-          type="text"
-          id="test_case_key"
-          [(ngModel)]="newTestCase.test_case_key"
-          name="test_case_key"
-          placeholder="Enter test case key"
-          required
-          [class.error]="errors.test_case_key"
-        />
-        @if (errors.test_case_key) {
-          <span class="error-message">{{ errors.test_case_key }}</span>
-        }
-      </div>
-      <div class="form-group">
-        <label for="title">Title *</label>
-        <input
-          type="text"
-          id="title"
-          [(ngModel)]="newTestCase.title"
-          name="title"
-          placeholder="Enter test case title"
-          required
-          [class.error]="errors.title"
-        />
-        @if (errors.title) {
-          <span class="error-message">{{ errors.title }}</span>
-        }
-      </div>
-      <div class="form-group">
-        <label for="description">Description</label>
-        <textarea
-          id="description"
-          [(ngModel)]="newTestCase.description"
-          name="description"
-          placeholder="Enter test case description"
-          rows="4"
-        ></textarea>
-      </div>
-      <div class="form-group">
-        <label for="status">Status</label>
-        <select
-          id="status"
-          [(ngModel)]="newTestCase.status"
-          name="status"
-        >
-          <option value="Draft">Draft</option>
-          <option value="Active">Active</option>
-          <option value="Deprecated">Deprecated</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="priority">Priority</label>
-        <select
-          id="priority"
-          [(ngModel)]="newTestCase.priority"
-          name="priority"
-        >
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
-        </select>
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary">Create Test Case</button>
-      </div>
-    </form>
-  </div>
+    <div class="form-container">
+        <form (ngSubmit)="submitTestCase()">
+            @if (apiError) {
+            <div class="alert-error">
+                {{ apiError }}
+            </div>
+            }
+
+            <div class="page-header">
+                <h1>Create New Test Case</h1>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label for="test_case_key">Test Case Key</label>
+                <input type="text" id="test_case_key" [(ngModel)]="newTestCase.test_case_key" name="test_case_key"
+                    placeholder="Enter test case key" required [class.error]="errors.test_case_key" />
+                @if (errors.test_case_key) {
+                <span class="error-message">{{ errors.test_case_key }}</span>
+                }
+            </div>
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" [(ngModel)]="newTestCase.title" name="title"
+                    placeholder="Enter test case title" required [class.error]="errors.title" />
+                @if (errors.title) {
+                <span class="error-message">{{ errors.title }}</span>
+                }
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" [(ngModel)]="newTestCase.description" name="description"
+                    placeholder="Enter test case description" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="folder">Folder</label>
+                <input type="text" id="folder" [(ngModel)]="newTestCase.folder" name="folder"
+                    placeholder="Enter folder path" />
+            </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <select id="status" [(ngModel)]="newTestCase.status" name="status">
+                    <option value="Draft">Draft</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Deprecated">Deprecated</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <select id="priority" [(ngModel)]="newTestCase.priority" name="priority">
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="test_frequency">Test Frequency</label>
+                <input type="text" id="test_frequency" [(ngModel)]="newTestCase.test_frequency" name="test_frequency"
+                    placeholder="Enter frequencies separated by commas (e.g., Daily, Weekly)" />
+            </div>
+            <div class="form-group">
+                <label for="labels">Labels</label>
+                <input type="text" id="labels" [(ngModel)]="newTestCase.labels" name="labels"
+                    placeholder="Enter labels separated by commas" />
+            </div>
+            <div class="form-group">
+                <label for="links">Links</label>
+                <input type="text" id="links" [(ngModel)]="newTestCase.links" name="links"
+                    placeholder="Enter links separated by commas" />
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </form>
+    </div>
 </div>

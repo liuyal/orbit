@@ -22,8 +22,12 @@ export class TestCaseCreate implements OnInit {
     test_case_key: '',
     title: '',
     description: '',
+    folder: '',
     status: 'Draft',
-    priority: 'Medium'
+    priority: 'Medium',
+    test_frequency: '',
+    labels: '',
+    links: ''
   };
   apiError = '';
   errors = {
@@ -35,8 +39,6 @@ export class TestCaseCreate implements OnInit {
     this.route.params.subscribe(params => {
       this.projectKey = params['projectKey'];
       console.log('Create test case for project:', this.projectKey);
-      // Pre-fill the project key prefix
-      this.newTestCase.test_case_key = this.projectKey + '-';
     });
   }
 
@@ -53,22 +55,7 @@ export class TestCaseCreate implements OnInit {
       test_case_key: '',
       title: ''
     };
-
     let isValid = true;
-
-    if (!this.newTestCase.test_case_key || this.newTestCase.test_case_key.trim() === '') {
-      this.errors.test_case_key = 'Test case key cannot be empty';
-      isValid = false;
-    } else if (!this.newTestCase.test_case_key.startsWith(this.projectKey + '-')) {
-      this.errors.test_case_key = `Test case key must start with ${this.projectKey}-`;
-      isValid = false;
-    }
-
-    if (!this.newTestCase.title || this.newTestCase.title.trim() === '') {
-      this.errors.title = 'Title cannot be empty';
-      isValid = false;
-    }
-
     return isValid;
   }
 
@@ -83,7 +70,10 @@ export class TestCaseCreate implements OnInit {
     
     const payload = {
       ...this.newTestCase,
-      project_key: this.projectKey
+      project_key: this.projectKey,
+      test_frequency: this.newTestCase.test_frequency ? this.newTestCase.test_frequency.split(',').map(s => s.trim()).filter(s => s) : null,
+      labels: this.newTestCase.labels ? this.newTestCase.labels.split(',').map(s => s.trim()).filter(s => s) : null,
+      links: this.newTestCase.links ? this.newTestCase.links.split(',').map(s => s.trim()).filter(s => s) : null
     };
 
     this.http.post(`/api/tm/projects/${this.projectKey}/test-cases`, payload).subscribe({

@@ -9,11 +9,11 @@ WORKDIR /usr/local/apache2/
 RUN apt-get update && \
     apt-get install -y \
     curl  \
-    python3  \
-    net-tools  \
     vim \
-    git && \
-    rm -rf /var/lib/apt/lists/*
+    git
+
+# Clean up apt cache to reduce image size
+RUN rm -rf /var/lib/apt/lists/*
 
 # Install Apache Directory Listing
 RUN cd /tmp && \
