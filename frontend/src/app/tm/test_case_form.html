@@ -7,10 +7,6 @@
         <div class="spinner"></div>
     </div>
     } @else {
-    <div class="page-header">
-        <h1>{{ isEditMode ? 'Edit Test Case' : 'Create New Test Case' }}</h1>
-    </div>
-
     <div class="tabs-container">
         <div class="tabs">
             <button type="button" class="tab" [class.active]="activeTab === 'details'" (click)="activeTab = 'details'">
@@ -111,7 +107,7 @@
                     <div class="form-group">
                         <label for="test_script">Test Script</label>
                         <textarea id="test_script" [(ngModel)]="testCase.test_script" name="test_script"
-                            placeholder="Enter test script steps" style="min-height: 520px; resize: vertical;"></textarea>
+                            placeholder="Enter test script steps"></textarea>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
@@ -126,7 +122,7 @@
                     <div class="form-group">
                         <label for="links">Links</label>
                         <textarea id="links" [(ngModel)]="testCase.links" name="links"
-                            placeholder="Enter links (one per line or comma separated)" style="min-height: 520px; resize: vertical;"></textarea>
+                            placeholder="Enter links (one per line or comma separated)"></textarea>
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
@@ -137,8 +133,8 @@
             </div>
             } @else if (activeTab === 'executions') {
             <div class="form-container">
-                <div style="padding: 20px; color: #999; text-align: center;">
-                    <i class="fa-solid fa-list-check" style="font-size: 48px; margin-bottom: 20px;"></i>
+                <div class="executions-placeholder">
+                    <i class="fa-solid fa-list-check executions-icon"></i>
                     <p>Test execution results will be displayed here.</p>
                 </div>
             </div>

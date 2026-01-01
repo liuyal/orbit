@@ -3,7 +3,7 @@
    ======================================== */
 
 .content {
-  margin: 20px 30px;
+  margin: 20px 20px;
 }
 
 .page-header {
@@ -99,26 +99,20 @@
 
 .form-container {
   background-color: #1e1e1e;
-  padding: 35px 30px 0px 30px;
+  padding: 30px 30px 0px 30px;
   border: none;
-  min-height: 700px;
-  max-height: 800px;
+  min-height: 740px;
+  max-height: 900px;
   overflow-y: auto;
 }
 
 .form-row {
   display: flex;
   gap: 15px;
-  margin-bottom: 10px;
-}
-
-.form-row .form-group {
-  flex: 1;
-  margin-bottom: 0;
 }
 
 .form-group {
-  margin-bottom: 0px;
+  flex: 1;
 }
 
 .form-group label {
@@ -126,6 +120,7 @@
   font-weight: bold;
   color: #e0e0e0;
   font-size: 15px;
+  margin-top: 15px;
 }
 
 .form-group input,
@@ -146,6 +141,12 @@
   resize: vertical;
   min-height: 100px;
   height: auto;
+}
+
+#test_script,
+#links {
+  min-height: 540px;
+  resize: vertical;
 }
 
 .form-group input:focus,
@@ -192,7 +193,7 @@
   display: flex;
   gap: 15px;
   justify-content: flex-end;
-  margin-top: 20px;
+  margin-top: 30px;
   padding-top: 20px;
   border-top: 1px solid #333;
 }
@@ -228,4 +229,19 @@
 .btn-secondary:hover {
   background-color: #555;
   border-color: #666;
+}
+
+/* ========================================
+   EXECUTIONS TAB
+   ======================================== */
+
+.executions-placeholder {
+  padding: 20px;
+  color: #999;
+  text-align: center;
+}
+
+.executions-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
 }
