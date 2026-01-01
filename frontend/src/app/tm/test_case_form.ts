@@ -4,7 +4,19 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from './navbar/navbar';
-import { TestCaseForm } from './test_cases';
+
+export interface TestCaseForm {
+  test_case_key: string;
+  title: string;
+  description: string;
+  test_script: string;
+  folder: string;
+  status: string;
+  priority: string;
+  test_frequency: string;
+  labels: string;
+  links: string;
+}
 
 @Component({
   selector: 'test-case-form',

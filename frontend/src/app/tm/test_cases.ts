@@ -24,19 +24,6 @@ export interface TestCase {
   links: string[] | null;
 }
 
-export interface TestCaseForm {
-  test_case_key: string;
-  title: string;
-  description: string;
-  test_script: string;
-  folder: string;
-  status: string;
-  priority: string;
-  test_frequency: string;
-  labels: string;
-  links: string;
-}
-
 @Component({
   selector: 'test-cases',
   standalone: true,
