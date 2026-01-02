@@ -34,8 +34,13 @@ class SqliteClient(DatabaseClient):
 
         super().__init__(db_name, db_url, db_type, db_mode)
 
+        self._db_conn = None
+
     async def connect(self):
         """Get the client with optional authentication."""
+
+        if self.db_url is None:
+            self.db_url = pathlib.Path(__file__).parent / 'tmp' / f"{self.db_name}.db"
 
         db_path = pathlib.Path(self.db_url)
 
