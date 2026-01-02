@@ -22,10 +22,10 @@ import yaml
 from fastapi import FastAPI
 
 from backend.db.mongodb import MongoClient
-from backend.db.sqlite import SqliteClient
+# from backend.db.sqlite import SqliteClient
 from backend.routes import routers
-from backend.app_def.app_def import API_VERSION, RUNNERS_DB_FILE
-from backend.module.runners import query_runner_status
+from backend.app_def.app_def import API_VERSION #,RUNNERS_DB_FILE
+# from backend.module.runners import query_runner_status
 
 logger = logging.getLogger(__name__)
 

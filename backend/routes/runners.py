@@ -18,9 +18,10 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.get(f"/api/{API_VERSION}/runners/status", tags=["runners"])
+@router.get(f"/api/{API_VERSION}/runners/status",
+            tags=["runners"],
+            status_code=status.HTTP_200_OK)
 async def get_runners_status(request: Request):
     """ Get the status of all runners. """
 
-
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return Response(status_code=status.HTTP_200_OK)
