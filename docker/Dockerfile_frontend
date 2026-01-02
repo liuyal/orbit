@@ -3,6 +3,8 @@ FROM node:alpine AS build
 
 # Maintainer information
 LABEL maintainer="jerry"
+
+# Set working directory
 WORKDIR /app
 
 # Copy application files and build the Angular app

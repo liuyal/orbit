@@ -3,20 +3,28 @@ FROM python:3.12-alpine
 
 # Maintainer information
 LABEL maintainer="jerry"
+
+# Set working directory
 WORKDIR /home
 
 # Install only essential packages
 RUN apk add --no-cache \
-        supervisor
+    supervisor \
+    sqlite \
+    sqlite-libs \
+    bash
 
-# Backend code will be mounted as a volume
+# Environment variables
 ENV PYTHONPATH=/home/orbit
-ENV MONGODB_HOST=db-app
+ENV MONGODB_HOST=mongodb-app
+ENV SQLITE_DATABASE=/data/orbit.db
 
 # Copy requirements file and install dependencies
-# Note: requirements.txt should be copied or the entire backend mounted
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Initialize a new SQLite database file if it doesn't exist
+RUN mkdir -p /data
 
 # Configure Supervisor to manage container services
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

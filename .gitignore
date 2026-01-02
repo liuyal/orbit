@@ -1,7 +1,7 @@
 .vscode/
 .idea/
 .pytest_cache/
-**/data
+**/db
 **/tmp
 **/ssl
 __pycache__

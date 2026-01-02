@@ -3,6 +3,8 @@ FROM httpd:latest
 
 # Maintainer information
 LABEL maintainer="jerry"
+
+# Set working directory
 WORKDIR /usr/local/apache2/
 
 # Install additional tools

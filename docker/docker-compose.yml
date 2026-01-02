@@ -23,9 +23,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - type: bind
-        source: ..
-        target: /home/orbit
+      - ../:/home/orbit
+      - ./db/sqlite:/data
   mongodb-app:
     build:
       context: .
@@ -35,7 +34,7 @@ services:
     ports:
       - "27017:27017"
     #volumes:
-    #  - ./data:/data/db
+    #  - ./db/mongodb:/data/db
   fileserver-app:
     build:
       context: .
