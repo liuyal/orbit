@@ -41,7 +41,7 @@ async def get_all_test_cases(request: Request):
     """Get all test cases."""
 
     # Retrieve all test cases from database
-    db = request.app.state.db
+    db = request.app.state.mdb
     test_cases = await db.find(DB_COLLECTION_TC, {})
 
     return JSONResponse(status_code=status.HTTP_200_OK,
@@ -61,7 +61,7 @@ async def get_all_test_cases_by_project(request: Request,
         return response
 
     # Retrieve test cases from database matching project_key
-    db = request.app.state.db
+    db = request.app.state.mdb
     test_cases = await db.find(DB_COLLECTION_TC,
                                {"project_key": project_key})
 
@@ -134,7 +134,7 @@ async def create_test_case_by_project(request: Request,
     db_insert["_id"] = test_case_key
 
     # Create the test case in the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     await db.create(DB_COLLECTION_TC, db_insert)
 
     return Response(status_code=status.HTTP_201_CREATED)
@@ -155,7 +155,7 @@ async def delete_all_test_case_by_project(request: Request,
     # TODO: Check if test case is linked to any test executions
 
     # Delete test cases from database matching project_key
-    db = request.app.state.db
+    db = request.app.state.mdb
     await db.delete(DB_COLLECTION_TC,
                     {"project_key": project_key})
 
@@ -178,7 +178,7 @@ async def get_test_case_by_key(request: Request,
         return response
 
     # Retrieve test case from database
-    db = request.app.state.db
+    db = request.app.state.mdb
     result = await db.find_one(DB_COLLECTION_TC,
                                {"test_case_key": test_case_key,
                                 "project_key": project_key})
@@ -220,7 +220,7 @@ async def update_test_case_by_key(request: Request,
     request_data["updated_at"] = current_time
 
     # Update the project in the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     await db.update(DB_COLLECTION_TC,
                     {"test_case_key": test_case_key,
                      "project_key": project_key},
@@ -256,7 +256,7 @@ async def delete_test_case_by_key(request: Request,
     # TODO: Check if test case is linked to any test executions
 
     # Delete the test case from project from the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     await db.delete_one(DB_COLLECTION_TC,
                         {"test_case_key": test_case_key,
                          "project_key": project_key})

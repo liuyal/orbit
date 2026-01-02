@@ -39,7 +39,7 @@ async def get_all_projects(request: Request):
     """Endpoint to get projects"""
 
     # Retrieve all projects from database
-    db = request.app.state.db
+    db = request.app.state.mdb
     projects = await db.find(DB_COLLECTION_PRJ, {})
 
     return JSONResponse(status_code=status.HTTP_200_OK,
@@ -76,7 +76,7 @@ async def create_project_by_key(request: Request,
     db_insert["_id"] = project_key
 
     # Create the project in the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     await db.create(DB_COLLECTION_PRJ, db_insert)
 
     # Retrieve the updated project
@@ -96,7 +96,7 @@ async def get_project_by_key(request: Request,
     """Endpoint to get project"""
 
     # Retrieve project from database
-    db = request.app.state.db
+    db = request.app.state.mdb
     result = await db.find_one(DB_COLLECTION_PRJ,
                                {"project_key": project_key})
 
@@ -132,7 +132,7 @@ async def update_project_by_key(request: Request,
     request_data["updated_at"] = current_time
 
     # Update the project in the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     await db.update(DB_COLLECTION_PRJ,
                     {"project_key": project_key},
                     request_data)
@@ -159,7 +159,7 @@ async def delete_project_by_key(request: Request,
         return response
 
     # Get all test-cases for the project
-    db = request.app.state.db
+    db = request.app.state.mdb
 
     if force and force["force"] is False:
         # TODO: add check for not existing test-executions, test-cycles linked

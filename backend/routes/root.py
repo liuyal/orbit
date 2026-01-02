@@ -44,7 +44,7 @@ async def root_api(request: Request):
 async def reset_tm_server(request: Request):
     """ Root endpoint to reset server. """
 
-    db = request.app.state.db
+    db = request.app.state.mdb
     await db.configure(clean_db=True)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

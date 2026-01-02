@@ -53,7 +53,7 @@ async def get_all_executions_for_test_case(request: Request,
         return response
 
     # Retrieve test execution matching project_key and test_case_key
-    db = request.app.state.db
+    db = request.app.state.mdb
     test_executions = await db.find(DB_COLLECTION_TE,
                                     {"project_key": project_key,
                                      "test_case_key": test_case_key})
@@ -134,7 +134,7 @@ async def create_execution_for_test_case(request: Request,
     db_insert["_id"] = execution_key
 
     # Create the test execution in the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     await db.create(DB_COLLECTION_TE, db_insert)
 
     return Response(status_code=status.HTTP_201_CREATED)
@@ -159,7 +159,7 @@ async def delete_all_execution_for_test_case(request: Request,
         return response
 
     # delete all test executions for the specified test case
-    db = request.app.state.db
+    db = request.app.state.mdb
     result, deleted_count = await db.delete(DB_COLLECTION_TE,
                                             {"project_key": project_key,
                                              "test_case_key": test_case_key})
@@ -180,7 +180,7 @@ async def get_execution_by_key(request: Request,
     """Retrieve a specific test execution by its ID."""
 
     # Retrieve test execution from database
-    db = request.app.state.db
+    db = request.app.state.mdb
     test_execution = await db.find_one(DB_COLLECTION_TE,
                                        {"execution_key": execution_key})
     if test_execution is None:
@@ -211,7 +211,7 @@ async def update_execution_by_key(request: Request,
     request_data = {k: v for k, v in request_data.items() if v is not None}
 
     # Update the execution in the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     result, matched_count = await db.update(
         DB_COLLECTION_TE,
         {"execution_key": execution_key},
@@ -239,7 +239,7 @@ async def delete_execution_by_key(request: Request,
     """Delete a specific test execution by its ID."""
 
     # Delete the project from the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     result, deleted_count = await db.delete_one(
         DB_COLLECTION_TE,
         {"execution_key": execution_key})

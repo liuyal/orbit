@@ -19,7 +19,6 @@ import uvicorn
 import yaml
 from fastapi import FastAPI
 
-from backend.db.db import DBType
 from backend.db.mongodb import MongoClient
 from backend.db.sqlite import SqliteClient
 from backend.routes import routers
@@ -32,19 +31,22 @@ logger = logging.getLogger(__name__)
 async def lifespan(app):
     """ Lifespan context manager to handle startup and shutdown events. """
 
-    if args.db_type == DBType.MONGODB:
-        client = MongoClient()
+    # Initialize sqlite client
+    sqlite_client = SqliteClient()
+    await sqlite_client.connect()
+    await sqlite_client.configure()
 
-    else:
-        client = SqliteClient()
-
-    await client.connect()
-    await client.configure()
+    # Initialize mongo client
+    mongodb_client = MongoClient()
+    await mongodb_client.connect()
+    await mongodb_client.configure()
 
     # Attach the database client to the app state
-    app.state.db = client
+    app.state.mdb = mongodb_client
+    app.state.sdb = sqlite_client
     yield
-    await client.close()
+    await mongodb_client.close()
+    await sqlite_client.close()
 
 
 def configure_logging_file(debug: bool = False) -> str:

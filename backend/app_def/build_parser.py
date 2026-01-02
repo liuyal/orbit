@@ -28,14 +28,6 @@ def build_parser():
         help='Set server listening port (default: 5000)'
     )
     parser.add_argument(
-        '--db',
-        dest='db_type',
-        type=lambda x: DBType(x),
-        choices=[DBType.MONGODB, DBType.SQLITE],
-        default=DBType.MONGODB,
-        help='Set database type, choices: mongodb, sqlite. (default: mongodb)'
-    )
-    parser.add_argument(
         '--debug',
         dest='debug',
         action='store_true',

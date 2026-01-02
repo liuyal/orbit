@@ -20,7 +20,11 @@ from backend.app_def.app_def import (
     DB_COLLECTION_TE,
     DB_COLLECTION_TCY
 )
-from backend.db.db import DatabaseClient, DBType, DBMode
+from backend.db.db import (
+    DatabaseClient,
+    DBType,
+    DBMode
+)
 from backend.models.projects import Project
 from backend.models.test_cases import TestCase
 from backend.models.test_cycles import TestCycle

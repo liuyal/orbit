@@ -53,7 +53,7 @@ async def get_all_cycles_for_project(request: Request,
         return response
 
     # Retrieve all test cycles from the database matching project_key
-    db = request.app.state.db
+    db = request.app.state.mdb
     test_cycles = await db.find(DB_COLLECTION_TCY,
                                 {"project_key": project_key})
 
@@ -127,7 +127,7 @@ async def create_cycle_for_project(request: Request,
     db_insert["_id"] = test_cycle_key
 
     # Create the test cycle in the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     await db.create(DB_COLLECTION_TCY, db_insert)
 
     return Response(status_code=status.HTTP_201_CREATED)
@@ -141,7 +141,7 @@ async def get_cycle_by_key(request: Request,
     """Get a specific test cycle by its ID."""
 
     # Retrieve the test cycle from the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     result = await db.find_one(DB_COLLECTION_TCY,
                                {"test_cycle_key": test_cycle_key})
 
@@ -174,7 +174,7 @@ async def update_cycle_by_key(request: Request,
     request_data["updated_at"] = current_time
 
     # Update the cycle in the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     result, matched_count = await db.update(
         DB_COLLECTION_TCY,
         {"test_cycle_key": test_cycle_key},
@@ -202,7 +202,7 @@ async def delete_cycle_by_key(request: Request,
     """Delete a specific test cycle by its ID."""
 
     # Delete the test_cycle from the database
-    db = request.app.state.db
+    db = request.app.state.mdb
     result, deleted_count = await db.delete_one(
         DB_COLLECTION_TCY,
         {"test_cycle_key": test_cycle_key})
@@ -259,7 +259,7 @@ async def add_execution_to_cycle(request: Request,
                               f"already in cycle {test_cycle_key}"})
 
     # Add execution to cycle
-    db = request.app.state.db
+    db = request.app.state.mdb
     cycle_data["executions"].append(execution_key)
     await db.update(DB_COLLECTION_TCY,
                     {"test_cycle_key": test_cycle_key},
@@ -300,7 +300,7 @@ async def remove_executions_from_cycle(request: Request,
         return response
 
     # remote execution to cycle
-    db = request.app.state.db
+    db = request.app.state.mdb
     cycle_data["executions"] = [e for e in cycle_data["executions"] if e != execution_key]
     await db.update(DB_COLLECTION_TCY,
                     {"test_cycle_key": test_cycle_key},

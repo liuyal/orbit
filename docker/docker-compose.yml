@@ -25,6 +25,7 @@ services:
     volumes:
       - ../:/home/orbit
       - ./db/sqlite:/data
+      # - /datadrive/sftp_user/tm4j_solar/RUNNER:/data
   mongodb-app:
     build:
       context: .

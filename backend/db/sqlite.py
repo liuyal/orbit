@@ -7,30 +7,27 @@
 
 # db/sqlitedb.py
 
+import os
+import pathlib
+import sqlite3
+
 from backend.app_def.app_def import (
-    DB_NAME,
-    DB_COLLECTION_PRJ,
-    DB_COLLECTION_TC,
-    DB_COLLECTION_TE,
-    DB_COLLECTION_TCY
+    DB_NAME
 )
-from backend.db.db import DatabaseClient, DBType, DBMode
+from backend.db.db import (
+    DatabaseClient,
+    DBType,
+    DBMode
+)
 
-DB_COLLECTIONS = [
-    DB_COLLECTION_PRJ,
-    DB_COLLECTION_TC,
-    DB_COLLECTION_TE,
-    DB_COLLECTION_TCY
-]
-
-SQLITE_URL = f""
+SQLITE_DATABASE = os.getenv("SQLITE_DATABASE")
 
 
 class SqliteClient(DatabaseClient):
 
     def __init__(self,
                  db_name: str = DB_NAME,
-                 db_url: str = SQLITE_URL,
+                 db_url: str = SQLITE_DATABASE,
                  db_type: DBType = DBType.SQLITE,
                  db_mode: DBMode = DBMode.DEBUG):
         """ Initialize the Sqlite client. """
@@ -40,12 +37,32 @@ class SqliteClient(DatabaseClient):
     async def connect(self):
         """Get the client with optional authentication."""
 
+        db_path = pathlib.Path(self.db_url)
+
+        # Check path existence, create if not exists
+        if not db_path.parent.exists():
+            db_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Connect to the database
+        if not db_path.exists():
+            # Create the database file
+            self._db_conn = sqlite3.connect(db_path)
+
     async def close(self):
         """ Disconnect from the database. """
+
+        if self._db_conn:
+            self._db_conn.close()
 
     async def configure(self,
                         **kwargs) -> None:
         """Configure database connection parameters"""
+
+        # Drop the database if in debug mode
+        clean_db = "clean_db" in kwargs and kwargs["clean_db"]
+        if self._db_mode == 'debug' or clean_db:
+            # self._db_conn.execute("")
+            pass
 
     async def create(self,
                      table: str,
