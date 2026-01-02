@@ -5,12 +5,14 @@
 # Author: Jerry
 # License: MIT
 # ================================================================
+import time
 
 from backend.app_def.build_parser import build_parser
 
 parser = build_parser()
 args = parser.parse_args()
 
+import threading
 import logging.config
 import pathlib
 from contextlib import asynccontextmanager
@@ -22,7 +24,8 @@ from fastapi import FastAPI
 from backend.db.mongodb import MongoClient
 from backend.db.sqlite import SqliteClient
 from backend.routes import routers
-from backend.app_def.app_def import API_VERSION
+from backend.app_def.app_def import API_VERSION, RUNNERS_DB_FILE
+from backend.module.runners import query_runner_status
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +34,10 @@ logger = logging.getLogger(__name__)
 async def lifespan(app):
     """ Lifespan context manager to handle startup and shutdown events. """
 
-    # Initialize sqlite client
-    sqlite_client = SqliteClient()
-    await sqlite_client.connect()
-    await sqlite_client.configure()
+    # # Initialize sqlite client
+    # sqlite_client = SqliteClient()
+    # await sqlite_client.connect()
+    # await sqlite_client.configure()
 
     # Initialize mongo client
     mongodb_client = MongoClient()
@@ -43,10 +46,10 @@ async def lifespan(app):
 
     # Attach the database client to the app state
     app.state.mdb = mongodb_client
-    app.state.sdb = sqlite_client
+    # app.state.sdb = sqlite_client
     yield
     await mongodb_client.close()
-    await sqlite_client.close()
+    # await sqlite_client.close()
 
 
 def configure_logging_file(debug: bool = False) -> str:
@@ -86,6 +89,14 @@ for router in routers:
 
 if __name__ == "__main__":
     log_conf = configure_logging_file(args.debug)
+
+    kill = threading.Event()
+    # thread_runner = threading.Thread(target=query_runner_status,
+    #                                  args=(kill, pathlib.Path(args.output) / f"{RUNNERS_DB_FILE}"),
+    #                                  name="RUNNER_THREAD",
+    #                                  daemon=True)
+    # thread_runner.start()
+
     uvicorn.run("index:app",
                 host=args.host,
                 port=int(args.port),

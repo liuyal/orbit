@@ -7,6 +7,8 @@
 # ================================================================
 
 import argparse
+import pathlib
+
 from backend.db.db import DBType
 
 def build_parser():
@@ -26,6 +28,12 @@ def build_parser():
         dest='port',
         default=5000,
         help='Set server listening port (default: 5000)'
+    )
+    parser.add_argument(
+        '-o', '--output',
+        dest='output',
+        default=pathlib.Path(__file__).parents[1] / 'tmp',
+        help='Set output directory (default: /tmp)'
     )
     parser.add_argument(
         '--debug',
