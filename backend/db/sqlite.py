@@ -51,7 +51,7 @@ class SqliteClient(DatabaseClient):
         # Connect to the database
         if not db_path.exists():
             # Create the database file
-            self._db_conn = sqlite3.connect(db_path)
+            self._db_conn = sqlite3.connect(f"file:{str(db_path)}?mode=ro", uri=True)
 
     async def close(self):
         """ Disconnect from the database. """
