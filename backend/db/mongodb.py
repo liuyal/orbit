@@ -194,7 +194,7 @@ class MongoClient(DatabaseClient):
 
         # Drop the database if in debug mode
         clean_db = "clean_db" in kwargs and kwargs["clean_db"]
-        if self._db_mode == 'debug' or clean_db:
+        if clean_db:
             await self._db_client.drop_database(self._db_name)
 
         # Initialize the database
