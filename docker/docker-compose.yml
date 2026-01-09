@@ -50,3 +50,21 @@ services:
     ports:
       - "8080:80"
       - "8443:443"
+  github-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile_runner
+    image: github-runner:latest
+    container_name: github-runner
+    environment:
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_NAME=docker-runner
+      - RUNNER_WORKDIR=_work
+      - RUNNER_LABELS=docker,linux,ubuntu
+    restart: unless-stopped
+    volumes:
+      - runner-work:/home/runner/_work
+volumes:
+  runner-work:

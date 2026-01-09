@@ -10,7 +10,6 @@ from backend.app_def.build_parser import build_parser
 parser = build_parser()
 args = parser.parse_args()
 
-import threading
 import logging.config
 import pathlib
 from contextlib import asynccontextmanager
@@ -21,8 +20,7 @@ from fastapi import FastAPI
 
 from backend.db.mongodb import MongoClient
 from backend.routes import routers
-from backend.app_def.app_def import API_VERSION#, RUNNERS_DB_FILE
-# from backend.module.runners import query_runner_status
+from backend.app_def.app_def import API_VERSION
 
 logger = logging.getLogger(__name__)
 
@@ -36,19 +34,10 @@ async def lifespan(app):
     await mongodb_client.connect()
     await mongodb_client.configure()
 
-    # Start the runner status query thread
-    kill = threading.Event()
-    # thread_runner = threading.Thread(target=query_runner_status,
-    #                                  args=(kill, pathlib.Path(args.output) / f"{RUNNERS_DB_FILE}"),
-    #                                  name="RUNNER_THREAD",
-    #                                  daemon=True)
-    # thread_runner.start()
-
     # Attach the database client to the app state
     app.state.mdb = mongodb_client
     yield
     await mongodb_client.close()
-    # thread_runner.join(1)
 
 
 def configure_logging_file(debug: bool = False) -> str:

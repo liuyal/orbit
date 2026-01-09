@@ -1,7 +1,8 @@
+__pycache__
 .vscode/
 .idea/
 .pytest_cache/
 **/db
 **/tmp
 **/ssl
-__pycache__
+**/.env

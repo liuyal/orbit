@@ -11,14 +11,18 @@ import sqlite3
 import threading
 import time
 
+import keyring
 import requests
 from natsort import natsorted
 
-from backend.app_def.app_def import (
-    GITHUB_API_URL,
-    HEADER,
-    WORKFLOW_REPOS
-)
+# GitHub Configuration
+GITHUB_API_URL = "https://github.schneider-electric.com/api/v3/repos/SchneiderProsumer"
+GITHUB_API_TOKEN = keyring.get_password("GHE_PAT", "GHE_PAT_USER")
+HEADER = {'Authorization': f'bearer {GITHUB_API_TOKEN}'}
+WORKFLOW_REPOS = ["test-workflows-libra"]
+
+# Runners DB File
+RUNNERS_DB_FILE = "runners.db"
 
 # Path to RESO workflow
 RESO_WORKFLOW_PATH = ".github/workflows/reso-workflow.yml"
