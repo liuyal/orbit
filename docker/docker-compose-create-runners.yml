@@ -10,3 +10,4 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN}
       - RUNNER_WORKDIR=_work
       - RUNNER_LABELS=linux
+    restart: unless-stopped
