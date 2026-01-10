@@ -1,0 +1,80 @@
+services:
+  runner-app-1:
+    build:
+      context: .
+      dockerfile: Dockerfile_runner
+    image: runner-app:latest
+    container_name: runner-app-1
+    environment:
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_NAME=runner-1
+      - RUNNER_WORKDIR=_work
+      - RUNNER_LABELS=linux
+  runner-app-2:
+    build:
+      context: .
+      dockerfile: Dockerfile_runner
+    image: runner-app:latest
+    container_name: runner-app-2
+    environment:
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_NAME=runner-1
+      - RUNNER_WORKDIR=_work
+      - RUNNER_LABELS=linux
+  runner-app-3:
+    build:
+      context: .
+      dockerfile: Dockerfile_runner
+    image: runner-app:latest
+    container_name: runner-app-3
+    environment:
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_NAME=runner-1
+      - RUNNER_WORKDIR=_work
+      - RUNNER_LABELS=linux
+  runner-app-4:
+    build:
+      context: .
+      dockerfile: Dockerfile_runner
+    image: runner-app:latest
+    container_name: runner-app-4
+    environment:
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_NAME=runner-1
+      - RUNNER_WORKDIR=_work
+      - RUNNER_LABELS=linux
+  runner-app-5:
+    build:
+      context: .
+      dockerfile: Dockerfile_runner
+    image: runner-app:latest
+    container_name: runner-app-5
+    environment:
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_NAME=runner-1
+      - RUNNER_WORKDIR=_work
+      - RUNNER_LABELS=linux
+  runner-app-6:
+    build:
+      context: .
+      dockerfile: Dockerfile_runner
+    image: runner-app:latest
+    container_name: runner-app-6
+    environment:
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_NAME=runner-1
+      - RUNNER_WORKDIR=_work
+      - RUNNER_LABELS=linux
+    
