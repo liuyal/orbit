@@ -14,12 +14,16 @@ ARGS=("$@")
 for ((i=0; i<$#; i++)); do
   arg="${ARGS[$i]}"
   next_arg="${ARGS[$((i+1))]:-}"
+
   if [[ "$arg" == "--build" || "$arg" == "-b" ]]; then
     BUILD_FLAG="--build"
+
   elif [[ "$arg" == "--clear" || "$arg" == "-c" ]]; then
     CLEAR_FLAG="--clear"
+
    elif [[ "$arg" == "--stop" || "$arg" == "-s" ]]; then
     STOP_FLAG="--stop"
+
   elif [[ "$arg" == "--runner" || "$arg" == "-r" ]]; then
     RUNNER_FLAG="--runner"
     # Check if next argument is a number
@@ -27,6 +31,7 @@ for ((i=0; i<$#; i++)); do
       RUNNER_SCALE="$next_arg"
       ((i++))  # Skip next arg
     fi
+
   fi
 done
 
@@ -37,14 +42,12 @@ if [[ -n "$CLEAR_FLAG" ]]; then
   docker system prune -af
   docker volume prune -af
   echo "Docker cleanup complete"
-  exit 0
 
 elif [[ -n "$STOP_FLAG" ]]; then
   echo "Cleaning up existing containers..."
   docker stop $(docker ps -q)
   docker rm -f $(docker ps -aq)
   echo "Docker containers cleanup complete"
-  exit 0
 
 fi
 
@@ -53,7 +56,9 @@ if [[ -n "$BUILD_FLAG" ]]; then
   docker compose -f docker-compose.yml up --build -d
   echo "Access the application at: https://localhost"
 
-elif [[ -n "$RUNNER_FLAG" ]]; then
+fi
+
+if [[ -n "$RUNNER_FLAG" ]]; then
   echo "Starting runner containers (scale: $RUNNER_SCALE)..."
   docker compose -f docker-compose-create-runners.yml up --scale runner-app=$RUNNER_SCALE
 
