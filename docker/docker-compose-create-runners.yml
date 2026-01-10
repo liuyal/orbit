@@ -1,74 +1,12 @@
 services:
-  runner-base:
+  runner-app:
     build:
       context: .
       dockerfile: Dockerfile_runner
     image: runner-app:latest
-    profiles: ["build"]
-
-  runner-app-1:
-    image: runner-app:latest
-    container_name: runner-app-1
     environment:
       - GITHUB_OWNER=${GITHUB_OWNER}
       - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-1
       - RUNNER_WORKDIR=_work
       - RUNNER_LABELS=linux
-
-  runner-app-2:
-    image: runner-app:latest
-    container_name: runner-app-2
-    environment:
-      - GITHUB_OWNER=${GITHUB_OWNER}
-      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-2
-      - RUNNER_WORKDIR=_work
-      - RUNNER_LABELS=linux
-
-  runner-app-3:
-    image: runner-app:latest
-    container_name: runner-app-3
-    environment:
-      - GITHUB_OWNER=${GITHUB_OWNER}
-      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-3
-      - RUNNER_WORKDIR=_work
-      - RUNNER_LABELS=linux
-
-  runner-app-4:
-    image: runner-app:latest
-    container_name: runner-app-4
-    environment:
-      - GITHUB_OWNER=${GITHUB_OWNER}
-      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-4
-      - RUNNER_WORKDIR=_work
-      - RUNNER_LABELS=linux
-
-  runner-app-5:
-    image: runner-app:latest
-    container_name: runner-app-5
-    environment:
-      - GITHUB_OWNER=${GITHUB_OWNER}
-      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-5
-      - RUNNER_WORKDIR=_work
-      - RUNNER_LABELS=linux
-
-  runner-app-6:
-    image: runner-app:latest
-    container_name: runner-app-6
-    environment:
-      - GITHUB_OWNER=${GITHUB_OWNER}
-      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-6
-      - RUNNER_WORKDIR=_work
-      - RUNNER_LABELS=linux
-    
