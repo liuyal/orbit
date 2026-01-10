@@ -60,7 +60,7 @@ fi
 
 if [[ -n "$RUNNER_FLAG" ]]; then
   echo "Starting runner containers (scale: $RUNNER_SCALE)..."
-  docker compose -f docker-compose-create-runners.yml up --scale runner-app=$RUNNER_SCALE
+  docker compose -f docker-compose-create-runners.yml up -d --scale runner-app=$RUNNER_SCALE
 
 else
   echo "Starting Docker containers..."
