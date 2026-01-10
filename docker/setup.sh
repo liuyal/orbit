@@ -7,6 +7,14 @@
 # License: MIT
 # ================================================================
 
+# Load environment variables from .env file if it exists
+if [ -f .env ]; then
+  echo "Loading environment variables from .env file..."
+  set -a
+  source .env
+  set +a
+fi
+
 RUNNER_SCALE=10  # Default value
 
 # Parse arguments
@@ -66,8 +74,42 @@ if [[ -n "$START_FLAG" ]]; then
   echo "Access the application at: https://localhost"
 
 elif [[ -n "$RUNNER_FLAG" ]]; then
-  echo "Starting runner containers (scale: $RUNNER_SCALE)..."
-  docker compose -f docker-compose-create-runners.yml up -d --scale runner-app=$RUNNER_SCALE
+  echo "Starting $RUNNER_SCALE runner container(s)..."
+
+  # Create tmp directory if it doesn't exist
+  mkdir -p tmp
+  cp .env tmp/.env
+
+  # Generate a temporary docker-compose file with explicit runner services
+  echo "Generating docker-compose configuration for $RUNNER_SCALE runners..."
+
+  cat > tmp/docker-compose-tmp-runner.yml << EOF
+services:
+EOF
+
+  # Generate service definition for each runner
+  for ((i=0; i<$RUNNER_SCALE; i++)); do
+    cat >> tmp/docker-compose-tmp-runner.yml << EOF
+  runner-$i:
+    image: runner-app:latest
+    container_name: runner-$i
+    restart: unless-stopped
+    environment:
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_NAME=runner-$i
+      - RUNNER_WORKDIR=_work
+      - RUNNER_LABELS=linux
+EOF
+  done
+
+  # Start all runners using docker compose
+  echo "Starting runners with docker compose..."
+  docker compose -f tmp/docker-compose-tmp-runner.yml up -d
+
+  echo "Started $RUNNER_SCALE runner(s)"
+  echo "Temporary compose file saved at: tmp/docker-compose-tmp-runner.yml"
 
 fi
 
