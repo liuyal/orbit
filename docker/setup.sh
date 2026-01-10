@@ -24,9 +24,6 @@ for ((i=0; i<$#; i++)); do
   elif [[ "$arg" == "--build" || "$arg" == "-b" ]]; then
     BUILD_FLAG="--build"
 
-  elif [[ "$arg" == "--build-runner" || "$arg" == "-br" ]]; then
-    BUILD_RUNNER_FLAG="--build-runner"
-
   elif [[ "$arg" == "--start" ]]; then
     START_FLAG="--start"
 
@@ -59,9 +56,6 @@ fi
 if [[ -n "$BUILD_FLAG" ]]; then
   echo "Building docker images..."
   docker compose -f docker-compose.yml build
-
-elif [[ -n "$BUILD_RUNNER_FLAG" ]]; then
-  echo "Building runner docker images..."
   docker compose -f docker-compose-create-runners.yml build
 
 fi
