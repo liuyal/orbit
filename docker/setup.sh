@@ -58,11 +58,11 @@ fi
 
 if [[ -n "$BUILD_FLAG" ]]; then
   echo "Building docker images..."
-  docker compose build -f docker-compose.yml
+  docker compose -f docker-compose.yml build
 
 elif [[ -n "$BUILD_RUNNER_FLAG" ]]; then
   echo "Building runner docker images..."
-  docker compose build -f docker-compose-create-runners.yml
+  docker compose -f docker-compose-create-runners.yml build
 
 fi
 
@@ -78,4 +78,3 @@ elif [[ -n "$RUNNER_FLAG" ]]; then
 fi
 
 echo "Docker setup complete"
-
