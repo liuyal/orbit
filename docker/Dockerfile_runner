@@ -8,7 +8,7 @@ LABEL maintainer="jerry"
 WORKDIR /home/runner
 
 # Create a user for the runner first and install dependencies in one layer
-ARG RUNNER_VERSION="2.320.0"
+ARG RUNNER_VERSION="2.321.0"
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl \
