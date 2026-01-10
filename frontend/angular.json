@@ -62,8 +62,8 @@
           "options": {
             "proxyConfig": "src/proxy.conf.json",
             "ssl": true,
-            "sslCert": "../docker/ssl/nginx.crt",
-            "sslKey": "../docker/ssl/nginx.key"
+            "sslCert": "../certs/ssl/ca.crt",
+            "sslKey": "../certs/ssl/ca.key"
           },
           "builder": "@angular/build:dev-server",
           "configurations": {

@@ -1,8 +1,9 @@
-import docker
 import os
+
+import docker
 from dotenv import load_dotenv
 
-load_dotenv()  # Loads variables from .env into os.environ
+load_dotenv()
 
 client = docker.from_env()
 
@@ -14,12 +15,16 @@ env_vars = [
     'RUNNER_LABELS=linux'
 ]
 
-image, _ = client.images.build(path='.', dockerfile='Dockerfile_runner', tag='runner-app')
+print("Building Docker image...")
+image, _ = client.images.build(path='.',
+                               dockerfile='Dockerfile_runner',
+                               tag='runner-app')
 
 containers = []
 for i in range(10):
+    print(f'Starting container {i}...')
     container = client.containers.run(
-        'runner-app',
+        image='runner-app',
         name=f'runner-{i}',
         detach=True,
         environment=env_vars + [f'RUNNER_NAME=runner-{i}']
