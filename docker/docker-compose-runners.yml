@@ -1,0 +1,12 @@
+services:
+  runner-app:
+    build:
+      context: .
+      dockerfile: Dockerfile_runner
+    image: runner-app:latest
+    environment:
+      - GITHUB_OWNER=${GITHUB_OWNER}
+      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - RUNNER_WORKDIR=_work
+      - RUNNER_LABELS=linux
