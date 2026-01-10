@@ -9,19 +9,14 @@ import logging
 import os
 import pathlib
 import sqlite3
-import threading
 import time
 
 import requests
 from natsort import natsorted
 
-# Runners DB File
-RUNNERS_DB_FILE = "runners.db"
-
 # GitHub Configuration
-GITHUB_API_URL = os.getenv("GITHUB_API_URL", "localhost")
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "localhost")
-HEADER = {'Authorization': f'bearer {GITHUB_TOKEN}'}
+GITHUB_API_URL = os.getenv("GITHUB_API_URL")
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 
 # Workflow Repositories
 # GITHUB_WORKFLOW_REPOS = ["test-workflows-libra"]
@@ -38,6 +33,7 @@ TABLE_RUNNERS_BUSY_STATS_BY_JOB = "RUNNERS_BUSY_STATS_BY_JOB"
 TABLE_RUNNERS_ONLINE_STATS = "RUNNERS_ONLINE_STATS"
 TABLE_USER_LEADERBOARD_STATS = "USER_LEADERBOARD_STATS"
 TABLE_TIMESTAMP_STATS = "TIMESTAMP_STATS"
+
 
 def get_runner_usage_stats(db_conn: sqlite3.Connection):
     """ get the runner usage stats from db file """
@@ -122,7 +118,7 @@ def get_github_runners(repo: str):
     """ get github runners info """
 
     resp = requests.get(url=f"{GITHUB_API_URL}/{repo}/actions/runners",
-                        headers=HEADER,
+                        headers={'Authorization': f'bearer {GITHUB_TOKEN}'},
                         params={"per_page": 100})
 
     if resp.status_code != 200:
@@ -137,7 +133,7 @@ def get_github_jobs(repo: str):
 
     params = {"per_page": 100, "status": "in_progress"}
     resp = requests.get(url=f"{GITHUB_API_URL}/{repo}/actions/runs",
-                        headers=HEADER,
+                        headers={'Authorization': f'bearer {GITHUB_TOKEN}'},
                         params=params)
 
     if resp.status_code != 200:
@@ -147,18 +143,18 @@ def get_github_jobs(repo: str):
     jobs = resp.json()["workflow_runs"]
     running_jobs = []
     for job in jobs:
-        resp = requests.get(url=job["jobs_url"], headers=HEADER, params=params)
+        resp = requests.get(url=job["jobs_url"],
+                            headers={'Authorization': f'bearer {GITHUB_TOKEN}'},
+                            params=params)
+
         if resp.status_code != 200:
             logging.debug(resp.content)
 
-        data = resp.json()["jobs"]
-
+        job["job_type"] = "TEST_RUN"
         if job["path"] == RESO_WORKFLOW_PATH:
             job["job_type"] = "RESO"
 
-        else:
-            job["job_type"] = "TEST_RUN"
-
+        data = resp.json()["jobs"]
         for item in data:
             item.update(job)
 
@@ -332,4 +328,3 @@ def query_runner_status(db_file: pathlib.Path,
 
     logging.debug(f"Sleeping for {interval} seconds...")
     # time.sleep(interval)
-
