@@ -22,7 +22,7 @@ services:
       - GITHUB_OWNER=${GITHUB_OWNER}
       - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-1
+      - RUNNER_NAME=runner-2
       - RUNNER_WORKDIR=_work
       - RUNNER_LABELS=linux
   runner-app-3:
@@ -35,7 +35,7 @@ services:
       - GITHUB_OWNER=${GITHUB_OWNER}
       - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-1
+      - RUNNER_NAME=runner-3
       - RUNNER_WORKDIR=_work
       - RUNNER_LABELS=linux
   runner-app-4:
@@ -48,7 +48,7 @@ services:
       - GITHUB_OWNER=${GITHUB_OWNER}
       - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-1
+      - RUNNER_NAME=runner-4
       - RUNNER_WORKDIR=_work
       - RUNNER_LABELS=linux
   runner-app-5:
@@ -61,7 +61,7 @@ services:
       - GITHUB_OWNER=${GITHUB_OWNER}
       - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-1
+      - RUNNER_NAME=runner-5
       - RUNNER_WORKDIR=_work
       - RUNNER_LABELS=linux
   runner-app-6:
@@ -74,7 +74,7 @@ services:
       - GITHUB_OWNER=${GITHUB_OWNER}
       - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
       - GITHUB_TOKEN=${GITHUB_TOKEN}
-      - RUNNER_NAME=runner-1
+      - RUNNER_NAME=runner-6
       - RUNNER_WORKDIR=_work
       - RUNNER_LABELS=linux
     
