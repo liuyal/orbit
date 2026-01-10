@@ -47,15 +47,15 @@ fi
     --replace
 
 # Cleanup function to remove runner on exit
-cleanup() {
-    echo "Removing runner..."
-    REMOVE_TOKEN=$(curl -s -X POST \
-        -H "Authorization: token ${GITHUB_TOKEN}" \
-        -H "Accept: application/vnd.github.v3+json" \
-        "${TOKEN_URL/registration/remove}" | jq -r .token)
+# cleanup() {
+#     echo "Removing runner..."
+#     REMOVE_TOKEN=$(curl -s -X POST \
+#         -H "Authorization: token ${GITHUB_TOKEN}" \
+#         -H "Accept: application/vnd.github.v3+json" \
+#         "${TOKEN_URL/registration/remove}" | jq -r .token)
     
-    ./config.sh remove --token "${REMOVE_TOKEN}"
-}
+#     ./config.sh remove --token "${REMOVE_TOKEN}"
+# }
 
 trap cleanup EXIT
 

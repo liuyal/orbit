@@ -52,6 +52,10 @@ class SqliteClient(DatabaseClient):
         if not db_path.exists():
             # Create the database file
             self._db_conn = sqlite3.connect(str(db_path))
+            self._db_conn.close()
+
+        # Reconnect in read-only mode
+        self._db_conn = sqlite3.connect(f"file:{str(db_path)}?mode=ro", uri=True)
 
     async def close(self):
         """ Disconnect from the database. """
@@ -64,10 +68,9 @@ class SqliteClient(DatabaseClient):
         """Configure database connection parameters"""
 
         # Drop the database if in debug mode
-        clean_db = "clean_db" in kwargs and kwargs["clean_db"]
-        if clean_db:
-            # self._db_conn.execute("")
-            pass
+        # clean_db = "clean_db" in kwargs and kwargs["clean_db"]
+        # if clean_db:
+        # self._db_conn.execute("")
 
     async def create(self,
                      table: str,

@@ -47,9 +47,10 @@ RUN curl -o actions-runner-linux-x64-${RUNNER_VERSION}.tar.gz -L \
 # Install dependencies for the runner
 RUN ./bin/installdependencies.sh
 
-# Copy the startup script
+# Copy the startup script and fix line endings
 COPY --chown=runner:runner start-runner.sh /home/runner/start-runner.sh
-RUN chmod +x /home/runner/start-runner.sh
+RUN sed -i 's/\r$//' /home/runner/start-runner.sh && \
+    chmod +x /home/runner/start-runner.sh
 
 # Switch to runner user
 USER runner

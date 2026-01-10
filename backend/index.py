@@ -19,15 +19,24 @@ import yaml
 from fastapi import FastAPI
 
 from backend.db.mongodb import MongoClient
+from backend.db.sqlite import SqliteClient
 from backend.routes import routers
 from backend.app_def.app_def import API_VERSION
+from backend.module.runners import query_runner_status
 
 logger = logging.getLogger(__name__)
 
-
+import os
 @asynccontextmanager
 async def lifespan(app):
     """ Lifespan context manager to handle startup and shutdown events. """
+
+    query_runner_status(pathlib.Path(os.getenv("SQLITE_DATABASE")))
+
+    # Initialize sqlite client
+    sqlite_client = SqliteClient()
+    await sqlite_client.connect()
+    await sqlite_client.configure()
 
     # Initialize mongo client
     mongodb_client = MongoClient()
@@ -36,8 +45,10 @@ async def lifespan(app):
 
     # Attach the database client to the app state
     app.state.mdb = mongodb_client
+    app.state.sqdb = sqlite_client
     yield
     await mongodb_client.close()
+    await sqlite_client.close()
 
 
 def configure_logging_file(debug: bool = False) -> str:
