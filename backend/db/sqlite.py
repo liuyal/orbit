@@ -36,6 +36,11 @@ class SqliteClient(DatabaseClient):
 
         self._db_conn = None
 
+    @property
+    def db_conn(self):
+        """ Get the database connection. """
+        return self._db_conn
+
     async def connect(self):
         """Get the client with optional authentication."""
 

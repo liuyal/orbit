@@ -27,11 +27,14 @@ logger = logging.getLogger(__name__)
 async def get_runners_status(request: Request):
     """ Get the status of all runners. """
 
-    db_conn = request.state.sqdb
+    db_conn = request.app.state.sqdb
 
-    cursor = db_conn.cursor()
+    cursor = db_conn.db_conn.cursor()
     cursor.execute(f"SELECT * FROM {TABLE_RUNNER_STATS_CURRENT};")
     runners_stats = cursor.fetchall()
+
+    # TODO: Convert to list of dicts with column names 
+    # Add stats model
 
     return Response(status_code=status.HTTP_200_OK,
                     content=runners_stats)
