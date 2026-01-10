@@ -15,28 +15,33 @@ for ((i=0; i<$#; i++)); do
   arg="${ARGS[$i]}"
   next_arg="${ARGS[$((i+1))]:-}"
 
-  if [[ "$arg" == "--build" || "$arg" == "-b" ]]; then
-    BUILD_FLAG="--build"
+  if [[ "$arg" == "--clean" || "$arg" == "-c" ]]; then
+    CLEAN_FLAG="--clean"
 
-  elif [[ "$arg" == "--clear" || "$arg" == "-c" ]]; then
-    CLEAR_FLAG="--clear"
-
-   elif [[ "$arg" == "--stop" || "$arg" == "-s" ]]; then
+  elif [[ "$arg" == "--stop" || "$arg" == "-s" ]]; then
     STOP_FLAG="--stop"
 
-  elif [[ "$arg" == "--runner" || "$arg" == "-r" ]]; then
-    RUNNER_FLAG="--runner"
+  elif [[ "$arg" == "--build" || "$arg" == "-b" ]]; then
+    BUILD_FLAG="--build"
+
+  elif [[ "$arg" == "--build-runner" || "$arg" == "-br" ]]; then
+    BUILD_RUNNER_FLAG="--build-runner"
+
+  elif [[ "$arg" == "--start" ]]; then
+    START_FLAG="--start"
+
+  elif [[ "$arg" == "--start-runner" || "$arg" == "-r" ]]; then
+    RUNNER_FLAG="--start-runner"
     # Check if next argument is a number
     if [[ "$next_arg" =~ ^[0-9]+$ ]]; then
       RUNNER_SCALE="$next_arg"
       ((i++))  # Skip next arg
     fi
-
   fi
 done
 
-if [[ -n "$CLEAR_FLAG" ]]; then
-  echo "Cleaning up existing containers and images..."
+if [[ -n "$CLEAN_FLAG" ]]; then
+  echo "Cleaning up Docker containers and images..."
   docker stop $(docker ps -q)
   docker rm -f $(docker ps -aq)
   docker system prune -af
@@ -44,7 +49,7 @@ if [[ -n "$CLEAR_FLAG" ]]; then
   echo "Docker cleanup complete"
 
 elif [[ -n "$STOP_FLAG" ]]; then
-  echo "Cleaning up existing containers..."
+  echo "Cleaning up existing Docker containers..."
   docker stop $(docker ps -q)
   docker rm -f $(docker ps -aq)
   echo "Docker containers cleanup complete"
@@ -52,20 +57,24 @@ elif [[ -n "$STOP_FLAG" ]]; then
 fi
 
 if [[ -n "$BUILD_FLAG" ]]; then
-  echo "Building and starting Docker containers..."
-  docker compose -f docker-compose.yml up --build -d
-  echo "Access the application at: https://localhost"
+  echo "Building docker images..."
+  docker compose -f docker-compose.yml --build -d
+
+elif [[ -n "$BUILD_RUNNER_FLAG" ]]; then
+  echo "Building runner docker images..."
+  docker compose -f docker-compose-create-runners.yml --build -d
 
 fi
 
-if [[ -n "$RUNNER_FLAG" ]]; then
-  echo "Starting runner containers (scale: $RUNNER_SCALE)..."
-  docker compose -f docker-compose-create-runners.yml up -d --scale runner-app=$RUNNER_SCALE
-
-else
+if [[ -n "$START_FLAG" ]]; then
   echo "Starting Docker containers..."
   docker compose -f docker-compose.yml up -d
   echo "Access the application at: https://localhost"
+
+elif [[ -n "$RUNNER_FLAG" ]]; then
+  echo "Starting runner containers (scale: $RUNNER_SCALE)..."
+  docker compose -f docker-compose-create-runners.yml up -d --scale runner-app=$RUNNER_SCALE
+
 fi
 
 echo "Docker setup complete"
