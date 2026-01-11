@@ -24,7 +24,11 @@
       } @else if (error) {
       <p style="color: #f44336;">{{ error }}</p>
       } @else if (testCases.length === 0) {
-      <p style="color: #999;">No test cases found for this project.</p>
+      <div class="empty-state">
+        <i style="margin-bottom: 10px;" class="fa-solid fa-flask"></i>
+        <p>No test cases found</p>
+        <p style="font-size: 16px;">Click the + button to create your first test case</p>
+      </div>
       } @else {
       <div class="test-cases-list">
         <table>
@@ -79,7 +83,11 @@
     </div>
     } @else if (activeTab === 'test-cycles') {
     <div>
-      <p style="color: #999;">Test cycles functionality coming soon...</p>
+      <div class="empty-state">
+        <i style="margin-bottom: 10px;"class="fa-regular fa-rectangle-list"></i>
+        <p>No test cycles found</p>
+        <p style="font-size: 16px;">Click the + button to create your first test cycle</p>
+      </div>
     </div>
     }
   </div>

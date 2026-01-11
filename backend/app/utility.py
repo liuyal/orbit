@@ -9,8 +9,10 @@
 
 import pathlib
 from datetime import datetime, timezone
-from backend.app.app_def import TMP_DIR
+
 import yaml
+
+from backend.app.app_def import TMP_DIR
 
 
 def configure_logging_file(file_path: pathlib.Path,
@@ -28,11 +30,10 @@ def configure_logging_file(file_path: pathlib.Path,
 
         log_conf_text = yaml.safe_load(conf_text)
 
-    log_conf_path = TMP_DIR / 'log_conf.yaml'
-    with open(log_conf_path, 'w') as f:
+    with open(TMP_DIR / file_path.name, 'w') as f:
         yaml.dump(log_conf_text, f)
 
-    return str(log_conf_path)
+    return str(TMP_DIR / file_path.name)
 
 
 def get_current_utc_time():

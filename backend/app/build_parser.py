@@ -9,7 +9,8 @@
 # tools/build_parser.py
 
 import argparse
-import pathlib
+
+from backend.app.app_def import TMP_DIR
 
 
 def build_parser():
@@ -33,13 +34,13 @@ def build_parser():
     parser.add_argument(
         '-o', '--output',
         dest='output',
-        default=pathlib.Path(__file__).parents[1] / 'tmp',
-        help='Set output directory (default: /tmp)'
+        default=TMP_DIR,
+        help='Set tmp output directory (default: orbit/backend/tmp)'
     )
     parser.add_argument(
         '--debug',
         dest='debug',
         action='store_true',
-        help='Set server to debug'
+        help='Set debug mode'
     )
     return parser

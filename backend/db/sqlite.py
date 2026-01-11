@@ -12,7 +12,8 @@ import pathlib
 import sqlite3
 
 from backend.app.app_def import (
-    DB_NAME
+    DB_NAME,
+    TMP_DIR
 )
 from backend.db.db import (
     DatabaseClient,
@@ -45,7 +46,7 @@ class SqliteClient(DatabaseClient):
         """Get the client with optional authentication."""
 
         if self.db_url is None:
-            self.db_url = pathlib.Path(__file__).parent / 'tmp' / f"{self.db_name}.db"
+            self.db_url = TMP_DIR / f"{self.db_name}.db"
 
         db_path = pathlib.Path(self.db_url)
 

@@ -1,9 +1,10 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, ChangeDetectorRef, AfterViewInit, OnDestroy, ViewChild, ElementRef, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from './navbar/navbar';
+import { configureMonaco } from './monaco-config';
 
 export interface TestCaseForm {
   test_case_key: string;
@@ -26,11 +27,17 @@ export interface TestCaseForm {
   templateUrl: './test_case_form.html'
 })
 
-export class TestCaseFormComponent implements OnInit {
+export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   route = inject(ActivatedRoute);
   router = inject(Router);
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
+  platformId = inject(PLATFORM_ID);
+  
+  @ViewChild('editorContainer', { static: false }) editorContainer?: ElementRef<HTMLDivElement>;
+  private editor?: any;
+  private isBrowser = false;
+  private monaco?: any;
   
   projectKey = '';
   testCaseKey = '';
@@ -58,6 +65,14 @@ export class TestCaseFormComponent implements OnInit {
   };
 
   ngOnInit() {
+    // Check if running in browser
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    
+    // Configure Monaco Editor environment only in browser
+    if (this.isBrowser) {
+      configureMonaco();
+    }
+    
     this.route.params.subscribe(params => {
       this.projectKey = params['projectKey'];
       this.testCaseKey = params['testCaseKey'];
@@ -70,6 +85,79 @@ export class TestCaseFormComponent implements OnInit {
         console.log('Create mode - project:', this.projectKey);
       }
     });
+  }
+
+  ngAfterViewInit() {
+    // Initialize editor when script tab is active
+    if (this.activeTab === 'script') {
+      this.initializeEditor();
+    }
+  }
+
+  ngOnDestroy() {
+    this.disposeEditor();
+  }
+
+  async initializeEditor() {
+    // Only initialize in browser context
+    if (!this.isBrowser || this.editor || !this.editorContainer) {
+      return;
+    }
+
+    // Dynamically import Monaco Editor only in browser
+    if (!this.monaco) {
+      this.monaco = await import('monaco-editor');
+    }
+
+    setTimeout(() => {
+      if (this.editorContainer && this.monaco) {
+        this.editor = this.monaco.editor.create(this.editorContainer.nativeElement, {
+          value: this.testCase.test_script || '',
+          language: 'python',
+          theme: 'vs-dark',
+          automaticLayout: true,
+          minimap: { enabled: false },
+          lineNumbers: 'on',
+          scrollBeyondLastLine: false,
+          fontSize: 14,
+          wordWrap: 'on',
+          lineDecorationsWidth: 10,
+          lineNumbersMinChars: 3,
+          glyphMargin: false,
+          folding: true,
+          renderLineHighlight: 'all',
+          selectOnLineNumbers: true,
+        });
+
+        // Update model when editor content changes
+        this.editor.onDidChangeModelContent(() => {
+          if (this.editor) {
+            this.testCase.test_script = this.editor.getValue();
+          }
+        });
+      }
+    }, 0);
+  }
+
+  disposeEditor() {
+    if (this.editor) {
+      this.editor.dispose();
+      this.editor = undefined;
+    }
+  }
+
+  onTabChange(tab: 'details' | 'script' | 'links' | 'executions') {
+    this.activeTab = tab;
+    
+    if (tab === 'script') {
+      // Dispose existing editor if any
+      this.disposeEditor();
+      // Initialize editor after view updates
+      setTimeout(() => this.initializeEditor(), 0);
+    } else {
+      // Dispose editor when leaving script tab
+      this.disposeEditor();
+    }
   }
 
   loadTestCase() {
