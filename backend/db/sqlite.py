@@ -11,7 +11,7 @@ import os
 import pathlib
 import sqlite3
 
-from backend.app_def.app_def import (
+from backend.app.app_def import (
     DB_NAME
 )
 from backend.db.db import (

@@ -11,7 +11,7 @@ import logging
 
 from fastapi import APIRouter, Request, status, Response
 
-from backend.app_def.app_def import API_VERSION
+from backend.app.app_def import API_VERSION
 from backend.module.runners import (
     TABLE_RUNNER_STATS_CURRENT
 )

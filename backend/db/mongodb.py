@@ -13,7 +13,7 @@ import os
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 
-from backend.app_def.app_def import (
+from backend.app.app_def import (
     DB_NAME,
     DB_COLLECTION_PRJ,
     DB_COLLECTION_TC,
@@ -162,7 +162,7 @@ class MongoClient(DatabaseClient):
 
         super().__init__(db_name, db_url, db_type, db_mode)
 
-    def _convert_objectid(self, doc: dict) -> dict:
+    def _convert_object_id(self, doc: dict) -> dict:
         """Convert ObjectId to string in a MongoDB document."""
 
         if doc and "_id" in doc and isinstance(doc["_id"], ObjectId):
@@ -225,7 +225,7 @@ class MongoClient(DatabaseClient):
 
         cursor = self._db_client[self._db_name][table].find(query)
         results = await cursor.to_list()
-        results = [self._convert_objectid(p) for p in results]
+        results = [self._convert_object_id(p) for p in results]
 
         return results
 
@@ -235,7 +235,7 @@ class MongoClient(DatabaseClient):
         """Retrieve a single record from the database."""
 
         result = await self._db_client[self._db_name][table].find_one(query)
-        result = self._convert_objectid(result)
+        result = self._convert_object_id(result)
 
         return result
 

@@ -18,7 +18,7 @@ from fastapi import (
 )
 from starlette.responses import JSONResponse
 
-from backend.app_def.app_def import (
+from backend.app.app_def import (
     DB_COLLECTION_TC,
     TC_KEY_PREFIX,
     API_VERSION
@@ -29,7 +29,7 @@ from backend.models.test_cases import (
     TestCaseUpdate
 )
 from backend.routes.projects import get_project_by_key
-from backend.tools.tools import get_current_utc_time
+from backend.app.utility import get_current_utc_time
 
 router = APIRouter()
 

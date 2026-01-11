@@ -15,7 +15,7 @@ from fastapi import (
 )
 from starlette.responses import JSONResponse
 
-from backend.app_def.app_def import (
+from backend.app.app_def import (
     DB_COLLECTION_PRJ,
     API_VERSION
 )
@@ -24,7 +24,7 @@ from backend.models.projects import (
     ProjectCreate,
     ProjectUpdate
 )
-from backend.tools.tools import (
+from backend.app.utility import (
     get_current_utc_time
 )
 

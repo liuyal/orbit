@@ -18,7 +18,7 @@ from fastapi import (
 )
 from starlette.responses import JSONResponse
 
-from backend.app_def.app_def import (
+from backend.app.app_def import (
     DB_COLLECTION_TE,
     DB_COLLECTION_TCY,
     TCY_KEY_PREFIX,
@@ -35,7 +35,7 @@ from backend.routes.test_executions import (
     TestExecution,
     get_execution_by_key
 )
-from backend.tools.tools import get_current_utc_time
+from backend.app.utility import get_current_utc_time
 
 router = APIRouter()
 

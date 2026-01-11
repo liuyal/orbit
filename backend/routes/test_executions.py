@@ -18,7 +18,7 @@ from fastapi import (
 )
 from starlette.responses import JSONResponse
 
-from backend.app_def.app_def import (
+from backend.app.app_def import (
     DB_COLLECTION_TE,
     TE_KEY_PREFIX,
     API_VERSION

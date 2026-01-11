@@ -6,10 +6,11 @@
 # License: MIT
 # ================================================================
 
+# tools/build_parser.py
+
 import argparse
 import pathlib
 
-from backend.db.db import DBType
 
 def build_parser():
     """ Build argument parser. """
