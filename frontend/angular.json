@@ -37,6 +37,9 @@
             "outputMode": "server",
             "ssr": {
               "entry": "src/server.ts"
+            },
+            "loader": {
+              ".ttf": "file"
             }
           },
           "configurations": {

@@ -64,7 +64,7 @@ fi
 if [[ -n "$BUILD_FLAG" ]]; then
   echo "Building docker images..."
   docker compose -f docker-compose.yml build
-  docker compose -f docker-compose-runners.yml build
+  #docker compose -f docker-compose-runners.yml build
 
 fi
 

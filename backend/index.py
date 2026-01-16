@@ -8,15 +8,16 @@
 import logging.config
 import os
 import pathlib
+
 from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
 
-from backend.app.app_def import API_VERSION
+from backend.app.app_def import API_VERSION, TMP_DIR, DB_NAME
 from backend.db.mongodb import MongoClient
 from backend.db.sqlite import SqliteClient
-from backend.module.runners import query_runner_status
+# from backend.module.runners import query_runner_status
 from backend.routes import routers
 from backend.app.build_parser import build_parser
 from backend.app.utility import configure_logging_file
@@ -28,7 +29,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app):
     """ Lifespan context manager to handle startup and shutdown events. """
 
-    query_runner_status(pathlib.Path(os.getenv("SQLITE_DATABASE")))
+    #query_runner_status(TMP_DIR / DB_NAME)
 
     # Initialize sqlite client
     sqlite_client = SqliteClient()
