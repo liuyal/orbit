@@ -26,8 +26,13 @@ RUN echo "=== Build output ===" && \
 # Stage 2: Serve the application with Nginx
 FROM nginx:alpine
 
-# Install OpenSSL for generating SSL certificates
-RUN apk add --no-cache openssl
+# Temporarily use HTTP repositories to avoid TLS issues, install packages including ca-certificates
+RUN sed -i 's/https/http/g' /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache \
+    ca-certificates \
+    openssl && \
+    sed -i 's/http:/https:/g' /etc/apk/repositories
 
 # Copy built Angular app from build stage (browser folder for SSR apps)
 # For static builds, files are directly in dist/orbit-app/browser

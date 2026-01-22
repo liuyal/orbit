@@ -7,24 +7,23 @@ LABEL maintainer="jerry"
 # Set working directory
 WORKDIR /usr/local/apache2/
 
-# Install additional tools
+# Install additional tools and clone Apache Directory Listing
 RUN apt-get update && \
     apt-get install -y \
+    ca-certificates \
     curl  \
     vim \
-    git
-
-# Clean up apt cache to reduce image size
-RUN rm -rf /var/lib/apt/lists/*
-
-# Install Apache Directory Listing
-RUN cd /tmp && \
-    git clone https://github.com/ramlmn/Apache-Directory-Listing.git && \
+    git \
+    openssl && \
+    update-ca-certificates --fresh && \
+    cd /tmp && \
+    GIT_SSL_NO_VERIFY=1 git clone https://github.com/ramlmn/Apache-Directory-Listing.git && \
     cp -r Apache-Directory-Listing/directory-listing /usr/local/apache2/htdocs/ && \
     cp Apache-Directory-Listing/htaccess.txt /usr/local/apache2/htdocs/.htaccess && \
     sed -i 's/{LISTING_DIRECTORY}/\/directory-listing/g' /usr/local/apache2/htdocs/.htaccess && \
     sed -i 's/{LISTING_STYLE}/table-darkmode/g' /usr/local/apache2/htdocs/.htaccess && \
-    rm -rf /tmp/Apache-Directory-Listing
+    rm -rf /tmp/Apache-Directory-Listing && \
+    rm -rf /var/lib/apt/lists/*
 
 # Enable .htaccess support and SSL
 RUN sed -i '/<Directory "\/usr\/local\/apache2\/htdocs">/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /usr/local/apache2/conf/httpd.conf && \
