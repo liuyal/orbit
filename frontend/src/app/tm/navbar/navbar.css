@@ -37,6 +37,27 @@
   font-size: 28px;
 }
 
+.api-docs-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  color: #4da6ff;
+  border: 1px solid #0057adff;
+  background: none;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+}
+
+.api-docs-button:hover {
+  background-color: #0057adff;
+  color: white;
+}
+
 .back-button {
   background: none;
   border: 1px solid #0057adff;
