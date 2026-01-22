@@ -15,6 +15,7 @@ export class NavbarComponent {
   @Input() backButtonAction?: () => void;
   @Input() showCreateButton: boolean = false;
   @Input() createButtonAction?: () => void;
+  @Input() showApiButton: boolean = false;
 
   handleBackClick() {
     if (this.backButtonAction) {

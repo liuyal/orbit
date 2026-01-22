@@ -3,9 +3,11 @@
     <i class="fa-solid fa-rocket"></i>
     <span>ORBIT</span>
   </a>
-  <a href="/api/v1/docs" class="api-docs-button" target="_blank">
-    <i class="fa-solid fa-code"></i>
-  </a>
+  @if (showApiButton) {
+    <a href="/api/v1/docs" class="api-docs-button" target="_blank">
+      <i class="fa-solid fa-code"></i>
+    </a>
+  }
   @if (showBackButton) {
     <button class="back-button" (click)="handleBackClick()">
       <i class="fa-solid fa-arrow-left"></i>

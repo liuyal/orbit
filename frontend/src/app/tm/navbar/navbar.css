@@ -4,7 +4,7 @@
 .navbar {
   background-color: #1e1e1e;
   border-bottom: 2px solid #0057adff;
-  padding: 0 30px;
+  padding: 0 20px;
   height: 70px;
   display: flex;
   align-items: center;
@@ -41,11 +41,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
   height: 36px;
-  border-radius: 6px;
   color: #4da6ff;
-  border: 1px solid #0057adff;
   background: none;
   text-decoration: none;
   cursor: pointer;
@@ -54,7 +51,6 @@
 }
 
 .api-docs-button:hover {
-  background-color: #0057adff;
   color: white;
 }
 
@@ -82,7 +78,7 @@
   border: none;
   color: white;
   padding: 8px 12px;
-  border-radius: 6px;
+  border-radius: 3px;
   cursor: pointer;
   font-size: 16px;
   display: flex;

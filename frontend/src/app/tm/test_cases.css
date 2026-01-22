@@ -3,7 +3,7 @@
    ======================================== */
 
 .content {
-  margin: 20px;
+  margin: 0px;
 }
 
 
@@ -75,10 +75,10 @@
 }
 
 .tab-content {
-  padding: 15px;
+  padding: 0px;
   color: #e0e0e0;
   background-color: #1e1e1e;
-  height: calc(100vh - 155px);
+  height: calc(100vh - 90px);
   overflow: hidden;
   display: flex;
   flex-direction: column;

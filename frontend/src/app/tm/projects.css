@@ -3,7 +3,11 @@
    ======================================== */
 
 .projects-container {
-  margin: 20px;
+  box-sizing: border-box;
+  height: calc(100vh - 50px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* ========================================
@@ -277,23 +281,23 @@
    ======================================== */
 
 .table-wrapper {
-  max-height: calc(100vh - 110px);
+  flex: 1;
   overflow-y: auto;
-  overflow-x: auto;
+  overflow-x: hidden;
+  position: relative;
 }
 
 .prj-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  overflow: hidden;
   background-color: #1e1e1e;
 }
 
 .prj-table th {
-  background-color: #0172ad;
+  background-color: #025e8f;
   color: white;
-  padding: 10px 20px;
+  padding: 5px 30px;
   text-align: left;
   position: sticky;
   top: 0;
@@ -310,11 +314,10 @@
   text-align: right;
   width: 1%;
   white-space: nowrap;
-  padding-right: 20px;
 }
 
 .prj-table td {
-  padding: 10px 20px;
+  padding: 5px 30px;
   text-align: left;
   border-bottom: 1px solid #333;
   background-color: #252525;
