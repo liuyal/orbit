@@ -1,0 +1,88 @@
+<app-navbar [showBackButton]="true" [backButtonText]="'Back to Test Cycles'"
+    [backButtonAction]="goBack.bind(this)"></app-navbar>
+
+<div class="content">
+    @if (loading) {
+    <div class="loading-container">
+        <div class="spinner"></div>
+    </div>
+    } @else {
+    <div class="tabs-container">
+        <div class="tabs">
+            <button type="button" class="tab" [class.active]="activeTab === 'details'" (click)="onTabChange('details')">
+                <i class="fa-solid fa-info-circle"></i>
+                Details
+            </button>
+            @if (isEditMode) {
+            <button type="button" class="tab" [class.active]="activeTab === 'executions'" (click)="onTabChange('executions')">
+                <i class="fa-solid fa-list-check"></i>
+                Executions
+            </button>
+            }
+        </div>
+
+        <div class="tab-content">
+            @if (activeTab === 'details') {
+            <div class="form-container">
+                <form (ngSubmit)="submitTestCycle()">
+                    @if (apiError) {
+                    <div class="alert-error">
+                        {{ apiError }}
+                    </div>
+                    }
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="test_cycle_key">Test Cycle Key</label>
+                            <input type="text" id="test_cycle_key" [(ngModel)]="testCycle.test_cycle_key" name="test_cycle_key"
+                                placeholder="Enter test cycle key" [required]="!isEditMode"
+                                [class.error]="errors.test_cycle_key" [disabled]="isEditMode" />
+                            @if (errors.test_cycle_key) {
+                            <span class="error-message">{{ errors.test_cycle_key }}</span>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" id="title" [(ngModel)]="testCycle.title" name="title"
+                                placeholder="Enter test cycle title" required [class.error]="errors.title" />
+                            @if (errors.title) {
+                            <span class="error-message">{{ errors.title }}</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" [(ngModel)]="testCycle.description" name="description"
+                            placeholder="Enter test cycle description" rows="4"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select id="status" [(ngModel)]="testCycle.status" name="status">
+                                <option value="DRAFT">DRAFT</option>
+                                <option value="ACTIVE">ACTIVE</option>
+                                <option value="COMPLETED">COMPLETED</option>
+                                <option value="ARCHIVED">ARCHIVED</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">{{ isEditMode ? 'Update' : 'Create' }}</button>
+                    </div>
+                </form>
+            </div>
+            } @else if (activeTab === 'executions') {
+            <div class="form-container">
+                <div class="executions-placeholder">
+                    <i class="fa-solid fa-list-check executions-icon"></i>
+                    <p>Test execution results will be displayed here.</p>
+                    @if (testCycle.executions && testCycle.executions.length > 0) {
+                    <p>Total executions: {{ testCycle.executions.length }}</p>
+                    }
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+    }
+</div>
