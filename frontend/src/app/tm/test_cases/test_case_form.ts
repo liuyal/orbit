@@ -91,16 +91,25 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // Initialize editor when script tab is active
-    if (this.activeTab === 'script') {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => this.initializeEditor(), 100);
-    }
+    // Editor will be initialized when script tab is activated
   }
 
   ngOnDestroy() {
+    // Mark as disposed to prevent any pending operations
     this.editorDisposed = true;
+    
+    // Save current value before disposing
+    if (this.editor) {
+      try {
+        this.testCase.test_script = this.editor.getValue();
+      } catch (e) {
+        // Ignore errors during cleanup
+      }
+    }
+    
+    // Clean up editor and observers
     this.disposeEditor();
+    
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
       this.resizeObserver = undefined;
@@ -110,6 +119,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   async initializeEditor() {
     // Prevent multiple initializations
     if (!this.isBrowser || this.isEditorInitializing || this.editor || !this.editorContainer || this.editorDisposed) {
+      console.log('Skipping editor init:', { isBrowser: this.isBrowser, isInit: this.isEditorInitializing, hasEditor: !!this.editor, hasContainer: !!this.editorContainer, disposed: this.editorDisposed });
       return;
     }
 
@@ -127,22 +137,24 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      // Small delay to ensure container is rendered
-      await new Promise(resolve => setTimeout(resolve, 50));
-
-      // Final check before creating editor
-      if (this.editorDisposed || this.editor || !this.editorContainer) {
+      const container = this.editorContainer.nativeElement;
+      
+      // Verify container has dimensions with retry logic
+      let retries = 0;
+      while ((container.offsetWidth === 0 || container.offsetHeight === 0) && retries < 5) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+      }
+      
+      if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+        console.warn('Editor container still has no dimensions after retries');
         this.isEditorInitializing = false;
         return;
       }
-
-      const container = this.editorContainer.nativeElement;
       
-      // Verify container has dimensions
-      if (container.offsetWidth === 0 || container.offsetHeight === 0) {
-        console.warn('Editor container has no dimensions, delaying initialization');
+      // Final check before creating editor
+      if (this.editorDisposed || this.editor || !this.editorContainer) {
         this.isEditorInitializing = false;
-        setTimeout(() => this.initializeEditor(), 200);
         return;
       }
 
@@ -218,31 +230,32 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onTabChange(tab: 'details' | 'script' | 'links' | 'executions') {
     const previousTab = this.activeTab;
+    
+    // Save script value before changing tabs
+    if (previousTab === 'script' && this.editor) {
+      this.testCase.test_script = this.editor.getValue();
+    }
+    
     this.activeTab = tab;
     
-    if (tab === 'script' && previousTab !== 'script') {
-      // Save current script value before disposing
-      if (this.editor) {
-        this.testCase.test_script = this.editor.getValue();
+    if (tab === 'script') {
+      // If editor doesn't exist, initialize it
+      if (!this.editor && !this.isEditorInitializing) {
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          if (this.activeTab === 'script' && !this.editorDisposed) {
+            this.initializeEditor();
+          }
+        }, 150);
+      } else if (this.editor) {
+        // Editor exists, just update its value and layout
+        setTimeout(() => {
+          if (this.editor && !this.editorDisposed) {
+            this.editor.setValue(this.testCase.test_script || '');
+            this.editor.layout();
+          }
+        }, 50);
       }
-      
-      // Dispose existing editor if any
-      this.disposeEditor();
-      
-      // Wait for Angular to update the view, then initialize
-      this.cdr.detectChanges();
-      setTimeout(() => {
-        if (this.activeTab === 'script' && !this.editorDisposed) {
-          this.initializeEditor();
-        }
-      }, 100);
-    } else if (previousTab === 'script' && tab !== 'script') {
-      // Save script value before leaving
-      if (this.editor) {
-        this.testCase.test_script = this.editor.getValue();
-      }
-      // Dispose editor when leaving script tab
-      this.disposeEditor();
     }
   }
 

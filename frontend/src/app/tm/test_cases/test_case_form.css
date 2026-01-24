@@ -165,10 +165,18 @@
   height: 540px;
   border: 1px solid #444;
   margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+  background-color: #1e1e1e;
 }
 
 .monaco-editor-container .monaco-editor {
   border-radius: 0px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .form-group input:focus,
