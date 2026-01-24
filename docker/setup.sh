@@ -26,11 +26,14 @@ for ((i=0; i<$#; i++)); do
   if [[ "$arg" == "--clean" || "$arg" == "-c" ]]; then
     CLEAN_FLAG="--clean"
 
-  elif [[ "$arg" == "--stop"  ]]; then
+  elif [[ "$arg" == "--stop" || "$arg" == "-p" ]]; then
     STOP_FLAG="--stop"
 
   elif [[ "$arg" == "--build" || "$arg" == "-b" ]]; then
     BUILD_FLAG="--build"
+
+  elif [[ "$arg" == "--build-runner" || "$arg" == "-br" ]]; then
+    BUILD_RUNNER_FLAG="--build-runner"
 
   elif [[ "$arg" == "--start" || "$arg" == "-s" ]]; then
     START_FLAG="--start"
@@ -45,6 +48,13 @@ for ((i=0; i<$#; i++)); do
   fi
 done
 
+if [[ -n "$STOP_FLAG" ]]; then
+  echo "Cleaning up existing Docker containers..."
+  docker stop $(docker ps -q)
+  docker rm -f $(docker ps -aq)
+  echo "Docker containers cleanup complete"
+fi
+
 if [[ -n "$CLEAN_FLAG" ]]; then
   echo "Cleaning up Docker containers and images..."
   docker stop $(docker ps -q)
@@ -52,28 +62,25 @@ if [[ -n "$CLEAN_FLAG" ]]; then
   docker system prune -af
   docker volume prune -af
   echo "Docker cleanup complete"
-
-elif [[ -n "$STOP_FLAG" ]]; then
-  echo "Cleaning up existing Docker containers..."
-  docker stop $(docker ps -q)
-  docker rm -f $(docker ps -aq)
-  echo "Docker containers cleanup complete"
-
 fi
 
 if [[ -n "$BUILD_FLAG" ]]; then
   echo "Building docker images..."
   docker compose -f docker-compose.yml build
-  #docker compose -f docker-compose-runners.yml build
+fi
 
+if [[ -n "$BUILD)_RUNNER_FLAG" ]]; then
+  echo "Building runner docker images..."
+  docker compose -f docker-compose-runners.yml build
 fi
 
 if [[ -n "$START_FLAG" ]]; then
   echo "Starting Docker containers..."
   docker compose -f docker-compose.yml up -d
   echo "Access the application at: https://localhost"
+fi
 
-elif [[ -n "$RUNNER_FLAG" ]]; then
+if [[ -n "$RUNNER_FLAG" ]]; then
   echo "Starting $RUNNER_SCALE runner container(s)..."
 
   # Create tmp directory if it doesn't exist
@@ -103,14 +110,11 @@ EOF
       - RUNNER_LABELS=linux
 EOF
   done
-
   # Start all runners using docker compose
   echo "Starting runners with docker compose..."
   docker compose -f tmp/docker-compose-tmp-runner.yml up -d
-
   echo "Started $RUNNER_SCALE runner(s)"
   echo "Temporary compose file saved at: tmp/docker-compose-tmp-runner.yml"
-
 fi
 
 echo "Docker setup complete"
