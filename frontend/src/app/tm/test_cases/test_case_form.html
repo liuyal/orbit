@@ -30,8 +30,7 @@
         </div>
 
         <div class="tab-content">
-            @if (activeTab === 'details') {
-            <div class="form-container">
+            <div class="form-container" [class.hidden]="activeTab !== 'details'">
                 <form (ngSubmit)="submitTestCase()">
                     @if (apiError) {
                     <div class="alert-error">
@@ -101,8 +100,7 @@
                     </div>
                 </form>
             </div>
-            } @else if (activeTab === 'script') {
-            <div class="form-container">
+            <div class="form-container" [class.hidden]="activeTab !== 'script'">
                 <form (ngSubmit)="submitTestCase()">
                     <div class="form-group">
                         <label for="test_script">Test Script</label>
@@ -115,8 +113,7 @@
                     </div>
                 </form>
             </div>
-            } @else if (activeTab === 'links') {
-            <div class="form-container">
+            <div class="form-container" [class.hidden]="activeTab !== 'links'">
                 <form (ngSubmit)="submitTestCase()">
                     <div class="form-group">
                         <label for="links">Links</label>
@@ -130,8 +127,8 @@
                     </div>
                 </form>
             </div>
-            } @else if (activeTab === 'executions') {
-            <div class="form-container">
+            @if (isEditMode) {
+            <div class="form-container" [class.hidden]="activeTab !== 'executions'">
                 <div class="executions-placeholder">
                     <i class="fa-solid fa-list-check executions-icon"></i>
                     <p>Test execution results will be displayed here.</p>

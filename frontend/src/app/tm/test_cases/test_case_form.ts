@@ -91,7 +91,12 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // Editor will be initialized when script tab is activated
+    // Initialize editor once - container now persists in DOM
+    setTimeout(() => {
+      if (this.editorContainer && !this.editor && !this.editorDisposed) {
+        this.initializeEditor();
+      }
+    }, 100);
   }
 
   ngOnDestroy() {
@@ -238,24 +243,15 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     
     this.activeTab = tab;
     
+    // If switching to script tab, ensure editor is properly laid out
     if (tab === 'script') {
-      // If editor doesn't exist, initialize it
-      if (!this.editor && !this.isEditorInitializing) {
-        this.cdr.detectChanges();
-        setTimeout(() => {
-          if (this.activeTab === 'script' && !this.editorDisposed) {
-            this.initializeEditor();
-          }
-        }, 150);
-      } else if (this.editor) {
-        // Editor exists, just update its value and layout
-        setTimeout(() => {
-          if (this.editor && !this.editorDisposed) {
-            this.editor.setValue(this.testCase.test_script || '');
-            this.editor.layout();
-          }
-        }, 50);
-      }
+      setTimeout(() => {
+        if (this.editor && !this.editorDisposed) {
+          this.editor.layout();
+        } else if (!this.editor && !this.isEditorInitializing && this.editorContainer) {
+          this.initializeEditor();
+        }
+      }, 50);
     }
   }
 

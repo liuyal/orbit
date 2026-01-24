@@ -104,6 +104,10 @@
   flex-direction: column;
 }
 
+.tab-content .hidden {
+  display: none !important;
+}
+
 /* ========================================
    FORMS
    ======================================= */
