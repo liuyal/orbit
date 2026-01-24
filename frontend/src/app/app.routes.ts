@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { Landing } from './landing';
-import { Project } from './tm/projects';
-import { TestCases } from './tm/test_cases';
-import { TestCaseFormComponent } from './tm/test_case_form';
+import { Landing } from './landing/landing';
+import { Project } from './tm/projects/projects';
+import { TestCases } from './tm/test_cases/test_cases';
+import { TestCaseFormComponent } from './tm/test_cases/test_case_form';
 
 export const routes: Routes = [
   { path: '', component: Landing },
