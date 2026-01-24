@@ -71,7 +71,6 @@ async def get_all_test_cases_by_project(request: Request,
 
 @router.post(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
              tags=[DB_COLLECTION_TC],
-             response_model=TestCase,
              status_code=status.HTTP_201_CREATED)
 async def create_test_case_by_project(request: Request,
                                       project_key: str,
@@ -138,8 +137,9 @@ async def create_test_case_by_project(request: Request,
     db = request.app.state.mdb
     await db.create(DB_COLLECTION_TC, db_insert)
 
-    return Response(status_code=status.HTTP_201_CREATED,
-                    content=request_data)
+    return JSONResponse(status_code=status.HTTP_201_CREATED,
+                        content=request_data)
+
 
 
 @router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
