@@ -4,7 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar';
-import { configureMonaco } from './monaco-config';
+import { createCodeMirrorEditor } from './codemirror-config';
+import type { EditorView } from 'codemirror';
 
 export interface TestCaseForm {
   test_case_key: string;
@@ -35,12 +36,10 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   platformId = inject(PLATFORM_ID);
   
   @ViewChild('editorContainer', { static: false }) editorContainer?: ElementRef<HTMLDivElement>;
-  private editor?: any;
+  private editor?: EditorView;
   private isBrowser = false;
-  private monaco?: any;
   private isEditorInitializing = false;
   private editorDisposed = false;
-  private resizeObserver?: ResizeObserver;
   
   projectKey = '';
   testCaseKey = '';
@@ -70,11 +69,6 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     // Check if running in browser
     this.isBrowser = isPlatformBrowser(this.platformId);
-    
-    // Configure Monaco Editor environment only in browser
-    if (this.isBrowser) {
-      configureMonaco();
-    }
     
     this.route.params.subscribe(params => {
       this.projectKey = params['projectKey'];
@@ -106,19 +100,14 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     // Save current value before disposing
     if (this.editor) {
       try {
-        this.testCase.test_script = this.editor.getValue();
+        this.testCase.test_script = this.editor.state.doc.toString();
       } catch (e) {
         // Ignore errors during cleanup
       }
     }
     
-    // Clean up editor and observers
+    // Clean up editor
     this.disposeEditor();
-    
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = undefined;
-    }
   }
 
   async initializeEditor() {
@@ -131,12 +120,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isEditorInitializing = true;
 
     try {
-      // Dynamically import Monaco Editor only in browser
-      if (!this.monaco) {
-        this.monaco = await import('monaco-editor');
-      }
-
-      // Check again after async import
+      // Check again after async operations
       if (this.editorDisposed || this.editor || !this.editorContainer) {
         this.isEditorInitializing = false;
         return;
@@ -163,67 +147,26 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      this.editor = this.monaco.editor.create(container, {
-        value: this.testCase.test_script || '',
-        language: 'python',
-        theme: 'vs-dark',
-        automaticLayout: false, // We'll handle this manually
-        minimap: { enabled: false },
-        lineNumbers: 'on',
-        scrollBeyondLastLine: false,
-        fontSize: 14,
-        wordWrap: 'on',
-        lineDecorationsWidth: 10,
-        lineNumbersMinChars: 3,
-        glyphMargin: false,
-        folding: true,
-        renderLineHighlight: 'all',
-        selectOnLineNumbers: true,
-        scrollbar: {
-          useShadows: false,
-          verticalScrollbarSize: 10,
-          horizontalScrollbarSize: 10
+      // Create CodeMirror editor
+      this.editor = createCodeMirrorEditor(
+        container,
+        this.testCase.test_script || '',
+        (value: string) => {
+          this.testCase.test_script = value;
         }
-      });
-
-      // Update model when editor content changes
-      this.editor.onDidChangeModelContent(() => {
-        if (this.editor) {
-          this.testCase.test_script = this.editor.getValue();
-        }
-      });
-
-      // Set up resize observer for better layout handling
-      this.resizeObserver = new ResizeObserver(() => {
-        if (this.editor && !this.editorDisposed) {
-          this.editor.layout();
-        }
-      });
-      this.resizeObserver.observe(container);
-
-      // Initial layout
-      setTimeout(() => {
-        if (this.editor && !this.editorDisposed) {
-          this.editor.layout();
-        }
-      }, 100);
+      );
 
     } catch (error) {
-      console.error('Failed to initialize Monaco Editor:', error);
+      console.error('Failed to initialize CodeMirror Editor:', error);
     } finally {
       this.isEditorInitializing = false;
     }
   }
 
   disposeEditor() {
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-      this.resizeObserver = undefined;
-    }
-    
     if (this.editor) {
       try {
-        this.editor.dispose();
+        this.editor.destroy();
       } catch (error) {
         console.warn('Error disposing editor:', error);
       }
@@ -238,19 +181,15 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     
     // Save script value before changing tabs
     if (previousTab === 'script' && this.editor) {
-      this.testCase.test_script = this.editor.getValue();
+      this.testCase.test_script = this.editor.state.doc.toString();
     }
     
     this.activeTab = tab;
     
-    // If switching to script tab, ensure editor is properly laid out
-    if (tab === 'script') {
+    // If switching to script tab, ensure editor exists (CodeMirror handles layout automatically)
+    if (tab === 'script' && !this.editor && !this.isEditorInitializing && this.editorContainer) {
       setTimeout(() => {
-        if (this.editor && !this.editorDisposed) {
-          this.editor.layout();
-        } else if (!this.editor && !this.isEditorInitializing && this.editorContainer) {
-          this.initializeEditor();
-        }
+        this.initializeEditor();
       }, 50);
     }
   }

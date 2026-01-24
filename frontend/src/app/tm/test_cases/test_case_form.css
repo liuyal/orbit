@@ -174,13 +174,19 @@
   background-color: #1e1e1e;
 }
 
-.monaco-editor-container .monaco-editor {
-  border-radius: 0px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+/* CodeMirror 6 styling */
+.monaco-editor-container .cm-editor {
+  height: 100%;
+  font-size: 14px;
+}
+
+.monaco-editor-container .cm-scroller {
+  overflow: auto;
+}
+
+.monaco-editor-container .cm-gutters {
+  background-color: #1e1e1e;
+  border-right: 1px solid #444;
 }
 
 .form-group input:focus,
