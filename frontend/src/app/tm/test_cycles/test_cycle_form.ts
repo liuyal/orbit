@@ -9,8 +9,7 @@ export interface TestCycleForm {
   test_cycle_key: string;
   title: string;
   description: string;
-  status: string;
-  executions: any[];
+  executions: any[] | null;
 }
 
 @Component({
@@ -31,13 +30,13 @@ export class TestCycleFormComponent implements OnInit {
   testCycleKey = '';
   isEditMode = false;
   loading = false;
-  activeTab: 'details' | 'executions' = 'details';
+  activeTab: 'test-executions' | 'details' = 'details';
+  selectedExecution: any = null;
   
   testCycle: TestCycleForm = {
     test_cycle_key: '',
     title: '',
     description: '',
-    status: 'DRAFT',
     executions: []
   };
   
@@ -55,20 +54,31 @@ export class TestCycleFormComponent implements OnInit {
       
       if (this.isEditMode) {
         console.log('Edit mode - test cycle:', this.testCycleKey, 'for project:', this.projectKey);
+        this.activeTab = 'test-executions';
         this.loadTestCycle();
       } else {
         console.log('Create mode - project:', this.projectKey);
+        this.activeTab = 'details';
       }
     });
   }
 
-  onTabChange(tab: 'details' | 'executions') {
+  onTabChange(tab: 'test-executions' | 'details') {
     this.activeTab = tab;
+  }
+
+  selectExecution(execution: any) {
+    this.selectedExecution = execution;
+  }
+
+  addTestCase() {
+    // TODO: Implement add test case to cycle functionality
+    console.log('Add test case to cycle');
   }
 
   loadTestCycle() {
     this.loading = true;
-    const url = `/api/tm/projects/${this.projectKey}/cycles/${this.testCycleKey}`;
+    const url = `/api/tm/cycles/${this.testCycleKey}`;
     console.log('Loading test cycle from URL:', url);
     
     this.http.get<any>(url).subscribe({
@@ -78,7 +88,6 @@ export class TestCycleFormComponent implements OnInit {
           this.testCycle.test_cycle_key = data.test_cycle_key || '';
           this.testCycle.title = data.title || '';
           this.testCycle.description = data.description || '';
-          this.testCycle.status = data.status || 'DRAFT';
           this.testCycle.executions = data.executions || [];
           console.log('Test cycle data processed successfully');
         } catch (error) {
@@ -126,17 +135,17 @@ export class TestCycleFormComponent implements OnInit {
     const payload: any = {
       title: this.testCycle.title,
       description: this.testCycle.description,
-      status: this.testCycle.status,
       executions: this.testCycle.executions
     };
 
-    // For create mode, include project_key and optional test_cycle_key
+    // For create mode, include optional test_cycle_key (project_key comes from URL)
     if (!this.isEditMode) {
-      payload.project_key = this.projectKey;
       if (this.testCycle.test_cycle_key && this.testCycle.test_cycle_key.trim()) {
         payload.test_cycle_key = this.testCycle.test_cycle_key;
       }
     }
+
+    console.log('Payload being sent:', payload);
 
     // Use POST for create, PUT for edit
     const request = this.isEditMode
@@ -150,6 +159,7 @@ export class TestCycleFormComponent implements OnInit {
       },
       error: (error) => {
         console.error(`Error ${this.isEditMode ? 'updating' : 'creating'} test cycle:`, error);
+        console.error('Full error object:', error);
         let errorMessage = `Failed to ${this.isEditMode ? 'update' : 'create'} test cycle. Please try again.`;
         if (error.error) {
           if (typeof error.error === 'string') {
@@ -162,6 +172,7 @@ export class TestCycleFormComponent implements OnInit {
           }
         }
         this.apiError = errorMessage;
+        this.cdr.detectChanges();
       }
     });
   }

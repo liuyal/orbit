@@ -24,6 +24,7 @@ from backend.app.app_def import (
     TCY_KEY_PREFIX,
     API_VERSION
 )
+from backend.app.utility import get_current_utc_time
 from backend.models.test_cycles import (
     TestCycle,
     TestCycleCreate,
@@ -35,7 +36,6 @@ from backend.routes.test_executions import (
     TestExecution,
     get_execution_by_key
 )
-from backend.app.utility import get_current_utc_time
 
 router = APIRouter()
 
@@ -130,8 +130,8 @@ async def create_cycle_for_project(request: Request,
     db = request.app.state.mdb
     await db.create(DB_COLLECTION_TCY, db_insert)
 
-    return Response(status_code=status.HTTP_201_CREATED,
-                    content=request_data)
+    return JSONResponse(status_code=status.HTTP_201_CREATED,
+                        content=request_data)
 
 
 @router.get(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}",

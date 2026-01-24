@@ -43,8 +43,7 @@
             <th>Key</th>
             <th>Title</th>
             <th>Status</th>
-            <th>Created</th>
-            <th>Executions</th>
+            <th>Progress</th>
             <th></th>
           </tr>
         </thead>
@@ -58,7 +57,6 @@
                 {{ testCycle.status || 'N/A' }}
               </span>
             </td>
-            <td>{{ testCycle.created_at || 'N/A' }}</td>
             <td>{{ testCycle.executions?.length || 0 }}</td>
             <td>
               <div class="action-buttons">

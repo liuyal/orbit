@@ -106,7 +106,7 @@ export class TestCycles implements OnInit {
   deleteTestCycle(testCycle: TestCycle) {
     if (confirm(`Are you sure you want to delete test cycle ${testCycle.test_cycle_key}?`)) {
       console.log('Delete test cycle:', testCycle);
-      this.http.delete(`/api/tm/projects/${this.projectKey}/cycles/${testCycle.test_cycle_key}`)
+      this.http.delete(`/api/tm/cycles/${testCycle.test_cycle_key}`)
         .subscribe({
           next: () => {
             console.log('Test cycle deleted successfully');
