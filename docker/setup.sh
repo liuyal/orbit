@@ -26,13 +26,13 @@ for ((i=0; i<$#; i++)); do
   if [[ "$arg" == "--clean" || "$arg" == "-c" ]]; then
     CLEAN_FLAG="--clean"
 
-  elif [[ "$arg" == "--stop" || "$arg" == "-s" ]]; then
+  elif [[ "$arg" == "--stop"  ]]; then
     STOP_FLAG="--stop"
 
   elif [[ "$arg" == "--build" || "$arg" == "-b" ]]; then
     BUILD_FLAG="--build"
 
-  elif [[ "$arg" == "--start" ]]; then
+  elif [[ "$arg" == "--start" || "$arg" == "-s" ]]; then
     START_FLAG="--start"
 
   elif [[ "$arg" == "--start-runner" || "$arg" == "-r" ]]; then

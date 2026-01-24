@@ -6,6 +6,11 @@
       <div class="spinner"></div>
       <span>Loading Projects...</span>
     </div>
+  } @else if (error) {
+    <div class="error-state">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ error }}</p>
+    </div>
   } @else if (projects.length === 0) {
     <div class="empty-state">
       <i class="fa-solid fa-folder-open"></i>

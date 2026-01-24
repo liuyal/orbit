@@ -19,6 +19,7 @@ export class Project {
   router = inject(Router);
   projects: any[] = [];
   isLoading = true;
+  error = '';
   showCreateModal = false;
   showEditModal = false;
   newProject = {
@@ -43,6 +44,7 @@ export class Project {
 
   loadProjects() {
     this.isLoading = true;
+    this.error = '';
     this.http.get<any[]>('/api/tm/projects').subscribe({
       next: (data) => {
         this.projects = data;
@@ -51,6 +53,7 @@ export class Project {
       },
       error: (error) => {
         console.error('Error loading projects:', error);
+        this.error = 'Failed to load projects. Please try again.';
         this.projects = [];
         this.isLoading = false;
         this.cdr.detectChanges();

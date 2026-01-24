@@ -1,0 +1,81 @@
+<app-navbar [showBackButton]="true" [backButtonText]="'Back to Projects'" [backButtonAction]="goBack.bind(this)"></app-navbar>
+
+<div class="content">
+<div class="tabs-container">
+  <div class="tabs">
+    <button class="tab" (click)="navigateToTestCases()">
+      <i class="fa-solid fa-flask"></i>
+      Test Cases
+    </button>
+    <button class="tab active">
+      <i class="fa-regular fa-rectangle-list"></i>
+      Test Cycles
+    </button>
+    <button class="create-btn-tab" (click)="createTestCycle()">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+  </div>
+</div>
+
+<div class="tab-content">
+  <div>
+    @if (loading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <span>Loading test cycles...</span>
+    </div>
+    } @else if (error) {
+    <div class="error-state">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ error }}</p>
+    </div>
+    } @else if (testCycles.length === 0) {
+    <div class="empty-state">
+      <i style="margin-bottom: 10px;" class="fa-regular fa-rectangle-list"></i>
+      <p>No test cycles found</p>
+      <p style="font-size: 16px;">Click the + button to create your first test cycle</p>
+    </div>
+    } @else {
+    <div class="test-cycles-list">
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Executions</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (testCycle of testCycles; track testCycle._id) {
+          <tr (click)="editTestCycle(testCycle)">
+            <td>{{ testCycle.test_cycle_key }}</td>
+            <td>{{ testCycle.title || 'Untitled' }}</td>
+            <td>
+              <span class="status-badge" [attr.data-status]="testCycle.status">
+                {{ testCycle.status || 'N/A' }}
+              </span>
+            </td>
+            <td>{{ testCycle.created_at || 'N/A' }}</td>
+            <td>{{ testCycle.executions?.length || 0 }}</td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn edit" (click)="$event.stopPropagation(); editTestCycle(testCycle)">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="action-btn delete" (click)="$event.stopPropagation(); deleteTestCycle(testCycle)">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+  </div>
+</div>
+</div>

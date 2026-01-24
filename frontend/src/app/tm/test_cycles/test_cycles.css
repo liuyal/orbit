@@ -123,30 +123,30 @@
 
 
 /* ========================================
-   TEST CASES TABLE
+   TEST CYCLES TABLE
    ======================================== */
 
-.test-cases-list {
+.test-cycles-list {
   overflow-y: auto;
   flex: 1;
 }
 
-.test-cases-list table {
+.test-cycles-list table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   background-color: #252525;
 }
 
-.test-cases-list thead {
+.test-cycles-list thead {
   background-color: #0172ad;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
-.test-cases-list th {
-  padding: 8px 20px;
+.test-cycles-list th {
+  padding: 12px 20px;
   text-align: left;
   color: #fff;
   font-weight: bold;
@@ -158,17 +158,17 @@
   background-color: #0172ad;
 }
 
-.test-cases-list th:first-child {
+.test-cycles-list th:first-child {
   padding-left: 24px;
 }
 
-.test-cases-list th:last-child {
+.test-cycles-list th:last-child {
   padding-right: 24px;
   width: 1%;
   white-space: nowrap;
 }
 
-.test-cases-list td {
+.test-cycles-list td {
   padding: 12px 20px;
   border-bottom: 1px solid #333;
   color: #e0e0e0;
@@ -177,31 +177,31 @@
   background-color: #252525;
 }
 
-.test-cases-list td:first-child {
+.test-cycles-list td:first-child {
   padding-left: 24px;
   font-weight: 500;
   color: #4da6ff;
 }
 
-.test-cases-list td:last-child {
+.test-cycles-list td:last-child {
   padding-right: 24px;
   width: 1%;
   white-space: nowrap;
 }
 
-.test-cases-list tbody tr {
+.test-cycles-list tbody tr {
   transition: all 0.2s ease;
 }
 
-.test-cases-list tbody tr:hover {
+.test-cycles-list tbody tr:hover {
   cursor: pointer;
 }
 
-.test-cases-list tbody tr:hover td {
+.test-cycles-list tbody tr:hover td {
   background-color: rgb(46, 46, 46);
 }
 
-.test-cases-list tbody tr:last-child td {
+.test-cycles-list tbody tr:last-child td {
   border-bottom: none;
 }
 
@@ -210,9 +210,7 @@
    BADGES
    ======================================== */
 
-.status-badge,
-.priority-badge,
-.result-badge {
+.status-badge {
   padding: 4px 8px;
   border-radius: 3px;
   font-size: 12px;
@@ -239,61 +237,22 @@
   font-weight: bold;
 }
 
-/* Priority Badge Variants */
-.priority-badge[data-priority="HIGH"] {
-  background-color: #ff1100;
-  color: #fff;
-  font-weight: bold;
-}
-
-.priority-badge[data-priority="MEDIUM"] {
-  background-color: #ffd700;
-  color: #222222;
-  font-weight: bold;
-}
-
-.priority-badge[data-priority="LOW"] {
-  background-color: #2196f3;
-  color: #fff;
-  font-weight: bold;
-}
-
-/* Result Badge Variants - Circular Design */
-.result-badge {
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 12px;
-  cursor: help;
-  transition: transform 0.2s ease;
-}
-
-.result-badge:hover {
-  transform: scale(1.15);
-}
-
-.result-badge[data-result="PASS"] {
+.status-badge[data-status="ACTIVE"] {
   background-color: #4caf50;
   color: #fff;
+  font-weight: bold;
 }
 
-.result-badge[data-result="FAIL"] {
-  background-color: #f44336;
-  color: #fff;
-}
-
-.result-badge[data-result="BLOCKED"] {
+.status-badge[data-status="COMPLETED"] {
   background-color: #2196f3;
   color: #fff;
+  font-weight: bold;
 }
 
-.result-badge[data-result="NOT_EXECUTED"] {
+.status-badge[data-status="ARCHIVED"] {
   background-color: #757575;
   color: #fff;
+  font-weight: bold;
 }
 
 

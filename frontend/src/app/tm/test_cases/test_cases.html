@@ -3,26 +3,32 @@
 <div class="content">
 <div class="tabs-container">
   <div class="tabs">
-    <button class="tab" [class.active]="activeTab === 'test-cases'" (click)="activeTab = 'test-cases'">
+    <button class="tab active">
       <i class="fa-solid fa-flask"></i>
       Test Cases
     </button>
-    <button class="tab" [class.active]="activeTab === 'test-cycles'" (click)="activeTab = 'test-cycles'">
+    <button class="tab" (click)="navigateToTestCycles()">
       <i class="fa-regular fa-rectangle-list"></i>
       Test Cycles
-      </button>
-      <button class="create-btn-tab" (click)="createTestCase()">
-        <i class="fa-solid fa-plus"></i>
-      </button>
-    </div>
+    </button>
+    <button class="create-btn-tab" (click)="createTestCase()">
+      <i class="fa-solid fa-plus"></i>
+    </button>
   </div>
+</div>
 
   <div class="tab-content">
-    @if (activeTab === 'test-cases') {
     <div>
       @if (loading) {
+      <div class="loading-container">
+        <div class="spinner"></div>
+        <span>Loading test cases...</span>
+      </div>
       } @else if (error) {
-      <p style="color: #f44336;">{{ error }}</p>
+      <div class="error-state">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p>{{ error }}</p>
+      </div>
       } @else if (testCases.length === 0) {
       <div class="empty-state">
         <i style="margin-bottom: 10px;" class="fa-solid fa-flask"></i>
@@ -81,14 +87,5 @@
       </div>
       }
     </div>
-    } @else if (activeTab === 'test-cycles') {
-    <div>
-      <div class="empty-state">
-        <i style="margin-bottom: 10px;"class="fa-regular fa-rectangle-list"></i>
-        <p>No test cycles found</p>
-        <p style="font-size: 16px;">Click the + button to create your first test cycle</p>
-      </div>
-    </div>
-    }
   </div>
 </div>

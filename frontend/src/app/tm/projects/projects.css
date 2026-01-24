@@ -11,6 +11,36 @@
 }
 
 /* ========================================
+   ERROR STATE
+   ======================================== */
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 100px;
+  padding-bottom: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
+  color: #f44336;
+  font-size: 18px;
+  text-align: center;
+  flex: 1;
+}
+
+.error-state i {
+  font-size: 48px;
+  color: #f44336;
+  margin-bottom: 16px;
+}
+
+.error-state p {
+  margin: 5px 0;
+  max-width: 600px;
+}
+
+/* ========================================
    BUTTONS
    ======================================== */
 
