@@ -130,7 +130,8 @@ async def create_cycle_for_project(request: Request,
     db = request.app.state.mdb
     await db.create(DB_COLLECTION_TCY, db_insert)
 
-    return Response(status_code=status.HTTP_201_CREATED)
+    return Response(status_code=status.HTTP_201_CREATED,
+                    content=request_data)
 
 
 @router.get(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}",

@@ -23,13 +23,13 @@ from backend.app.app_def import (
     TC_KEY_PREFIX,
     API_VERSION
 )
+from backend.app.utility import get_current_utc_time
 from backend.models.test_cases import (
     TestCase,
     TestCaseCreate,
     TestCaseUpdate
 )
 from backend.routes.projects import get_project_by_key
-from backend.app.utility import get_current_utc_time
 
 router = APIRouter()
 
@@ -71,6 +71,7 @@ async def get_all_test_cases_by_project(request: Request,
 
 @router.post(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
              tags=[DB_COLLECTION_TC],
+             response_model=TestCase,
              status_code=status.HTTP_201_CREATED)
 async def create_test_case_by_project(request: Request,
                                       project_key: str,
@@ -137,7 +138,8 @@ async def create_test_case_by_project(request: Request,
     db = request.app.state.mdb
     await db.create(DB_COLLECTION_TC, db_insert)
 
-    return Response(status_code=status.HTTP_201_CREATED)
+    return Response(status_code=status.HTTP_201_CREATED,
+                    content=request_data)
 
 
 @router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",

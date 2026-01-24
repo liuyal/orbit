@@ -137,7 +137,8 @@ async def create_execution_for_test_case(request: Request,
     db = request.app.state.mdb
     await db.create(DB_COLLECTION_TE, db_insert)
 
-    return Response(status_code=status.HTTP_201_CREATED)
+    return Response(status_code=status.HTTP_201_CREATED,
+                    content=request_data)
 
 
 @router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",

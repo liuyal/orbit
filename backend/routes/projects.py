@@ -19,13 +19,13 @@ from backend.app.app_def import (
     DB_COLLECTION_PRJ,
     API_VERSION
 )
+from backend.app.utility import (
+    get_current_utc_time
+)
 from backend.models.projects import (
     Project,
     ProjectCreate,
     ProjectUpdate
-)
-from backend.app.utility import (
-    get_current_utc_time
 )
 
 router = APIRouter()
@@ -79,12 +79,8 @@ async def create_project_by_key(request: Request,
     db = request.app.state.mdb
     await db.create(DB_COLLECTION_PRJ, db_insert)
 
-    # Retrieve the updated project
-    created_project = await db.find_one(DB_COLLECTION_PRJ,
-                                        {"project_key": project_key})
-
     return JSONResponse(status_code=status.HTTP_201_CREATED,
-                        content=created_project)
+                        content=request_data)
 
 
 @router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}",

@@ -38,6 +38,9 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   private editor?: any;
   private isBrowser = false;
   private monaco?: any;
+  private isEditorInitializing = false;
+  private editorDisposed = false;
+  private resizeObserver?: ResizeObserver;
   
   projectKey = '';
   testCaseKey = '';
@@ -90,71 +93,154 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     // Initialize editor when script tab is active
     if (this.activeTab === 'script') {
-      this.initializeEditor();
+      // Small delay to ensure DOM is ready
+      setTimeout(() => this.initializeEditor(), 100);
     }
   }
 
   ngOnDestroy() {
+    this.editorDisposed = true;
     this.disposeEditor();
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = undefined;
+    }
   }
 
   async initializeEditor() {
-    // Only initialize in browser context
-    if (!this.isBrowser || this.editor || !this.editorContainer) {
+    // Prevent multiple initializations
+    if (!this.isBrowser || this.isEditorInitializing || this.editor || !this.editorContainer || this.editorDisposed) {
       return;
     }
 
-    // Dynamically import Monaco Editor only in browser
-    if (!this.monaco) {
-      this.monaco = await import('monaco-editor');
-    }
+    this.isEditorInitializing = true;
 
-    setTimeout(() => {
-      if (this.editorContainer && this.monaco) {
-        this.editor = this.monaco.editor.create(this.editorContainer.nativeElement, {
-          value: this.testCase.test_script || '',
-          language: 'python',
-          theme: 'vs-dark',
-          automaticLayout: true,
-          minimap: { enabled: false },
-          lineNumbers: 'on',
-          scrollBeyondLastLine: false,
-          fontSize: 14,
-          wordWrap: 'on',
-          lineDecorationsWidth: 10,
-          lineNumbersMinChars: 3,
-          glyphMargin: false,
-          folding: true,
-          renderLineHighlight: 'all',
-          selectOnLineNumbers: true,
-        });
-
-        // Update model when editor content changes
-        this.editor.onDidChangeModelContent(() => {
-          if (this.editor) {
-            this.testCase.test_script = this.editor.getValue();
-          }
-        });
+    try {
+      // Dynamically import Monaco Editor only in browser
+      if (!this.monaco) {
+        this.monaco = await import('monaco-editor');
       }
-    }, 0);
+
+      // Check again after async import
+      if (this.editorDisposed || this.editor || !this.editorContainer) {
+        this.isEditorInitializing = false;
+        return;
+      }
+
+      // Small delay to ensure container is rendered
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      // Final check before creating editor
+      if (this.editorDisposed || this.editor || !this.editorContainer) {
+        this.isEditorInitializing = false;
+        return;
+      }
+
+      const container = this.editorContainer.nativeElement;
+      
+      // Verify container has dimensions
+      if (container.offsetWidth === 0 || container.offsetHeight === 0) {
+        console.warn('Editor container has no dimensions, delaying initialization');
+        this.isEditorInitializing = false;
+        setTimeout(() => this.initializeEditor(), 200);
+        return;
+      }
+
+      this.editor = this.monaco.editor.create(container, {
+        value: this.testCase.test_script || '',
+        language: 'python',
+        theme: 'vs-dark',
+        automaticLayout: false, // We'll handle this manually
+        minimap: { enabled: false },
+        lineNumbers: 'on',
+        scrollBeyondLastLine: false,
+        fontSize: 14,
+        wordWrap: 'on',
+        lineDecorationsWidth: 10,
+        lineNumbersMinChars: 3,
+        glyphMargin: false,
+        folding: true,
+        renderLineHighlight: 'all',
+        selectOnLineNumbers: true,
+        scrollbar: {
+          useShadows: false,
+          verticalScrollbarSize: 10,
+          horizontalScrollbarSize: 10
+        }
+      });
+
+      // Update model when editor content changes
+      this.editor.onDidChangeModelContent(() => {
+        if (this.editor) {
+          this.testCase.test_script = this.editor.getValue();
+        }
+      });
+
+      // Set up resize observer for better layout handling
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.editor && !this.editorDisposed) {
+          this.editor.layout();
+        }
+      });
+      this.resizeObserver.observe(container);
+
+      // Initial layout
+      setTimeout(() => {
+        if (this.editor && !this.editorDisposed) {
+          this.editor.layout();
+        }
+      }, 100);
+
+    } catch (error) {
+      console.error('Failed to initialize Monaco Editor:', error);
+    } finally {
+      this.isEditorInitializing = false;
+    }
   }
 
   disposeEditor() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = undefined;
+    }
+    
     if (this.editor) {
-      this.editor.dispose();
+      try {
+        this.editor.dispose();
+      } catch (error) {
+        console.warn('Error disposing editor:', error);
+      }
       this.editor = undefined;
     }
+    
+    this.isEditorInitializing = false;
   }
 
   onTabChange(tab: 'details' | 'script' | 'links' | 'executions') {
+    const previousTab = this.activeTab;
     this.activeTab = tab;
     
-    if (tab === 'script') {
+    if (tab === 'script' && previousTab !== 'script') {
+      // Save current script value before disposing
+      if (this.editor) {
+        this.testCase.test_script = this.editor.getValue();
+      }
+      
       // Dispose existing editor if any
       this.disposeEditor();
-      // Initialize editor after view updates
-      setTimeout(() => this.initializeEditor(), 0);
-    } else {
+      
+      // Wait for Angular to update the view, then initialize
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        if (this.activeTab === 'script' && !this.editorDisposed) {
+          this.initializeEditor();
+        }
+      }, 100);
+    } else if (previousTab === 'script' && tab !== 'script') {
+      // Save script value before leaving
+      if (this.editor) {
+        this.testCase.test_script = this.editor.getValue();
+      }
       // Dispose editor when leaving script tab
       this.disposeEditor();
     }
