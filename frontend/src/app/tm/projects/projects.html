@@ -1,0 +1,201 @@
+<app-navbar [showCreateButton]="true" [createButtonAction]="create.bind(this)" [showApiButton]="true"></app-navbar>
+
+<div class="projects-container">
+  @if (isLoading) {
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <span>Loading Projects...</span>
+    </div>
+  } @else if (projects.length === 0) {
+    <div class="empty-state">
+      <i class="fa-solid fa-folder-open"></i>
+      <p>No projects found</p>
+      <p style="font-size: 14px; margin-top: 10px;">Click the + button to create your first project</p>
+    </div>
+  } @else {
+    <div class="table-wrapper">
+      <table class="prj-table">
+        <thead>
+          <tr>
+            <th>PROJECT</th>
+            <th>DESCRIPTION</th>
+            <th>STATUS</th>
+            <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of projects; track item.project_key) {
+          <tr (mousedown)="onProjectClick($event, item.project_key)" class="clickable-row">
+            <td>
+              <span class="project-key-link">
+                {{ item.project_key }}
+              </span>
+            </td>
+            <td>{{ item.description }}</td>
+            <td>
+              @if (item.is_active == true ) {
+                <span class="status-badge active">
+                  <i class="fa-solid fa-circle-check"></i>
+                  Active
+                </span>
+              } @else {
+                <span class="status-badge inactive">
+                  <i class="fa-solid fa-circle-xmark"></i>
+                  Inactive
+                </span>
+              }
+            </td>
+            <td>
+              <div class="action-buttons">
+                <button class="action-btn edit" (mousedown)="$event.stopPropagation()" (click)="editProject(item)">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button class="action-btn delete" (mousedown)="$event.stopPropagation()" (click)="deleteProject(item)">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    </div>
+  }
+</div>
+
+<!-- Create Project Modal -->
+@if (showCreateModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Create New Project</h2>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </div>
+      <form (ngSubmit)="submitProject()">
+        @if (apiError) {
+          <div class="alert-error">
+            {{ apiError }}
+          </div>
+        }
+        <div class="form-group">
+          <label for="project_key">Project Key *</label>
+          <input
+            type="text"
+            id="project_key"
+            [(ngModel)]="newProject.project_key"
+            name="project_key"
+            placeholder="Enter project key"
+            required
+            [class.error]="errors.project_key"
+          />
+          @if (errors.project_key) {
+            <span class="error-message">{{ errors.project_key }}</span>
+          }
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            [(ngModel)]="newProject.description"
+            name="description"
+            placeholder="Enter project description"
+            required
+            [class.error]="errors.description"
+          ></textarea>
+          @if (errors.description) {
+            <span class="error-message">{{ errors.description }}</span>
+          }
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <div class="toggle-wrapper">
+            <label class="toggle-switch">
+              <input
+                type="checkbox"
+                id="is_active"
+                [(ngModel)]="newProject.is_active"
+                name="is_active"
+              />
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">{{ newProject.is_active ? 'Active' : 'Inactive' }}</span>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Create
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Edit Project Modal -->
+@if (showEditModal) {
+  <div class="modal-overlay" (click)="closeEditModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Edit Project</h2>
+        <button class="close-btn" (click)="closeEditModal()">&times;</button>
+      </div>
+      <form (ngSubmit)="submitEditProject()">
+        @if (apiError) {
+          <div class="alert-error">
+            {{ apiError }}
+          </div>
+        }
+        <div class="form-group">
+          <label for="edit_project_key">Project Key *</label>
+          <input
+            type="text"
+            id="edit_project_key"
+            [(ngModel)]="editProjectData.project_key"
+            name="edit_project_key"
+            disabled
+          />
+        </div>
+        <div class="form-group">
+          <label for="edit_description">Description</label>
+          <textarea
+            id="edit_description"
+            [(ngModel)]="editProjectData.description"
+            name="edit_description"
+            placeholder="Enter project description"
+            required
+            [class.error]="errors.description"
+          ></textarea>
+          @if (errors.description) {
+            <span class="error-message">{{ errors.description }}</span>
+          }
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <div class="toggle-wrapper">
+            <label class="toggle-switch">
+              <input
+                type="checkbox"
+                id="edit_is_active"
+                [(ngModel)]="editProjectData.is_active"
+                name="edit_is_active"
+              />
+              <span class="toggle-slider"></span>
+            </label>
+            <span class="toggle-label">{{ editProjectData.is_active ? 'Active' : 'Inactive' }}</span>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="closeEditModal()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Update
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,337 @@
+/* ========================================
+   PAGE LAYOUT
+   ======================================== */
+
+.content {
+  margin: 0px;
+}
+
+
+/* ========================================
+   TABS
+   ======================================== */
+
+.tabs-container {
+  border-radius: 0;
+  background-color: #1e1e1e;
+  border-bottom: 1px solid #333;
+}
+
+.tabs {
+  border-radius: 0;
+  display: flex;
+  gap: 0;
+}
+
+.create-btn-tab {
+  margin-left: auto;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #28a745;
+  color: white;
+  margin-right: 10px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.create-btn-tab:hover {
+  background-color: #218838;
+}
+
+.tab {
+  border-radius: 0;
+  padding: 8px 30px;
+  background-color: #1e1e1e;
+  border: none;
+  color: #ffffffff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab:hover {
+  border-radius: 0;
+  color: #e0e0e0;
+  background-color: #252525;
+}
+
+.tab.active {
+  border-radius: 0;
+  color: #ffffff;
+  background-color: #2a2a2a;
+  border-bottom-color: #0057adff;
+}
+
+.tab-content {
+  padding: 0px;
+  color: #e0e0e0;
+  background-color: #1e1e1e;
+  height: calc(100vh - 90px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-content>div {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+
+/* ========================================
+   TEST CASES TABLE
+   ======================================== */
+
+.test-cases-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.test-cases-list table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #252525;
+}
+
+.test-cases-list thead {
+  background-color: #0172ad;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.test-cases-list th {
+  padding: 12px 20px;
+  text-align: left;
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #004090;
+  width: 20%;
+  background-color: #0172ad;
+}
+
+.test-cases-list th:first-child {
+  padding-left: 24px;
+}
+
+.test-cases-list th:last-child {
+  padding-right: 24px;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.test-cases-list td {
+  padding: 12px 20px;
+  border-bottom: 1px solid #333;
+  color: #e0e0e0;
+  font-size: 14px;
+  vertical-align: middle;
+  background-color: #252525;
+}
+
+.test-cases-list td:first-child {
+  padding-left: 24px;
+  font-weight: 500;
+  color: #4da6ff;
+}
+
+.test-cases-list td:last-child {
+  padding-right: 24px;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.test-cases-list tbody tr {
+  transition: all 0.2s ease;
+}
+
+.test-cases-list tbody tr:hover {
+  cursor: pointer;
+}
+
+.test-cases-list tbody tr:hover td {
+  background-color: rgb(46, 46, 46);
+}
+
+.test-cases-list tbody tr:last-child td {
+  border-bottom: none;
+}
+
+
+/* ========================================
+   BADGES
+   ======================================== */
+
+.status-badge,
+.priority-badge,
+.result-badge {
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+/* Status Badge Variants */
+.status-badge[data-status="APPROVED"] {
+  background-color: #4caf50;
+  color: #fff;
+  font-weight: bold;
+}
+
+.status-badge[data-status="DRAFT"] {
+  background-color: #ffd700;
+  color: #222222;
+  font-weight: bold;
+}
+
+.status-badge[data-status="DEPRECATED"] {
+  background-color: #9c27b0;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Priority Badge Variants */
+.priority-badge[data-priority="HIGH"] {
+  background-color: #ff1100;
+  color: #fff;
+  font-weight: bold;
+}
+
+.priority-badge[data-priority="MEDIUM"] {
+  background-color: #ffd700;
+  color: #222222;
+  font-weight: bold;
+}
+
+.priority-badge[data-priority="LOW"] {
+  background-color: #2196f3;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Result Badge Variants - Circular Design */
+.result-badge {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: help;
+  transition: transform 0.2s ease;
+}
+
+.result-badge:hover {
+  transform: scale(1.15);
+}
+
+.result-badge[data-result="PASS"] {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.result-badge[data-result="FAIL"] {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.result-badge[data-result="BLOCKED"] {
+  background-color: #2196f3;
+  color: #fff;
+}
+
+.result-badge[data-result="NOT_EXECUTED"] {
+  background-color: #757575;
+  color: #fff;
+}
+
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #888;
+  font-size: 18px;
+  text-align: center;
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: #555;
+}
+
+.empty-state p {
+  margin: 5px 0;
+}
+
+
+/* ========================================
+   ACTION BUTTONS
+   ======================================== */
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn.edit {
+  background-color: #0057adff;
+  color: #fff;
+}
+
+.action-btn.edit:hover {
+  background-color: #0069d9;
+}
+
+.action-btn.delete {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.action-btn.delete:hover {
+  background-color: #c82333;
+}
+
+.action-btn i {
+  font-size: 14px;
+}
