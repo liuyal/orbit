@@ -3,7 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { NavbarComponent } from '../navbar/navbar';
+import { NavbarComponent } from '../../navbar/navbar';
 import { createCodeMirrorEditor } from './codemirror-config';
 import type { EditorView } from 'codemirror';
 

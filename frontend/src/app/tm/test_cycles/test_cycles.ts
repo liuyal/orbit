@@ -2,7 +2,7 @@ import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { NavbarComponent } from '../navbar/navbar';
+import { NavbarComponent } from '../../navbar/navbar';
 
 export interface TestCycle {
   _id: string;
