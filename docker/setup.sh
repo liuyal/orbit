@@ -22,7 +22,7 @@ show_help() {
 }
 
 # Load environment variables from .env file if it exists
-if [ -f .env ]; then
+if [ -f ../env/.env ]; then
   echo "Loading environment variables from .env file..."
   set -a
   source ../env/.env
