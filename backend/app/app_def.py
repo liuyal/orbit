@@ -7,6 +7,7 @@
 
 # app/app_def.py
 
+import json
 import os
 import pathlib
 
@@ -72,7 +73,7 @@ SQLITE_DATABASE = os.getenv("SQLITE_DATABASE")
 GITHUB_API_URL = os.getenv("GITHUB_API_URL")
 GITHUB_OWNER = os.getenv("GITHUB_OWNER")
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_REPOSITORY = eval(os.getenv("GITHUB_REPOSITORY"))
+GITHUB_REPOSITORY = json.loads(os.getenv("GITHUB_REPOSITORY"))
 
 # Runner Constants
 QUERY_API_INTERVAL = 60
