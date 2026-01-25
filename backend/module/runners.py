@@ -14,8 +14,12 @@ from backend.app.app_def import (
     GITHUB_API_URL,
     GITHUB_OWNER,
     GITHUB_TOKEN,
-    GITHUB_REPOSITORY
+    GITHUB_REPOSITORY,
+    TABLE_RUNNER_STATS_HISTORIC,
+    TABLE_RUNNER_STATS_CURRENT
 )
+from backend.db.mongodb import MongoClient
+from backend.models.runner import Runner
 
 
 def query_github_runners(repo: str):
@@ -120,7 +124,17 @@ def fetch_runner_status():
         return []
 
 
-async def save_runner_status(mdb, data):
+async def save_runner_status(mdb: MongoClient, interval: int = 60):
     """ save runner status to mongodb """
 
+    # Fetch runner status from GitHub
     status = fetch_runner_status()
+
+    # Clear the current stats collection before inserting new data
+    await mdb.delete(TABLE_RUNNER_STATS_CURRENT, {})
+
+    # Save runner status to historic and current collections
+    for item in status:
+        db_insert = Runner(**item).model_dump()
+        await mdb.create(TABLE_RUNNER_STATS_HISTORIC, db_insert)
+        await mdb.create(TABLE_RUNNER_STATS_CURRENT, db_insert)

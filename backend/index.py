@@ -15,6 +15,7 @@ from backend.app.app_def import API_VERSION, ROOT_DIR
 from backend.app.build_parser import build_parser
 from backend.app.utility import configure_logging
 from backend.db.mongodb import MongoClient
+from backend.module.runners import save_runner_status
 from backend.routes import routers
 
 logger = logging.getLogger(__name__)
@@ -30,6 +31,8 @@ async def lifespan(app):
     mongodb_client = MongoClient()
     await mongodb_client.connect()
     await mongodb_client.configure()
+
+    #await save_runner_status(mongodb_client)
 
     # Attach the database client to the app state
     app.state.mdb = mongodb_client

@@ -6,7 +6,7 @@
 # License: MIT
 # ================================================================
 
-# tools/build_parser.py
+# app/build_parser.py
 
 import argparse
 
