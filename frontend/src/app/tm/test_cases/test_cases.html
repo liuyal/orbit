@@ -18,26 +18,61 @@
 </div>
 
   <div class="tab-content">
-    <div>
-      @if (loading) {
-      <div class="loading-container">
-        <div class="spinner"></div>
-        <span>Loading test cases...</span>
+    <div class="split-view">
+      <!-- Folder Sidebar -->
+      <div class="folder-sidebar">
+        <div class="folder-header">
+          <h3>Folders</h3>
+          <button class="folder-add-btn" (click)="addFolder()" title="Add Folder">
+            <i class="fa-solid fa-folder-plus"></i>
+          </button>
+        </div>
+        <div class="folder-list">
+          <div class="folder-item" 
+               [class.selected]="selectedFolder === null"
+               (click)="selectFolder(null)">
+            <i class="fa-solid fa-folder"></i>
+            <span>Test Cases</span>
+            <span class="folder-count">{{ testCases.length }}</span>
+          </div>
+          @for (folder of folders; track folder.name) {
+            <div class="folder-item" 
+                 [class.selected]="selectedFolder === folder.name"
+                 (click)="selectFolder(folder.name)">
+              <i class="fa-solid fa-folder"></i>
+              <span>{{ folder.name }}</span>
+              <span class="folder-count">{{ folder.count }}</span>
+              <button class="folder-delete-btn" 
+                      (click)="$event.stopPropagation(); deleteFolder(folder.name)"
+                      title="Delete Folder">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          }
+        </div>
       </div>
-      } @else if (error) {
-      <div class="error-state">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <p>{{ error }}</p>
-      </div>
-      } @else if (testCases.length === 0) {
-      <div class="empty-state">
-        <i style="margin-bottom: 10px;" class="fa-solid fa-flask"></i>
-        <p>No test cases found</p>
-        <p style="font-size: 16px;">Click the + button to create your first test case</p>
-      </div>
-      } @else {
-      <div class="test-cases-list">
-        <table>
+
+      <!-- Test Cases Content -->
+      <div class="test-cases-content">
+        @if (loading) {
+        <div class="loading-container">
+          <div class="spinner"></div>
+          <span>Loading test cases...</span>
+        </div>
+        } @else if (error) {
+        <div class="error-state">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <p>{{ error }}</p>
+        </div>
+        } @else if (filteredTestCases.length === 0) {
+        <div class="empty-state">
+          <i style="margin-bottom: 10px;" class="fa-solid fa-flask"></i>
+          <p>No test cases found</p>
+          <p style="font-size: 16px;">Click the + button to create your first test case</p>
+        </div>
+        } @else {
+        <div class="test-cases-list">
+          <table>
           <thead>
             <tr>
               <th>Key</th>
@@ -86,6 +121,7 @@
         </table>
       </div>
       }
+    </div>
     </div>
   </div>
 </div>

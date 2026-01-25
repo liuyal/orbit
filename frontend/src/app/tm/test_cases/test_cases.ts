@@ -24,6 +24,11 @@ export interface TestCase {
   links: string[] | null;
 }
 
+export interface Folder {
+  name: string;
+  count: number;
+}
+
 @Component({
   selector: 'test-cases',
   standalone: true,
@@ -39,6 +44,9 @@ export class TestCases implements OnInit {
   cdr = inject(ChangeDetectorRef);
   projectKey = '';
   testCases: TestCase[] = [];
+  filteredTestCases: TestCase[] = [];
+  folders: Folder[] = [];
+  selectedFolder: string | null = null;
   loading = false;
   error = '';
 
@@ -73,6 +81,8 @@ export class TestCases implements OnInit {
           console.log('Test cases received:', data);
           console.log('Number of test cases:', data?.length);
           this.testCases = data;
+          this.updateFolders();
+          this.applyFilter();
           this.loading = false;
           this.error = '';
           this.cdr.detectChanges();
@@ -126,6 +136,70 @@ export class TestCases implements OnInit {
             alert('Failed to delete test case. Please try again.');
           }
         });
+    }
+  }
+
+  updateFolders() {
+    const folderMap = new Map<string, number>();
+    
+    this.testCases.forEach(tc => {
+      if (tc.folder) {
+        folderMap.set(tc.folder, (folderMap.get(tc.folder) || 0) + 1);
+      }
+    });
+
+    this.folders = Array.from(folderMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  selectFolder(folderName: string | null) {
+    this.selectedFolder = folderName;
+    this.applyFilter();
+    this.cdr.detectChanges();
+  }
+
+  applyFilter() {
+    if (this.selectedFolder === null) {
+      this.filteredTestCases = [...this.testCases];
+    } else {
+      this.filteredTestCases = this.testCases.filter(tc => 
+        tc.folder === this.selectedFolder
+      );
+    }
+  }
+
+  addFolder() {
+    const folderName = prompt('Enter folder name:');
+    if (folderName && folderName.trim()) {
+      // Check if folder already exists
+      if (this.folders.some(f => f.name === folderName.trim())) {
+        alert('Folder already exists');
+        return;
+      }
+      // Add empty folder
+      this.folders.push({ name: folderName.trim(), count: 0 });
+      this.folders.sort((a, b) => a.name.localeCompare(b.name));
+      this.cdr.detectChanges();
+    }
+  }
+
+  deleteFolder(folderName: string) {
+    const hasTestCases = this.testCases.some(tc => 
+      tc.folder === folderName
+    );
+    
+    if (hasTestCases) {
+      alert('Cannot delete folder with test cases. Please move or delete test cases first.');
+      return;
+    }
+
+    if (confirm(`Delete folder "${folderName}"?`)) {
+      this.folders = this.folders.filter(f => f.name !== folderName);
+      if (this.selectedFolder === folderName) {
+        this.selectFolder(null);
+      }
+      this.cdr.detectChanges();
     }
   }
 }
