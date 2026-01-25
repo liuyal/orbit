@@ -261,7 +261,8 @@ async def add_execution_to_cycle(request: Request,
 
     # Add execution to cycle
     db = request.app.state.mdb
-    cycle_data["executions"].append(execution_key)
+    exec_data = {execution_data["test_case_key"]: execution_key}
+    cycle_data["executions"].append(exec_data)
     await db.update(DB_COLLECTION_TCY,
                     {"test_cycle_key": test_cycle_key},
                     cycle_data)
@@ -302,7 +303,8 @@ async def remove_executions_from_cycle(request: Request,
 
     # remote execution to cycle
     db = request.app.state.mdb
-    cycle_data["executions"] = [e for e in cycle_data["executions"] if e != execution_key]
+    exec_data = {execution_data["test_case_key"]: execution_key}
+    cycle_data["executions"] = [e for e in cycle_data["executions"] if e != exec_data]
     await db.update(DB_COLLECTION_TCY,
                     {"test_cycle_key": test_cycle_key},
                     cycle_data)
