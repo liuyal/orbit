@@ -5,4 +5,4 @@ __pycache__
 **/ssl
 **/db
 **/tmp
-docker/.env
+**/.env
