@@ -7,21 +7,19 @@
 
 # db/sqlitedb.py
 
-import os
 import pathlib
 import sqlite3
 
 from backend.app.app_def import (
     DB_NAME,
-    TMP_DIR
+    TMP_DIR,
+    SQLITE_DATABASE
 )
 from backend.db.db import (
     DatabaseClient,
     DBType,
     DBMode
 )
-
-SQLITE_DATABASE = os.getenv("SQLITE_DATABASE")
 
 
 class SqliteClient(DatabaseClient):
@@ -55,13 +53,7 @@ class SqliteClient(DatabaseClient):
             db_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Connect to the database
-        if not db_path.exists():
-            # Create the database file
-            self._db_conn = sqlite3.connect(str(db_path))
-            self._db_conn.close()
-
-        # Reconnect in read-only mode
-        self._db_conn = sqlite3.connect(f"file:{str(db_path)}?mode=ro", uri=True)
+        self._db_conn = sqlite3.connect(str(db_path))
 
     async def close(self):
         """ Disconnect from the database. """
@@ -72,11 +64,6 @@ class SqliteClient(DatabaseClient):
     async def configure(self,
                         **kwargs) -> None:
         """Configure database connection parameters"""
-
-        # Drop the database if in debug mode
-        # clean_db = "clean_db" in kwargs and kwargs["clean_db"]
-        # if clean_db:
-        # self._db_conn.execute("")
 
     async def create(self,
                      table: str,

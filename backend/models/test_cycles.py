@@ -22,7 +22,7 @@ class TestCycle(BaseModel):
     created_at: str | None
     updated_at: str | None
     status: str | None
-    executions: list | None
+    executions: list[dict] | None
     model_config = {"extra": "forbid"}
 
 
@@ -31,7 +31,7 @@ class TestCycleCreate(BaseModel):
     title: str = None
     description: str = None
     status: str = None
-    executions: list = []
+    executions: list[dict] = []
     model_config = {"extra": "forbid"}
 
 
@@ -39,5 +39,5 @@ class TestCycleUpdate(BaseModel):
     title: str = None
     description: str = None
     status: str = None
-    executions: list = []
+    executions: list[dict] = []
     model_config = {"extra": "forbid"}

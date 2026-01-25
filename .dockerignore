@@ -29,7 +29,7 @@
 **/docker-compose*
 
 # Environment
-**/.env
+docker/.env
 **/.env.local
 
 # OS

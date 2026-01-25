@@ -15,8 +15,8 @@ import yaml
 from backend.app.app_def import TMP_DIR
 
 
-def configure_logging_file(file_path: pathlib.Path,
-                           debug: bool = False) -> str:
+def configure_logging(file_path: pathlib.Path,
+                      debug: bool = False) -> str:
     """ Configure logging from file. """
 
     with open(file_path, 'r') as f:
@@ -43,3 +43,4 @@ def get_current_utc_time():
     current_utc_iso = current_utc_iso.isoformat().replace("+00:00", "Z")
 
     return current_utc_iso
+

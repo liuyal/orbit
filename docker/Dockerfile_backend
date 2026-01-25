@@ -20,7 +20,6 @@ RUN sed -i 's/https/http/g' /etc/apk/repositories && \
 # Environment variables
 ENV PYTHONPATH=/home/orbit
 ENV MONGODB_HOST=mongodb-app
-ENV SQLITE_DATABASE=/data/orbit.db
 
 # Copy requirements file and install dependencies
 COPY requirements.txt /tmp/requirements.txt

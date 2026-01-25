@@ -6,35 +6,25 @@
 # ================================================================
 
 import logging.config
-import os
-import pathlib
-
 from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
 
-from backend.app.app_def import API_VERSION, TMP_DIR, DB_NAME
-from backend.db.mongodb import MongoClient
-from backend.db.sqlite import SqliteClient
-# from backend.module.runners import query_runner_status
-from backend.routes import routers
+from backend.app.app_def import API_VERSION, ROOT_DIR
 from backend.app.build_parser import build_parser
-from backend.app.utility import configure_logging_file
+from backend.app.utility import configure_logging
+from backend.db.mongodb import MongoClient
+from backend.routes import routers
 
 logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app):
-    """ Lifespan context manager to handle startup and shutdown events. """
-
-    #query_runner_status(TMP_DIR / DB_NAME)
-
-    # Initialize sqlite client
-    sqlite_client = SqliteClient()
-    await sqlite_client.connect()
-    await sqlite_client.configure()
+    """ Lifespan context manager to handle startup
+        and shutdown events.
+    """
 
     # Initialize mongo client
     mongodb_client = MongoClient()
@@ -43,10 +33,8 @@ async def lifespan(app):
 
     # Attach the database client to the app state
     app.state.mdb = mongodb_client
-    app.state.sqdb = sqlite_client
     yield
     await mongodb_client.close()
-    await sqlite_client.close()
 
 
 parser = build_parser()
@@ -65,8 +53,9 @@ for router in routers:
     app.include_router(router)
 
 if __name__ == "__main__":
-    log_conf = configure_logging_file(pathlib.Path(__file__).parent / 'log_conf.yaml',
-                                      args.debug)
+    log_conf = configure_logging(ROOT_DIR / 'log_conf.yaml',
+                                 args.debug)
+
     uvicorn.run("index:app",
                 host=args.host,
                 port=int(args.port),

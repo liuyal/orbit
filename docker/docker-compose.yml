@@ -16,6 +16,8 @@ services:
       dockerfile: Dockerfile_backend
     image: backend-app:latest
     container_name: backend-app
+    env_file:
+      - ..env/.env
     environment:
       - MONGODB_HOST=mongodb-app
       - GITHUB_API_URL=${GITHUB_API_URL}
@@ -28,7 +30,7 @@ services:
       - "5000:5000"
     volumes:
       - ../:/home/orbit
-      - ./db/sqlite:/data
+      - ../backend/tmp/db/sqlite:/data/sqlite
       # - /datadrive/sftp_user/tm4j_solar/RUNNER:/data
   mongodb-app:
     build:
@@ -38,8 +40,8 @@ services:
     container_name: mongodb-app
     ports:
       - "27017:27017"
-    #volumes:
-    #  - ./db/mongodb:/data/db
+#    volumes:
+#      - ../backend/tmp/db/mongodb:/data/db
   fileserver-app:
     build:
       context: .
@@ -47,10 +49,8 @@ services:
     image: apache-app:latest
     container_name: apache-app
     volumes:
-      - type: bind
-        # source: /datadrive/sftp_user/tm4j_solar
-        source: ..
-        target: /usr/local/apache2/htdocs/files      
+        # - /datadrive/sftp_user/tm4j_solar:/usr/local/apache2/htdocs/files
+        - ../:/usr/local/apache2/htdocs/files
     ports:
       - "8080:80"
       - "8443:443"

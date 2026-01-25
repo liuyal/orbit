@@ -2,7 +2,7 @@ __pycache__
 .vscode/
 .idea/
 .pytest_cache/
+**/ssl
 **/db
 **/tmp
-certs/ssl
-**/.env
+docker/.env

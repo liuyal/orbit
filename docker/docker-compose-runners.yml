@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: Dockerfile_runner
     image: runner-app:latest
+    env_file:
+      - ..env/.env
     environment:
       - GITHUB_OWNER=${GITHUB_OWNER}
       - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}

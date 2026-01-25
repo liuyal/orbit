@@ -9,12 +9,10 @@
 
 import logging
 
-from fastapi import APIRouter, Request, status, Response
+from fastapi import APIRouter, Request, status
+from starlette.responses import JSONResponse
 
 from backend.app.app_def import API_VERSION
-from backend.module.runners import (
-    TABLE_RUNNER_STATS_CURRENT
-)
 
 router = APIRouter()
 
@@ -27,14 +25,7 @@ logger = logging.getLogger(__name__)
 async def get_runners_status(request: Request):
     """ Get the status of all runners. """
 
-    db_conn = request.app.state.sqdb
+    runners_stats = {}
 
-    cursor = db_conn.db_conn.cursor()
-    cursor.execute(f"SELECT * FROM {TABLE_RUNNER_STATS_CURRENT};")
-    runners_stats = cursor.fetchall()
-
-    # TODO: Convert to list of dicts with column names 
-    # Add stats model
-
-    return Response(status_code=status.HTTP_200_OK,
-                    content=runners_stats)
+    return JSONResponse(status_code=status.HTTP_200_OK,
+                        content=runners_stats)

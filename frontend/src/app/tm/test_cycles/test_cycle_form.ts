@@ -149,7 +149,7 @@ export class TestCycleFormComponent implements OnInit {
 
     // Use POST for create, PUT for edit
     const request = this.isEditMode
-      ? this.http.put(`/api/tm/projects/${this.projectKey}/cycles/${this.testCycleKey}`, payload)
+      ? this.http.put(`/api/tm/cycles/${this.testCycleKey}`, payload)
       : this.http.post(`/api/tm/projects/${this.projectKey}/cycles`, payload);
 
     request.subscribe({
