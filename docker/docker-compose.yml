@@ -30,8 +30,6 @@ services:
       - "5000:5000"
     volumes:
       - ../:/home/orbit
-      - ../backend/tmp/db/sqlite:/data/sqlite
-      # - /datadrive/sftp_user/tm4j_solar/RUNNER:/data
   mongodb-app:
     build:
       context: .
@@ -49,7 +47,7 @@ services:
     image: apache-app:latest
     container_name: apache-app
     volumes:
-        # - /datadrive/sftp_user/tm4j_solar:/usr/local/apache2/htdocs/files
+        - /datadrive/sftp_user/tm4j_solar:/usr/local/apache2/htdocs/files
         - ../:/usr/local/apache2/htdocs/files
     ports:
       - "8080:80"

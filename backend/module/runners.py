@@ -5,6 +5,7 @@
 # License: MIT
 # ================================================================
 
+import asyncio
 import logging
 import time
 
@@ -80,13 +81,15 @@ def fetch_runner_status():
     try:
         # Get runner status from GitHub APIs
         logging.debug(f"Getting runner status...")
+
         runners = []
         jobs = []
         ts = time.time()
         for repo in GITHUB_REPOSITORY:
             runners += query_github_runners(repo)
             jobs += query_github_jobs(repo)
-        logging.debug(f"Query completed in {round(time.time() - ts, 2)} seconds")
+
+        logging.info(f"Runner status query completed in {round(time.time() - ts, 2)} seconds")
 
         # Process runner data
         for runner in runners:
@@ -125,16 +128,26 @@ def fetch_runner_status():
 
 
 async def save_runner_status(mdb: MongoClient, interval: int = 60):
-    """ save runner status to mongodb """
+    """ save runner status to mongodb - runs periodically in background """
 
-    # Fetch runner status from GitHub
-    status = fetch_runner_status()
+    while True:
+        try:
+            # Fetch runner status from GitHub
+            status = fetch_runner_status()
 
-    # Clear the current stats collection before inserting new data
-    await mdb.delete(TABLE_RUNNER_STATS_CURRENT, {})
+            # Clear the current stats collection before inserting new data
+            await mdb.delete(TABLE_RUNNER_STATS_CURRENT, {})
 
-    # Save runner status to historic and current collections
-    for item in status:
-        db_insert = Runner(**item).model_dump()
-        await mdb.create(TABLE_RUNNER_STATS_HISTORIC, db_insert)
-        await mdb.create(TABLE_RUNNER_STATS_CURRENT, db_insert)
+            # Save runner status to historic and current collections
+            for item in status:
+                db_insert = Runner(**item).model_dump()
+                await mdb.create(TABLE_RUNNER_STATS_HISTORIC, db_insert)
+                await mdb.create(TABLE_RUNNER_STATS_CURRENT, db_insert)
+
+            logging.debug(f"Saved {len(status)} runner statuses to database")
+
+        except Exception as e:
+            logging.error(f"Error saving runner status: {e}", exc_info=True)
+
+        # Use asyncio.sleep instead of time.sleep to not block event loop
+        await asyncio.sleep(interval)

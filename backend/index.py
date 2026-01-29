@@ -5,6 +5,7 @@
 # License: MIT
 # ================================================================
 
+import asyncio
 import logging.config
 from contextlib import asynccontextmanager
 
@@ -32,11 +33,22 @@ async def lifespan(app):
     await mongodb_client.connect()
     await mongodb_client.configure()
 
-    #await save_runner_status(mongodb_client)
+    # Start the background task to save runner status periodically
+    runner_task = asyncio.create_task(save_runner_status(mongodb_client))
+    logger.info("Started background task for runner status monitoring")
 
     # Attach the database client to the app state
     app.state.mdb = mongodb_client
     yield
+
+    # Cleanup: Cancel the background task
+    runner_task.cancel()
+    try:
+        await runner_task
+
+    except asyncio.CancelledError:
+        logger.info("Background runner task cancelled successfully")
+
     await mongodb_client.close()
 
 
