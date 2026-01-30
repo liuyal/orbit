@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://localhost:5000",
+    "target": "http://libra.schneider-electric.com:5000",
     "secure": false,
     "pathRewrite": {
       "^/api": "/api/v1"
