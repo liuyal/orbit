@@ -56,11 +56,11 @@
   overflow-x: auto;
   background: #262626;
   border-radius: 0px;
-  border: 1px solid #252525;
+  border: 1px solid #1d1d1d;
   width: 100%;
-  max-width: 1700px;
-  max-height: 800px;
-  margin-top: 30px;
+  max-width: 1600px;
+  max-height: 750px;
+  margin-top: 40px;
 }
 
 .runners-table {
@@ -70,8 +70,7 @@
 }
 
 .runners-table thead {
-  background: linear-gradient(to bottom, #1e3a8a, #1e40af);
-  border-bottom: 2px solid #3b82f6;
+  border-bottom: 1px solid #1d1d1d;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -85,11 +84,11 @@
   color: #deedff;
   text-transform: uppercase;
   width: 16.66%;
-  background: linear-gradient(to bottom, #1e3a8a, #1e40af);
+  background: solid #1d1d1d;
 }
 
 .runners-table tbody tr {
-  border-bottom: 1px solid #323233;
+  border-bottom: 1px solid #1d1d1d;
   transition: all 0.2s ease;
   background-color: #1f1e1e;
 }
