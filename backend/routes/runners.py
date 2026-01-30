@@ -13,12 +13,9 @@ from fastapi import APIRouter, Request, status
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
-    API_VERSION,
-    TABLE_RUNNER_STATS_CURRENT,
-
+    API_VERSION
 )
 from backend.models.runner import Runner
-from backend.module.runners import RUNNER_STATUS_CACHE
 
 router = APIRouter()
 
