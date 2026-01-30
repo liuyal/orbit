@@ -5,10 +5,12 @@ import { TestCases } from './tm/test_cases/test_cases';
 import { TestCaseFormComponent } from './tm/test_cases/test_case_form';
 import { TestCycles } from './tm/test_cycles/test_cycles';
 import { TestCycleFormComponent } from './tm/test_cycles/test_cycle_form';
+import { Runners } from './runners/runners';
 
 export const routes: Routes = [
   { path: '', component: Landing },
   { path: 'projects', component: Project },
+  { path: 'runners', component: Runners },
   { path: 'test-cases/:projectKey', component: TestCases },
   { path: 'test-cases/:projectKey/create', component: TestCaseFormComponent },
   { path: 'test-cases/:projectKey/edit/:testCaseKey', component: TestCaseFormComponent },

@@ -1,0 +1,77 @@
+<app-navbar></app-navbar>
+
+<div class="runners-container">
+    @if (isLoading && showSpinner) {
+    <div class="loading-container">
+        <div class="spinner"></div>
+        <span>Loading Runners...</span>
+    </div>
+    } @else if (error) {
+    <div class="error-state">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p>{{ error }}</p>
+    </div>
+    } @else if (runners.length === 0 && !isLoading) {
+    <div class="empty-state">
+        <i class="fa-solid fa-server"></i>
+        <p>No runners found</p>
+    </div>
+    } @else if (!isLoading) {
+    <div class="table-wrapper">
+        <table class="runners-table">
+            <thead>
+                <tr>
+                    <th>NAME</th>
+                    <th>DESIGNATION</th>
+                    <th>STATUS</th>
+                    <th>BUSY</th>
+                    <th>USER</th>
+                    <th>JOB LINK</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (runner of runners; track runner.id) {
+                <tr>
+                    <td>{{ runner.name }}</td>
+                    <td>{{ runner.designation || '-' }}</td>
+                    <td>
+                        @if (runner.status === 'online') {
+                        <span class="status-badge active">
+                            <i class="fa-solid fa-circle-check"></i>
+                            Online
+                        </span>
+                        } @else {
+                        <span class="status-badge inactive">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                            Offline
+                        </span>
+                        }
+                    </td>
+                    <td>
+                        @if (runner.busy) {
+                        <span class="status-badge busy">
+                            <i class="fa-solid fa-hourglass-half"></i>
+                            Busy
+                        </span>
+                        } @else {
+                        <span class="status-badge idle">
+                            <i class="fa-solid fa-circle"></i>
+                            Idle
+                        </span>
+                        }
+                    </td>
+                    <td>{{ runner.user || '-' }}</td>
+                    <td>
+                        @if (runner.job_url != "-") {
+                        <a [href]="runner.job_url" target="_blank" class="job-link">LINK</a>
+                        } @else {
+                        {{ '-' }}
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    }
+</div>

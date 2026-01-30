@@ -10,6 +10,7 @@ import logging
 import time
 
 import requests
+from pymongo import ReplaceOne
 
 from backend.app.app_def import (
     GITHUB_API_URL,
@@ -52,7 +53,7 @@ def query_github_jobs(repo: str):
 
     # Check for request success
     if resp.status_code != 200:
-        logging.warning(resp.content)
+        logging.debug(resp.content)
         return []
 
     jobs = resp.json()["workflow_runs"]
@@ -90,6 +91,7 @@ def fetch_runner_status():
             jobs += query_github_jobs(repo)
 
         logging.info(f"Runner status query completed in {round(time.time() - ts, 2)} seconds")
+        logging.info(f"Total: {len(runners)} runners, {len(jobs)} jobs")
 
         # Process runner data
         for runner in runners:
@@ -151,3 +153,5 @@ async def save_runner_status(mdb: MongoClient, interval: int = 60):
 
         # Use asyncio.sleep instead of time.sleep to not block event loop
         await asyncio.sleep(interval)
+        print(1)
+

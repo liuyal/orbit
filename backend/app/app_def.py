@@ -66,9 +66,6 @@ MONGODB_PASS = os.getenv("MONGODB_PASS", "password")
 
 MONGODB_URL = f"mongodb://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_HOST}:{MONGODB_PORT}"
 
-# SQLite Constants
-SQLITE_DATABASE = os.getenv("SQLITE_DATABASE")
-
 # GitHub Configuration Constants
 GITHUB_API_URL = os.getenv("GITHUB_API_URL")
 GITHUB_OWNER = os.getenv("GITHUB_OWNER")

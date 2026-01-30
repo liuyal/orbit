@@ -1,0 +1,160 @@
+.runners-container {
+  margin: 0 auto;
+  min-height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 20px;
+  color: #e0e0e0;
+}
+
+.spinner {
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left-color: #60a5fa;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 15px;
+  color: #9ca3af;
+}
+
+.error-state i {
+  font-size: 48px;
+  color: #ef4444;
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: #4b5563;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  background: #262626;
+  border-radius: 0px;
+  border: 1px solid #252525;
+  width: 100%;
+  max-width: 1700px;
+  max-height: 800px;
+  margin-top: 30px;
+}
+
+.runners-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.runners-table thead {
+  background: linear-gradient(to bottom, #1e3a8a, #1e40af);
+  border-bottom: 2px solid #3b82f6;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.runners-table th {
+  padding: 14px;
+  text-align: center;
+  font-weight: 600;
+  font-size: medium;
+  color: #deedff;
+  text-transform: uppercase;
+  width: 16.66%;
+  background: linear-gradient(to bottom, #1e3a8a, #1e40af);
+}
+
+.runners-table tbody tr {
+  border-bottom: 1px solid #323233;
+  transition: all 0.2s ease;
+  background-color: #1f1e1e;
+}
+
+.runners-table tbody tr:hover {
+  background-color: #1e293b;
+  box-shadow: inset 0 1px 0 0 #3b82f6, inset 0 -1px 0 0 #3b82f6;
+}
+
+.runners-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.runners-table td {
+  padding: 14px;
+  font-size: 16px;
+  color: #e5e7eb;
+  text-align: center;
+  width: 16.66%;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.active {
+  background-color: #064e3b;
+  color: #6ee7b7;
+  border: 1px solid #10b981;
+}
+
+.status-badge.inactive {
+  background-color: #450a0a;
+  color: #fca5a5;
+  border: 1px solid #dc2626;
+}
+
+.status-badge i {
+  font-size: 10px;
+}
+
+.status-badge.busy {
+  background-color: #713f12;
+  color: #fcd34d;
+  border: 1px solid #f59e0b;
+}
+
+.status-badge.idle {
+  background-color: #253146;
+  color: #94a3b8;
+  border: 1px solid #475569;
+}
+
+.job-link {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.job-link:hover {
+  color: #93c5fd;
+  text-decoration: underline;
+}

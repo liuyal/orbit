@@ -33,6 +33,11 @@ async def get_runners_status(request: Request):
     db = request.app.state.mdb
     runners_stats = await db.find(TABLE_RUNNER_STATS_CURRENT, {})
 
+    if len(runners_stats) == 0:
+        print(0)
+    else:
+        print(len(runners_stats))
+
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=runners_stats)
 

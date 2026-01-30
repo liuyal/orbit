@@ -12,8 +12,7 @@ import sqlite3
 
 from backend.app.app_def import (
     DB_NAME,
-    TMP_DIR,
-    SQLITE_DATABASE
+    TMP_DIR
 )
 from backend.db.db import (
     DatabaseClient,
@@ -26,7 +25,7 @@ class SqliteClient(DatabaseClient):
 
     def __init__(self,
                  db_name: str = DB_NAME,
-                 db_url: str = SQLITE_DATABASE,
+                 db_url: str = None,
                  db_type: DBType = DBType.SQLITE,
                  db_mode: DBMode = DBMode.DEBUG):
         """ Initialize the Sqlite client. """
