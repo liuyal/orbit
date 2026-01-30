@@ -14,9 +14,11 @@ from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
     API_VERSION,
-    TABLE_RUNNER_STATS_CURRENT
+    TABLE_RUNNER_STATS_CURRENT,
+
 )
 from backend.models.runner import Runner
+from backend.module.runners import RUNNER_STATUS_CACHE
 
 router = APIRouter()
 
@@ -29,17 +31,11 @@ logger = logging.getLogger(__name__)
 async def get_runners_status(request: Request):
     """ Get the status of all runners. """
 
-    # Retrieve all projects from database
-    db = request.app.state.mdb
-    runners_stats = await db.find(TABLE_RUNNER_STATS_CURRENT, {})
-
-    if len(runners_stats) == 0:
-        print(0)
-    else:
-        print(len(runners_stats))
+    # Retrieve status from cache
+    cache = getattr(request.app.state, "runner_status_cache", [])
 
     return JSONResponse(status_code=status.HTTP_200_OK,
-                        content=runners_stats)
+                        content=cache)
 
 
 @router.get(f"/api/{API_VERSION}/runners/status/{{name}}",
@@ -48,11 +44,16 @@ async def get_runners_status(request: Request):
             status_code=status.HTTP_200_OK)
 async def get_runners_status_by_name(request: Request,
                                      name: str):
-    """ Get the status of all runners. """
+    """ Get the status of a runners. """
 
     # Retrieve runner from database
-    db = request.app.state.mdb
-    result = await db.find_one(TABLE_RUNNER_STATS_CURRENT, {"name": name})
+    cache = getattr(request.app.state, "runner_status_cache", [])
+
+    result = None
+    for item in cache:
+        if item["name"] == name:
+            result = item
+            break
 
     if result is None:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,

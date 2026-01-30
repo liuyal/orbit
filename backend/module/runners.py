@@ -10,7 +10,6 @@ import logging
 import time
 
 import requests
-from pymongo import ReplaceOne
 
 from backend.app.app_def import (
     GITHUB_API_URL,
@@ -18,7 +17,6 @@ from backend.app.app_def import (
     GITHUB_TOKEN,
     GITHUB_REPOSITORY,
     TABLE_RUNNER_STATS_HISTORIC,
-    TABLE_RUNNER_STATS_CURRENT
 )
 from backend.db.mongodb import MongoClient
 from backend.models.runner import Runner
@@ -129,7 +127,9 @@ def fetch_runner_status():
         return []
 
 
-async def save_runner_status(mdb: MongoClient, interval: int = 60):
+async def save_runner_status(app,
+                             mdb: MongoClient,
+                             interval: int = 60):
     """ save runner status to mongodb - runs periodically in background """
 
     while True:
@@ -137,14 +137,13 @@ async def save_runner_status(mdb: MongoClient, interval: int = 60):
             # Fetch runner status from GitHub
             status = fetch_runner_status()
 
-            # Clear the current stats collection before inserting new data
-            await mdb.delete(TABLE_RUNNER_STATS_CURRENT, {})
+            # Save status to app state cache
+            app.state.runner_status_cache = status
 
             # Save runner status to historic and current collections
             for item in status:
                 db_insert = Runner(**item).model_dump()
                 await mdb.create(TABLE_RUNNER_STATS_HISTORIC, db_insert)
-                await mdb.create(TABLE_RUNNER_STATS_CURRENT, db_insert)
 
             logging.debug(f"Saved {len(status)} runner statuses to database")
 
@@ -153,5 +152,3 @@ async def save_runner_status(mdb: MongoClient, interval: int = 60):
 
         # Use asyncio.sleep instead of time.sleep to not block event loop
         await asyncio.sleep(interval)
-        print(1)
-

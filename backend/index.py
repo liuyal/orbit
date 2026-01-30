@@ -34,7 +34,7 @@ async def lifespan(app):
     await mongodb_client.configure()
 
     # Start the background task to save runner status periodically
-    runner_task = asyncio.create_task(save_runner_status(mongodb_client))
+    runner_task = asyncio.create_task(save_runner_status(app, mongodb_client))
     logger.info("Started background task")
 
     # Attach the database client to the app state
