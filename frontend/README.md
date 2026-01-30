@@ -54,6 +54,44 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## Using proxy.conf.json for API Requests
+
+Angular's development server can proxy API requests to a backend server using a proxy configuration file. This is useful to avoid CORS issues and to simplify API calls during development.
+
+### Location
+The proxy configuration file for this project is located at `src/proxy.conf.json`.
+
+### Example Configuration
+```json
+{
+  "/api": {
+    "target": "http://localhost:5000",
+    "secure": false,
+    "pathRewrite": {
+      "^/api": "/api/v1"
+    },
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
+```
+
+### How to Use
+To enable the proxy, run the Angular development server with the `--proxy-config` option:
+
+```bash
+ng serve --proxy-config src/proxy.conf.json
+```
+
+This will forward any requests from your Angular app to `/api/*` to the backend server at `http://localhost:5000/api/v1/*`.
+
+### Why Use a Proxy?
+- Avoids CORS issues during development
+- Allows you to use relative API paths in your frontend code
+- Supports path rewriting and origin changes
+
+For more details, see the [Angular CLI Proxy documentation](https://angular.io/guide/build#proxying-to-a-backend-server).
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
