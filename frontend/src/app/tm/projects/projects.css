@@ -335,7 +335,7 @@
   background-color: #025e8f;
   color: white;
   padding: 5px 30px;
-  text-align: left;
+  text-align: center;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -355,7 +355,7 @@
 
 .prj-table td {
   padding: 5px 30px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid #333;
   background-color: #252525;
   color: #e0e0e0;
@@ -402,7 +402,6 @@
   text-decoration: underline;
 }
 
-
 /* ========================================
    BADGES
    ======================================== */
@@ -415,6 +414,7 @@
   border-radius: 20px;
   font-size: 13px;
   font-weight: 500;
+  line-height: 1;
 }
 
 .status-badge.active {
@@ -431,6 +431,9 @@
 
 .status-badge i {
   font-size: 12px;
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
 }
 
 

@@ -5,7 +5,7 @@
   background-color: #1e1e1e;
   border-bottom: 2px solid #0057adff;
   padding: 0 20px;
-  height: 50px;
+  height: 55px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -47,7 +47,7 @@
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 16px;
+  font-size: 26px;
 }
 
 .api-docs-button:hover {
@@ -58,10 +58,10 @@
   background: none;
   border: 1px solid #0057adff;
   color: #4da6ff;
-  padding: 8px 16px;
+  padding: 7px 12px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 8px;
