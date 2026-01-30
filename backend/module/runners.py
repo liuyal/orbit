@@ -6,6 +6,7 @@
 # ================================================================
 
 import asyncio
+import copy
 import logging
 import time
 
@@ -138,7 +139,7 @@ async def save_runner_status(app,
             status = fetch_runner_status()
 
             # Save status to app state cache
-            app.state.runner_status_cache = status
+            app.state.runner_status_cache = copy.deepcopy(status)
 
             # Save runner status to historic and current collections
             for item in status:
