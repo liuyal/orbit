@@ -56,7 +56,7 @@
   overflow-x: auto;
   background: #262626;
   border-radius: 0px;
-  border: 1px solid #1d1d1d;
+  border: 1px solid #303030;
   width: 100%;
   max-width: 1600px;
   max-height: 750px;
@@ -70,7 +70,7 @@
 }
 
 .runners-table thead {
-  border-bottom: 1px solid #1d1d1d;
+  border-bottom: 1px solid #303030;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -84,11 +84,11 @@
   color: #deedff;
   text-transform: uppercase;
   width: 16.66%;
-  background: solid #1d1d1d;
+  background: solid #262626;
 }
 
 .runners-table tbody tr {
-  border-bottom: 1px solid #1d1d1d;
+  border-bottom: 1px solid #303030;
   transition: all 0.2s ease;
   background-color: #1f1e1e;
 }
@@ -137,7 +137,7 @@
 }
 
 .status-badge.busy {
-  background-color: #713f12;
+  background-color: #914f16;
   color: #fcd34d;
   border: 1px solid #f59e0b;
 }
