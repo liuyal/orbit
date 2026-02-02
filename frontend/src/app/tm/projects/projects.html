@@ -126,6 +126,24 @@
             <span class="toggle-label">{{ newProject.is_active ? 'Active' : 'Inactive' }}</span>
           </div>
         </div>
+        <div class="form-group">
+          <label for="labels">Labels</label>
+          <input
+            type="text"
+            id="labels"
+            name="labels"
+            placeholder="Type label and press Enter"
+            (keydown)="addLabel($event, false)"
+          />
+          <div class="labels-container">
+            @for (label of newProject.labels; track label) {
+              <span class="label-chip">
+                {{ label }}
+                <button type="button" class="remove-label" (click)="removeLabel(label, false)">&times;</button>
+              </span>
+            }
+          </div>
+        </div>
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" (click)="closeModal()">
             Cancel
@@ -190,6 +208,24 @@
               <span class="toggle-slider"></span>
             </label>
             <span class="toggle-label">{{ editProjectData.is_active ? 'Active' : 'Inactive' }}</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="edit_labels">Labels</label>
+          <input
+            type="text"
+            id="edit_labels"
+            name="edit_labels"
+            placeholder="Type label and press Enter"
+            (keydown)="addLabel($event, true)"
+          />
+          <div class="labels-container">
+            @for (label of editProjectData.labels; track label) {
+              <span class="label-chip">
+                {{ label }}
+                <button type="button" class="remove-label" (click)="removeLabel(label, true)">&times;</button>
+              </span>
+            }
           </div>
         </div>
         <div class="form-actions">

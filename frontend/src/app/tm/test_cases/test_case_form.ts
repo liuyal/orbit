@@ -55,7 +55,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     folder: '',
     status: 'DRAFT',
     priority: 'MEDIUM',
-    test_frequency: '',
+    test_frequency: 'Nightly',
     labels: '',
     links: ''
   };

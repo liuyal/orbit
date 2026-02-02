@@ -20,6 +20,7 @@ class Project(BaseModel):
     created_at: str
     updated_at: str | None
     is_active: bool
+    labels: list[str] = []
     model_config = {"extra": "forbid"}
 
 
@@ -27,10 +28,12 @@ class ProjectCreate(BaseModel):
     project_key: str
     description: str = ""
     is_active: bool = True
+    labels: list[str] = []
     model_config = {"extra": "forbid"}
 
 
 class ProjectUpdate(BaseModel):
     description: str = None
     is_active: bool = None
+    labels: list[str] = []
     model_config = {"extra": "forbid"}

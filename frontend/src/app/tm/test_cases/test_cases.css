@@ -36,7 +36,6 @@
   }
 }
 
-
 /* ========================================
    TABS
    ======================================== */
@@ -254,7 +253,6 @@
   overflow: hidden;
 }
 
-
 /* ========================================
    TEST CASES TABLE
    ======================================== */
@@ -272,7 +270,7 @@
 }
 
 .test-cases-list thead {
-  background-color: #0172ad;
+  background-color: #0057ad;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -288,7 +286,7 @@
   letter-spacing: 0.5px;
   border-bottom: 2px solid #004090;
   width: 20%;
-  background-color: #0172ad;
+  background-color: #0057ad;
 }
 
 .test-cases-list th:first-child {
@@ -302,12 +300,12 @@
 }
 
 .test-cases-list td {
-  padding: 12px 20px;
+  padding: 6px 20px;
   border-bottom: 1px solid #333;
   color: #e0e0e0;
   font-size: 14px;
   vertical-align: middle;
-  background-color: #252525;
+  background-color: #171c25;
 }
 
 .test-cases-list td:first-child {
@@ -337,7 +335,6 @@
 .test-cases-list tbody tr:last-child td {
   border-bottom: none;
 }
-
 
 /* ========================================
    BADGES
@@ -393,14 +390,15 @@
 
 /* Result Badge Variants - Circular Design */
 .result-badge {
-  width: 25px;
-  height: 25px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  font-size: 12px;
+  font-size: 10px;
+  padding: 0;
   cursor: help;
   transition: transform 0.2s ease;
 }

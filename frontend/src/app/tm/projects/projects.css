@@ -163,6 +163,8 @@
   width: 90%;
   color: #e0e0e0;
   border: 1px solid #333;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-header {
@@ -191,7 +193,7 @@
 
 .form-group label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-weight: bold;
   color: #e0e0e0;
   font-size: 15px;
@@ -200,7 +202,9 @@
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 12px 15px;
+  padding: 10px 15px;
+  height: 43px;
+  line-height: 20px;
   border: 1px solid #444;
   border-radius: 6px;
   font-size: 15px;
@@ -211,8 +215,9 @@
 }
 
 .form-group textarea {
-  resize: vertical;
-  min-height: 120px;
+  resize: none;
+  overflow: hidden;
+  height: 45px;
 }
 
 .form-group input:focus,
@@ -239,6 +244,40 @@
   border-color: #333;
 }
 
+.labels-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.label-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background-color: #2769f7;
+  color: #fff;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.remove-label {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.remove-label:hover {
+  opacity: 1;
+}
+
 .form-actions {
   display: flex;
   gap: 15px;
@@ -246,6 +285,13 @@
   margin-top: 35px;
   padding-top: 20px;
   border-top: 1px solid #333;
+  margin-top: auto;
+}
+
+.labels-container {
+  max-height: 80px;
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
 /* ========================================
@@ -315,13 +361,13 @@
    ======================================== */
 
 .table-wrapper {
+  overflow-x: auto;
+  background: #13171f;
+  border-radius: 0px;
   width: 100%;
-  max-width: 1400px;
-  max-height: 800px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  position: relative;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  max-width: 1600px;
+  max-height: 790px;
+  border: 1px solid #303030;
 }
 
 .prj-table {
@@ -332,18 +378,16 @@
 }
 
 .prj-table th {
-  background-color: #025e8f;
+  background-color: #0057ad;
   color: white;
-  padding: 5px 30px;
+  padding: 10px;
   text-align: center;
   position: sticky;
   top: 0;
   z-index: 10;
   font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 0.5px;
+  font-size: 16px;
   text-transform: uppercase;
-  border-bottom: 2px solid #004090;
   width: 33.33%;
 }
 
@@ -354,10 +398,9 @@
 }
 
 .prj-table td {
-  padding: 5px 30px;
+  padding: 10px 30px;
   text-align: center;
-  border-bottom: 1px solid #333;
-  background-color: #252525;
+  background-color: 13171f;
   color: #e0e0e0;
   font-size: 15px;
 }
@@ -376,14 +419,9 @@
   cursor: pointer;
 }
 
-.prj-table tbody tr:hover {
-  background-color: #2a2a2a;
-}
-
 .prj-table tbody tr:hover td {
-  background-color: #2a2a2a;
+  background-color: #181818;
 }
-
 
 .prj-table tbody tr:last-child td {
   border-bottom: none;

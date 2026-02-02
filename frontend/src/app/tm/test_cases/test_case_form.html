@@ -69,8 +69,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="test_frequency">Test Frequency</label>
-                            <input type="text" id="test_frequency" [(ngModel)]="testCase.test_frequency"
-                                name="test_frequency" placeholder="Enter frequencies" />
+                            <select id="test_frequency" [(ngModel)]="testCase.test_frequency" name="test_frequency">
+                                <option value="Nightly">Nightly</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Not Scheduled">Not Scheduled</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="status">Status</label>

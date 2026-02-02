@@ -25,13 +25,16 @@ export class Project {
   newProject = {
     project_key: '',
     description: '',
-    is_active: true
+    is_active: true,
+    labels: [] as string[]
   };
   editProjectData = {
     project_key: '',
     description: '',
-    is_active: true
+    is_active: true,
+    labels: [] as string[]
   };
+  allLabels: string[] = [];
   errors = {
     project_key: '',
     description: ''
@@ -48,6 +51,14 @@ export class Project {
     this.http.get<any[]>('/api/tm/projects').subscribe({
       next: (data) => {
         this.projects = data;
+        // Collect all unique labels from all projects
+        const labelSet = new Set<string>();
+        for (const prj of data) {
+          if (Array.isArray(prj.labels)) {
+            prj.labels.forEach((l: string) => labelSet.add(l));
+          }
+        }
+        this.allLabels = Array.from(labelSet).sort();
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -89,7 +100,8 @@ export class Project {
     this.newProject = {
       project_key: '',
       description: '',
-      is_active: true
+      is_active: true,
+      labels: []
     };
     this.errors = {
       project_key: '',
@@ -121,8 +133,9 @@ export class Project {
     }
 
     this.apiError = '';
-    console.log('Submitting project:', this.newProject);
-    this.http.post('/api/tm/projects', this.newProject).subscribe({
+    const payload = { ...this.newProject, labels: this.newProject.labels || [] };
+    console.log('Submitting project:', payload);
+    this.http.post('/api/tm/projects', payload).subscribe({
       next: (response) => {
         console.log('Project created successfully:', response);
         this.closeModal();
@@ -163,7 +176,8 @@ export class Project {
     this.editProjectData = {
       project_key: project.project_key,
       description: project.description,
-      is_active: project.is_active
+      is_active: project.is_active,
+      labels: Array.isArray(project.labels) ? [...project.labels] : []
     };
     this.showEditModal = true;
   }
@@ -177,7 +191,8 @@ export class Project {
     this.editProjectData = {
       project_key: '',
       description: '',
-      is_active: true
+      is_active: true,
+      labels: []
     };
     this.errors = {
       project_key: '',
@@ -196,10 +211,11 @@ export class Project {
     console.log('Submitting edited project:', this.editProjectData);
     const url = `/api/tm/projects/${this.editProjectData.project_key}`;
 
-    // Prepare the update payload (only description and is_active)
+    // Prepare the update payload (description, is_active, and labels)
     const updatePayload = {
       description: this.editProjectData.description,
-      is_active: this.editProjectData.is_active
+      is_active: this.editProjectData.is_active,
+      labels: this.editProjectData.labels || []
     };
 
     this.http.put(url, updatePayload).subscribe({
@@ -267,6 +283,36 @@ export class Project {
       window.open(url, '_blank');
     } else if (event.button === 0) { // Left mouse button
       this.navigateToTestCases(projectKey);
+    }
+  }
+
+  addLabel(event: KeyboardEvent, isEdit: boolean = false) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const input = event.target as HTMLInputElement;
+      const label = input.value.trim();
+      
+      if (label) {
+        const targetLabels = isEdit ? this.editProjectData.labels : this.newProject.labels;
+        if (!targetLabels.includes(label)) {
+          targetLabels.push(label);
+        }
+        input.value = '';
+      }
+    }
+  }
+
+  removeLabel(label: string, isEdit: boolean = false) {
+    if (isEdit) {
+      const index = this.editProjectData.labels.indexOf(label);
+      if (index > -1) {
+        this.editProjectData.labels.splice(index, 1);
+      }
+    } else {
+      const index = this.newProject.labels.indexOf(label);
+      if (index > -1) {
+        this.newProject.labels.splice(index, 1);
+      }
     }
   }
 }
