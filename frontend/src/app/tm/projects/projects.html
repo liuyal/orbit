@@ -25,6 +25,7 @@
             <th>PROJECT</th>
             <th>DESCRIPTION</th>
             <th># TESTS</th>
+            <th># CYCLES</th>
             <th>STATUS</th>
             <th></th>
         </tr>
@@ -40,6 +41,9 @@
             <td>{{ item.description }}</td>
             <td>
               {{ item.test_case_count || (item.test_cases && item.test_cases.length) || '-' }}
+            </td>
+            <td>
+              {{ item.test_cycle_count || '-' }}
             </td>
             <td>
               @if (item.is_active == true ) {

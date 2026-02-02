@@ -389,10 +389,11 @@
   text-transform: uppercase;
 }
 
-.prj-table th:first-child { width: 25%; }
-.prj-table th:nth-child(2) { width: 25%; }
-.prj-table th:nth-child(3) { width: 25%; }
-.prj-table th:nth-child(4) { width: 25%; }
+.prj-table th:first-child { width: 20%; }
+.prj-table th:nth-child(2) { width: 20%; }
+.prj-table th:nth-child(3) { width: 20%; }
+.prj-table th:nth-child(4) { width: 20%; }
+.prj-table th:nth-child(5) { width: 20%; }
 
 .prj-table th:last-child {
   text-align: right;

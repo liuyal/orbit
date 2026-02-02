@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../../navbar/navbar';
+import { TestCycleExecutionComponent } from './test_cycle_execution';
+import { ViewChild } from '@angular/core';
 
 export interface TestCycleForm {
   test_cycle_key: string;
@@ -15,12 +17,14 @@ export interface TestCycleForm {
 @Component({
   selector: 'test-cycle-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, NavbarComponent, TestCycleExecutionComponent],
   styleUrls: ['./test_cycle_form.css'],
   templateUrl: './test_cycle_form.html'
 })
 
 export class TestCycleFormComponent implements OnInit {
+  @ViewChild(TestCycleExecutionComponent) executionComponent?: TestCycleExecutionComponent;
+  
   route = inject(ActivatedRoute);
   router = inject(Router);
   http = inject(HttpClient);
@@ -31,7 +35,6 @@ export class TestCycleFormComponent implements OnInit {
   isEditMode = false;
   loading = false;
   activeTab: 'test-executions' | 'details' = 'details';
-  selectedExecution: any = null;
   
   testCycle: TestCycleForm = {
     test_cycle_key: '',
@@ -65,15 +68,6 @@ export class TestCycleFormComponent implements OnInit {
 
   onTabChange(tab: 'test-executions' | 'details') {
     this.activeTab = tab;
-  }
-
-  selectExecution(execution: any) {
-    this.selectedExecution = execution;
-  }
-
-  addTestCase() {
-    // TODO: Implement add test case to cycle functionality
-    console.log('Add test case to cycle');
   }
 
   loadTestCycle() {

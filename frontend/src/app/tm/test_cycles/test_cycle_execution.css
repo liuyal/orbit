@@ -1,132 +1,4 @@
 /* ========================================
-   PAGE LAYOUT
-   ======================================== */
-
-.content {
-  margin: 0;
-  height: calc(100vh - 50px);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.page-header {
-  margin-bottom: 20px;
-}
-
-.page-header h1 {
-  color: #ffffff;
-  font-size: 24px;
-}
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 100px 20px;
-  color: #999;
-  gap: 20px;
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 4px solid #333;
-  border-top-color: #0057adff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.tabs-container {
-  background-color: #1e1e1e;
-  border: 1px solid #333;
-  overflow: hidden;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.tabs {
-  display: flex;
-  border-bottom: 1px solid #333;
-  background-color: #1e1e1e;
-  border-radius: 0px;
-  height: 48px;
-}
-
-.tab {
-  padding: 12px 24px;
-  background-color: #1e1e1e;
-  border: none;
-  color: #999;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  border-bottom: 1px solid #333;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-radius: 0px;
-  height: 48px;
-}
-
-.tab:hover {
-  color: #e0e0e0;
-  background-color: #252525;
-
-}
-
-.tab.active {
-  color: #ffffff;
-  background-color: #252525;
-  border-bottom: 3px solid #0057adff;
-  border-radius: 0px;
-}
-
-.tab i {
-  font-size: 13px;
-}
-
-.create-btn-tab {
-  margin-left: auto;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #0057adff;
-  color: white;
-  margin-right: 10px;
-  margin-top: 8px;
-  margin-bottom: 8px;
-}
-
-.create-btn-tab:hover {
-  background-color: #004090;
-}
-
-.tab-content {
-  padding: 0;
-  background-color: #1e1e1e;
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* ========================================
    TEST EXECUTIONS TAB
    ======================================= */
 
@@ -166,6 +38,24 @@
   padding: 15px 20px;
   border-bottom: 1px solid #333;
   background-color: #252525;
+}
+
+.create-btn-tab {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #28a745;
+  color: white;
+}
+
+.create-btn-tab:hover {
+  background-color: #218838;
 }
 
 .panel-header h4 {
@@ -401,55 +291,7 @@
   margin: 0;
 }
 
-/* ========================================
-   FORMS
-   ======================================= */
-
-.form-container {
-  background-color: #1e1e1e;
-  padding: 30px;
-  border: none;
-  overflow-y: auto;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Make the inner form a column flex so .form-actions can be pushed to the bottom */
-.form-container form {
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-}
-
-.form-row {
-  display: flex;
-  gap: 20px;
-}
-
-.form-group {
-  flex: 1;
-}
-
-.form-group label {
-  display: block;
-  font-weight: bold;
-  color: #e0e0e0;
-  font-size: 15px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: 10px 15px;
-  border: 1px solid #444;
-  font-size: 15px;
-  box-sizing: border-box;
-
-/* Code editor container (matches test case form) */
+/* Code editor container */
 .monaco-editor-container {
   width: 100%;
   height: 540px;
@@ -460,7 +302,6 @@
   background-color: #1e1e1e;
 }
 
-/* Small adjustments to ensure editor scrolls */
 .monaco-editor-container .cm-editor {
   height: 100%;
   font-size: 14px;
@@ -474,107 +315,8 @@
   background-color: #1e1e1e;
   border-right: 1px solid #444;
 }
-  background-color: #2a2a2a;
-  color: #e0e0e0;
-  transition: border-color 0.2s;
-  height: 50px;
-  border-radius: 4px;
-}
 
-.form-group textarea {
-  min-height: 350px;
-  height: auto;
-  resize: vertical;
-  padding-top: 12px;
-  font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #0057adff;
-}
-
-.form-group input:disabled {
-  background-color: #1a1a1a;
-  color: #666;
-  cursor: not-allowed;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #0057adff;
-  background-color: #2f2f2f;
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-  color: #777;
-}
-
-.form-group input.error,
-.form-group textarea.error {
-  border-color: #dc3545;
-}
-
-.form-group input:disabled {
-  background-color: #1a1a1a;
-  color: #777;
-  cursor: not-allowed;
-  border-color: #333;
-}
-
-.error-message {
-  color: #dc3545;
-  font-size: 13px;
-  margin-top: 5px;
-  display: block;
-}
-
-/* ========================================
-   FORM ACTIONS
-   ======================================== */
-
-.alert-error {
-  background-color: #dc3545;
-  color: white;
-  padding: 12px 15px;
-  margin-bottom: 20px;
-  font-size: 14px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 15px;
-  justify-content: flex-end;
-  margin-top: auto;
-  padding-top: 20px;
-  /* border moved to pseudo-element so it can be positioned above */
-  border-top: none;
-  position: relative;
-}
-
-/* Ensure actions sit at bottom-right of the form */
-.form-actions {
-  align-self: stretch;
-  width: 100%;
-  padding-left: 0;
-}
-
-/* Draw the separator line 20px above the top of the actions */
-.form-actions::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: #333;
-  top: -20px;
-}
-
+/* Button styles */
 .btn {
   padding: 12px 30px;
   border: none;
@@ -610,30 +352,4 @@
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-/* Nudge action buttons up slightly to sit closer to the content */
-.form-actions .btn {
-  transform: translateY(-20px);
-}
-
-/* ========================================
-   EXECUTIONS TAB
-   ======================================== */
-
-.executions-placeholder {
-  padding: 80px 20px;
-  color: #999;
-  text-align: center;
-}
-
-.executions-icon {
-  font-size: 64px;
-  margin-bottom: 20px;
-  color: #555;
-}
-
-.executions-placeholder p {
-  margin: 8px 0;
-  font-size: 16px;
 }

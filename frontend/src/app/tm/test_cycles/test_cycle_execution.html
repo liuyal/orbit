@@ -1,0 +1,77 @@
+<div class="test-executions-container">
+    <div class="split-view">
+        <div class="test-cases-panel">
+            <div class="panel-header">
+                <h4>Test Cases</h4>
+                <span class="count-badge">{{ testCycle.executions?.length || 0 }}</span>
+            </div>
+            <div class="test-cases-list">
+                @if (testCycle.executions && testCycle.executions.length > 0) {
+                    @for (execution of testCycle.executions; track execution.test_case_key) {
+                    <div class="test-case-item" 
+                         [class.selected]="selectedExecution === execution"
+                         [attr.data-status]="execution.result || 'NOT_EXECUTED'"
+                         (click)="selectExecution(execution)">
+                        <div class="test-case-header">
+                            <span class="test-case-key">{{ execution.test_case_key }}</span>
+                        </div>
+                        <div class="test-case-title">{{ execution.title || 'Untitled' }}</div>
+                    </div>
+                    }
+                } @else {
+                    <div class="empty-message">
+                        <i class="fa-solid fa-flask"></i>
+                        <p>No test cases added to this cycle</p>
+                        <p class="hint">Click "Add Test Case" to get started</p>
+                    </div>
+                }
+            </div>
+        </div>
+        <div class="execution-details-panel">
+            @if (selectedExecution) {
+            <div class="details-content">
+                <div class="details-header">
+                    <h4>{{ selectedExecution.test_case_key }}</h4>
+                    <div class="result-selector">
+                        <select [(ngModel)]="selectedExecution.result" name="result">
+                            <option value="NOT_EXECUTED">Not Executed</option>
+                            <option value="PASS">Pass</option>
+                            <option value="FAIL">Fail</option>
+                            <option value="BLOCKED">Blocked</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="details-section">
+                    <label>Title</label>
+                    <p>{{ selectedExecution.title || 'N/A' }}</p>
+                </div>
+                <div class="details-section">
+                    <label>Description</label>
+                    <p>{{ selectedExecution.description || 'N/A' }}</p>
+                </div>
+                
+                <div class="details-section">
+                    <label>Comment</label>
+                    <textarea [(ngModel)]="selectedExecution.comment" 
+                              name="comment"
+                              placeholder="Add execution notes or comments..."
+                              rows="4"></textarea>
+                </div>
+                <div class="details-section">
+                    <label>Test Script</label>
+                    <div #scriptEditorContainer class="monaco-editor-container"></div>
+                </div>
+                <div class="details-actions">
+                    <button type="button" class="btn btn-secondary">Remove</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+            } @else {
+            <div class="no-selection">
+                <i class="fa-solid fa-hand-pointer"></i>
+                <p>Select a test case to view details</p>
+            </div>
+            }
+        </div>
+    </div>
+</div>
