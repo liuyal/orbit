@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: flex-start;
   overflow: hidden;
-  padding: 50px;
+  padding: 50px 0px;
 }
 
 /* ========================================
@@ -181,7 +181,6 @@
   color: #ffffff;
   font-size: 24px;
 }
-
 
 /* ========================================
    FORMS
@@ -365,8 +364,8 @@
   background: #13171f;
   border-radius: 0px;
   width: 100%;
-  max-width: 1600px;
-  max-height: 790px;
+  max-width: 85%;
+  max-height: 80vh;
   border: 1px solid #1e1e1e;
   border-radius: 5px;
 }
