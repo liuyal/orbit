@@ -17,6 +17,7 @@ from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
     DB_COLLECTION_PRJ,
+    DB_COLLECTION_TC,
     API_VERSION
 )
 from backend.app.utility import (
@@ -41,6 +42,11 @@ async def get_all_projects(request: Request):
     # Retrieve all projects from database
     db = request.app.state.mdb
     projects = await db.find(DB_COLLECTION_PRJ, {})
+
+    for project in projects:
+        test_cases = await db.find(DB_COLLECTION_TC,
+                                   {"project_key": project["project_key"]})
+        project["test_case_count"] = len(test_cases)
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=projects)
@@ -93,17 +99,21 @@ async def get_project_by_key(request: Request,
 
     # Retrieve project from database
     db = request.app.state.mdb
-    result = await db.find_one(DB_COLLECTION_PRJ,
-                               {"project_key": project_key})
+    project = await db.find_one(DB_COLLECTION_PRJ,
+                                {"project_key": project_key})
 
-    if result is None:
+    if project is None:
         # Project not found
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
                             content={"error": f"Project {project_key} not found"})
-    else:
-        # Convert ObjectId to string
-        return JSONResponse(status_code=status.HTTP_200_OK,
-                            content=result)
+
+    test_cases = await db.find(DB_COLLECTION_TC,
+                               {"project_key": project["project_key"]})
+    project["test_case_count"] = len(test_cases)
+
+    # Convert ObjectId to string
+    return JSONResponse(status_code=status.HTTP_200_OK,
+                        content=project)
 
 
 @router.put(f"/api/{API_VERSION}/tm/projects/{{project_key}}",

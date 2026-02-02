@@ -24,6 +24,7 @@
           <tr>
             <th>PROJECT</th>
             <th>DESCRIPTION</th>
+            <th># TESTS</th>
             <th>STATUS</th>
             <th></th>
         </tr>
@@ -37,6 +38,9 @@
               </span>
             </td>
             <td>{{ item.description }}</td>
+            <td>
+              {{ item.test_case_count || (item.test_cases && item.test_cases.length) || '-' }}
+            </td>
             <td>
               @if (item.is_active == true ) {
                 <span class="status-badge active">

@@ -380,16 +380,20 @@
 .prj-table th {
   background-color: #0057ad;
   color: white;
-  padding: 10px;
-  text-align: center;
+  padding: 10px 20px;
+  text-align: left;
   position: sticky;
   top: 0;
   z-index: 10;
   font-weight: 600;
   font-size: 16px;
   text-transform: uppercase;
-  width: 33.33%;
 }
+
+.prj-table th:first-child { width: 25%; }
+.prj-table th:nth-child(2) { width: 25%; }
+.prj-table th:nth-child(3) { width: 25%; }
+.prj-table th:nth-child(4) { width: 25%; }
 
 .prj-table th:last-child {
   text-align: right;
@@ -398,11 +402,21 @@
 }
 
 .prj-table td {
-  padding: 10px 30px;
-  text-align: center;
-  background-color: 13171f;
+  padding: 10px 20px;
+  text-align: left;
+  background-color: #13171f;
   color: #e0e0e0;
   font-size: 15px;
+}
+
+/* center the Tests count column to match the header */
+.prj-table td:nth-child(3) {
+  text-align: left;
+}
+
+/* ensure status column stays left-aligned */
+.prj-table td:nth-child(4) {
+  text-align: left;
 }
 
 .prj-table td:last-child {
