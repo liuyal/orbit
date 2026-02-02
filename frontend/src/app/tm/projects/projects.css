@@ -367,18 +367,17 @@
   width: 100%;
   max-width: 1600px;
   max-height: 790px;
-  border: 1px solid #303030;
+  border: 1px solid #1e1e1e;
+  border-radius: 5px;
 }
 
 .prj-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
   background-color: #1e1e1e;
 }
 
 .prj-table th {
-  background-color: #0057ad;
+  background-color: #1e1e1e;
   color: white;
   padding: 10px 20px;
   text-align: left;

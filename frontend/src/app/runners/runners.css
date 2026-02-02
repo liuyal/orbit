@@ -75,12 +75,12 @@
 .table-wrapper {
   overflow-x: auto;
   background: #13171f;
-  border-radius: 0px;
+  border-radius: 6px;
   width: 100%;
   max-width: 1600px;
   max-height: 790px;
   margin-top: 50px;
-  border: 1px solid #303030;
+  border: 1px solid #1e1e1e;
 }
 
 /* ========================= */
@@ -100,7 +100,15 @@
 .runners-table thead {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 50;
+}
+
+/* Ensure header cells sit above body cells (fixes left-edge overlap) */
+.runners-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 51;
+  background: #1e1e1e;
 }
 
 /* ========================= */
@@ -110,12 +118,11 @@
 .runners-table th {
   padding: 10px;
   text-align: center;
-  font-weight: 600;
   font-size: 16px;
   color: #deedff;
   text-transform: uppercase;
-  width: 16.66%;
-  background: #0057ad;
+  width: 16.6666%;
+  background: #1e1e1e;
 }
 
 /* ========================= */
@@ -124,17 +131,10 @@
 
 .runners-table tbody tr {
   border: 1px solid #1e1e1e;
-  transition: all 0.2s ease;
-  background-color: #1e1e1e;
 }
 
 .runners-table tbody tr:hover td {
   background-color: #181818;
-}
-
-
-.runners-table tbody tr:last-child {
-  border-bottom: none;
 }
 
 /* ========================= */
