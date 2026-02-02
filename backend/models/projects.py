@@ -21,6 +21,7 @@ class Project(BaseModel):
     updated_at: str | None
     is_active: bool
     test_count: int
+    test_cycle_count: int
     labels: list[str] = []
     model_config = {"extra": "forbid"}
 

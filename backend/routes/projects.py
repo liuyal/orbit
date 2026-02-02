@@ -18,6 +18,7 @@ from starlette.responses import JSONResponse
 from backend.app.app_def import (
     DB_COLLECTION_PRJ,
     DB_COLLECTION_TC,
+    DB_COLLECTION_TCY,
     API_VERSION
 )
 from backend.app.utility import (
@@ -46,7 +47,10 @@ async def get_all_projects(request: Request):
     for project in projects:
         test_cases = await db.find(DB_COLLECTION_TC,
                                    {"project_key": project["project_key"]})
+        test_cycles = await db.find(DB_COLLECTION_TCY,
+                                    {"project_key": project["project_key"]})
         project["test_case_count"] = len(test_cases)
+        project["test_cycle_count"] = len(test_cycles)
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=projects)
@@ -109,7 +113,11 @@ async def get_project_by_key(request: Request,
 
     test_cases = await db.find(DB_COLLECTION_TC,
                                {"project_key": project["project_key"]})
+
+    test_cycles = await db.find(DB_COLLECTION_TCY,
+                                {"project_key": project["project_key"]})
     project["test_case_count"] = len(test_cases)
+    project["test_cycle_count"] = len(test_cycles)
 
     # Convert ObjectId to string
     return JSONResponse(status_code=status.HTTP_200_OK,

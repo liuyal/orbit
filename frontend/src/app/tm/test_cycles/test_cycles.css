@@ -121,7 +121,6 @@
   overflow: hidden;
 }
 
-
 /* ========================================
    TEST CYCLES TABLE
    ======================================== */
@@ -139,14 +138,14 @@
 }
 
 .test-cycles-list thead {
-  background-color: #0172ad;
+  background-color: #0057ad;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .test-cycles-list th {
-  padding: 12px 20px;
+  padding: 8px 20px;
   text-align: left;
   color: #fff;
   font-weight: bold;
@@ -155,7 +154,7 @@
   letter-spacing: 0.5px;
   border-bottom: 2px solid #004090;
   width: 20%;
-  background-color: #0172ad;
+  background-color: #0057ad;
 }
 
 .test-cycles-list th:first-child {
@@ -169,12 +168,12 @@
 }
 
 .test-cycles-list td {
-  padding: 12px 20px;
+  padding: 6px 20px;
   border-bottom: 1px solid #333;
   color: #e0e0e0;
   font-size: 14px;
   vertical-align: middle;
-  background-color: #252525;
+  background-color: #171c25;
 }
 
 .test-cycles-list td:first-child {
@@ -204,7 +203,6 @@
 .test-cycles-list tbody tr:last-child td {
   border-bottom: none;
 }
-
 
 /* ========================================
    BADGES

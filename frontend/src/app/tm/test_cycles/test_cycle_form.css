@@ -4,7 +4,7 @@
 
 .content {
   margin: 0;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 50px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -424,11 +424,20 @@
   border: none;
   overflow-y: auto;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make the inner form a column flex so .form-actions can be pushed to the bottom */
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .form-row {
   display: flex;
-  gap: 15px;
+  gap: 20px;
 }
 
 .form-group {
@@ -441,13 +450,14 @@
   color: #e0e0e0;
   font-size: 15px;
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .form-group input,
 .form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 8px 15px;
+  padding: 10px 15px;
   border: 1px solid #444;
   font-size: 15px;
   box-sizing: border-box;
@@ -459,7 +469,7 @@
 }
 
 .form-group textarea {
-  min-height: 100px;
+  min-height: 350px;
   height: auto;
   resize: vertical;
   padding-top: 12px;
@@ -511,7 +521,6 @@
   display: block;
 }
 
-
 /* ========================================
    FORM ACTIONS
    ======================================== */
@@ -528,9 +537,29 @@
   display: flex;
   gap: 15px;
   justify-content: flex-end;
-  margin-top: 40px;
+  margin-top: auto;
   padding-top: 20px;
-  border-top: 1px solid #333;
+  /* border moved to pseudo-element so it can be positioned above */
+  border-top: none;
+  position: relative;
+}
+
+/* Ensure actions sit at bottom-right of the form */
+.form-actions {
+  align-self: stretch;
+  width: 100%;
+  padding-left: 0;
+}
+
+/* Draw the separator line 20px above the top of the actions */
+.form-actions::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #333;
+  top: -20px;
 }
 
 .btn {
@@ -570,6 +599,10 @@
   cursor: not-allowed;
 }
 
+/* Nudge action buttons up slightly to sit closer to the content */
+.form-actions .btn {
+  transform: translateY(-20px);
+}
 
 /* ========================================
    EXECUTIONS TAB
