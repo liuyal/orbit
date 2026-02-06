@@ -8,6 +8,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 50px 0px;
 }
 
 /* ========================= */
@@ -73,13 +74,12 @@
 /* ========================= */
 
 .table-wrapper {
-  overflow-x: auto;
+  overflow: auto;
   background: #13171f;
   border-radius: 6px;
   width: 100%;
-  max-width: 1600px;
-  max-height: 790px;
-  margin-top: 50px;
+  max-width: 85%;
+  max-height: 80vh;
   border: 1px solid #1e1e1e;
 }
 
@@ -91,6 +91,7 @@
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+  margin: 0px;
 }
 
 /* ========================= */
@@ -121,7 +122,7 @@
   font-size: 16px;
   color: #deedff;
   text-transform: uppercase;
-  width: 16.6666%;
+  width: auto;
   background: #1e1e1e;
 }
 
@@ -146,8 +147,98 @@
   font-size: 16px;
   color: #e5e7eb;
   text-align: center;
-  width: 16.66%;
+  width: auto;
   background-color: #13171f;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+
+  .runners-table th,
+  .runners-table td {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 600px) {
+  .table-wrapper {
+    margin-top: 20px;
+  }
+
+  .runners-table thead {
+    display: none;
+  }
+
+  .runners-table,
+  .runners-table tbody,
+  .runners-table tr,
+  .runners-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .runners-table tr {
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #1e1e1e;
+    padding: 10px;
+    background-color: #0f1724;
+  }
+
+  .runners-table td {
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 14px;
+    background: transparent;
+    border: none;
+  }
+
+  .runners-table td:before {
+    content: '';
+    display: block;
+    font-weight: 600;
+    color: #9ca3af;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+
+  .runners-table tr td:nth-child(1):before {
+    content: "Name";
+  }
+
+  .runners-table tr td:nth-child(2):before {
+    content: "Designation";
+  }
+
+  .runners-table tr td:nth-child(3):before {
+    content: "Status";
+  }
+
+  .runners-table tr td:nth-child(4):before {
+    content: "Busy";
+  }
+
+  .runners-table tr td:nth-child(5):before {
+    content: "User";
+  }
+
+  .runners-table tr td:nth-child(6):before {
+    content: "Job Link";
+  }
+
+  .status-badge {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .job-link {
+    display: inline-block;
+    margin-top: 4px;
+  }
 }
 
 /* ========================= */
@@ -204,4 +295,100 @@
 .job-link:hover {
   color: #93c5fd;
   text-decoration: underline;
+}
+
+/* ========================= */
+/*   Light Theme (System)    */
+/* ========================= */
+
+@media (prefers-color-scheme: light) {
+  .table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+  }
+
+  .runners-table th {
+    background-color: #f9fafb;
+    color: #fff;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .runners-table tbody tr {
+    border: 1px solid #e5e7eb;
+  }
+
+  .runners-table tbody tr:hover td {
+    background-color: #f9fafb;
+  }
+
+  .runners-table td {
+    background-color: #ffffff;
+    color: #1f2937;
+  }
+
+  .loading-container {
+    color: #4b5563;
+  }
+
+  .spinner {
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #3b82f6;
+  }
+
+  .error-state,
+  .empty-state {
+    color: #6b7280;
+  }
+
+  .error-state i {
+    color: #ef4444;
+  }
+
+  .empty-state i {
+    color: #9ca3af;
+  }
+
+  .status-badge.active {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+  }
+
+  .status-badge.inactive {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #dc2626;
+  }
+
+  .status-badge.busy {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+  }
+
+  .status-badge.idle {
+    background-color: #f1f5f9;
+    color: #334155;
+    border: 1px solid #94a3b8;
+  }
+
+  .job-link {
+    color: #2563eb;
+  }
+
+  .job-link:hover {
+    color: #1d4ed8;
+  }
+
+  /* Responsive mobile styles for light theme */
+  @media (max-width: 600px) {
+    .runners-table tr {
+      background-color: #f9fafb;
+      border: 1px solid #e5e7eb;
+    }
+
+    .runners-table td:before {
+      color: #6b7280;
+    }
+  }
 }

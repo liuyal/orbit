@@ -10,7 +10,7 @@ export function createCodeMirrorEditor(container: HTMLElement, initialValue: str
       basicSetup,
       python(),
       oneDark,
-      EditorView.updateListener.of((update) => {
+      EditorView.updateListener.of((update: any) => {
         if (update.docChanged) {
           onChange(update.state.doc.toString());
         }

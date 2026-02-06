@@ -45,12 +45,20 @@ async def get_all_projects(request: Request):
     projects = await db.find(DB_COLLECTION_PRJ, {})
 
     for project in projects:
+        # Get count for test cases and cycles
         test_cases = await db.find(DB_COLLECTION_TC,
                                    {"project_key": project["project_key"]})
         test_cycles = await db.find(DB_COLLECTION_TCY,
                                     {"project_key": project["project_key"]})
+
+        # Assign value to dict
         project["test_case_count"] = len(test_cases)
         project["test_cycle_count"] = len(test_cycles)
+
+        # Update count back into DB
+        await db.update(DB_COLLECTION_PRJ,
+                        {"project_key": project["project_key"]},
+                        project)
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=projects)
@@ -80,6 +88,8 @@ async def create_project_by_key(request: Request,
     # Initialize counts and timestamps
     request_data["created_at"] = current_time
     request_data["updated_at"] = current_time
+    request_data["test_count"] = 0
+    request_data["test_cycle_count"] = 0
 
     # Assign _id
     db_insert = Project(**request_data).model_dump()
@@ -111,13 +121,21 @@ async def get_project_by_key(request: Request,
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
                             content={"error": f"Project {project_key} not found"})
 
+    # Get count of test cases and cycles
     test_cases = await db.find(DB_COLLECTION_TC,
                                {"project_key": project["project_key"]})
 
     test_cycles = await db.find(DB_COLLECTION_TCY,
                                 {"project_key": project["project_key"]})
+
+    # Assign value to dict
     project["test_case_count"] = len(test_cases)
     project["test_cycle_count"] = len(test_cycles)
+
+    # Update count back into DB
+    await db.update(DB_COLLECTION_PRJ,
+                    {"project_key": project["project_key"]},
+                    project)
 
     # Convert ObjectId to string
     return JSONResponse(status_code=status.HTTP_200_OK,
@@ -147,6 +165,17 @@ async def update_project_by_key(request: Request,
 
     # Update the project in the database
     db = request.app.state.mdb
+
+    # Get count of test cases and cycles
+    test_cases = await db.find(DB_COLLECTION_TC,
+                               {"project_key": project_key})
+    test_cycles = await db.find(DB_COLLECTION_TCY,
+                                {"project_key": project_key})
+
+    # Assign value to dict
+    request_data["test_case_count"] = len(test_cases)
+    request_data["test_cycle_count"] = len(test_cycles)
+
     await db.update(DB_COLLECTION_PRJ,
                     {"project_key": project_key},
                     request_data)
