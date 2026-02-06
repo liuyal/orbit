@@ -169,21 +169,6 @@ export class TestCases implements OnInit {
     }
   }
 
-  addFolder() {
-    const folderName = prompt('Enter folder name:');
-    if (folderName && folderName.trim()) {
-      // Check if folder already exists
-      if (this.folders.some(f => f.name === folderName.trim())) {
-        alert('Folder already exists');
-        return;
-      }
-      // Add empty folder
-      this.folders.push({ name: folderName.trim(), count: 0 });
-      this.folders.sort((a, b) => a.name.localeCompare(b.name));
-      this.cdr.detectChanges();
-    }
-  }
-
   deleteFolder(folderName: string) {
     const hasTestCases = this.testCases.some(tc => 
       tc.folder === folderName

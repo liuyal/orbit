@@ -150,22 +150,6 @@
   color: #e0e0e0;
 }
 
-.folder-add-btn {
-  background: none;
-  border: none;
-  color: #0057adff;
-  cursor: pointer;
-  font-size: 16px;
-  padding: 0px 6px;
-  transition: all 0.2s;
-  border-radius: 4px;
-}
-
-.folder-add-btn:hover {
-  background-color: #333;
-  color: #4da6ff;
-}
-
 .folder-list {
   flex: 1;
   overflow-y: auto;
