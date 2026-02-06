@@ -373,6 +373,7 @@
 .prj-table {
   width: 100%;
   background-color: #1e1e1e;
+  margin: 0px;
 }
 
 .prj-table th {

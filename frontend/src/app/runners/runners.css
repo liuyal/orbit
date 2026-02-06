@@ -91,6 +91,7 @@
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
+  margin: 0px;
 }
 
 /* ========================= */
