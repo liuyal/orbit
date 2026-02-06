@@ -238,8 +238,8 @@ async def update_test_case_by_key(request: Request,
     # Update the project in the database
     db = request.app.state.mdb
     await db.update(DB_COLLECTION_TC,
-                    {"test_case_key": test_case_key,
-                     "project_key": project_key},
+                    {"project_key": project_key,
+                     "test_case_key": test_case_key, },
                     request_data)
 
     # Retrieve the updated test case

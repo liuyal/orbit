@@ -281,6 +281,9 @@ class OrbitBackendSanityTest(unittest.TestCase):
             response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
             assert response.status_code == 200
             assert len(response.json()) == te_count
+            response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}")
+            assert response.status_code == 200
+            assert response.json()["last_execution_key"] == f"{project_key}-E{j * te_count}"
         response = requests.get(f"{self.__class__.url}/projects/{project_key}/executions")
         assert response.status_code == 200
         assert len(response.json()) == tc_count * te_count

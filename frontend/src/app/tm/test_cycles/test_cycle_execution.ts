@@ -21,13 +21,13 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
   platformId = inject(PLATFORM_ID);
-  
+
+  loading: boolean = false;
+  apiError: string = '';
+
   @ViewChild('scriptEditorContainer', { static: false }) scriptEditorContainer?: ElementRef<HTMLDivElement>;
-  private scriptEditor?: EditorView;
   private isBrowser = false;
-  private editorInitializing = false;
-  private editorDisposed = false;
-  
+
   selectedExecution: any = null;
 
   ngOnInit() {
@@ -39,44 +39,30 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnDestroy() {
-    this.editorDisposed = true;
-    if (this.scriptEditor && this.selectedExecution) {
-      try {
-        this.selectedExecution.test_script = this.scriptEditor.state.doc.toString();
-      } catch (e) {}
-    }
-    this.disposeScriptEditor();
+    // Dispose CodeMirror editor if present
   }
 
   selectExecution(execution: any) {
-    // Save and dispose current editor value if present
-    if (this.scriptEditor && this.selectedExecution) {
-      try {
-        this.selectedExecution.test_script = this.scriptEditor.state.doc.toString();
-      } catch (e) {
-        // ignore
-      }
-      this.disposeScriptEditor();
-    }
+    console.log('Selected execution:', execution);
 
     this.selectedExecution = execution;
     this.cdr.detectChanges();
-    
+
     // Fetch both test case data and execution data from backend
     this.loadTestCaseAndExecutionData(execution.test_case_key);
   }
 
   loadTestCaseAndExecutionData(testCaseKey: string) {
     console.log('Loading test case and execution data for:', testCaseKey);
-    
+
     // Fetch test case data
     const testCaseUrl = `/api/tm/projects/${this.projectKey}/test-cases/${testCaseKey}`;
     const testCaseRequest = this.http.get<any>(testCaseUrl);
-    
+
     // Fetch execution data
     const executionUrl = `/api/tm/cycles/${this.testCycleKey}/executions/${testCaseKey}`;
     const executionRequest = this.http.get<any>(executionUrl);
-    
+
     // Wait for both requests to complete
     testCaseRequest.subscribe({
       next: (testCaseData) => {
@@ -89,7 +75,7 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
           this.selectedExecution.folder = testCaseData.folder || '';
           this.selectedExecution.status = testCaseData.status || '';
           this.selectedExecution.priority = testCaseData.priority || '';
-          
+
           this.cdr.detectChanges();
         }
       },
@@ -97,7 +83,7 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
         console.error('Error loading test case data:', err);
       }
     });
-    
+
     executionRequest.subscribe({
       next: (executionData) => {
         console.log('Execution data loaded:', executionData);
@@ -107,79 +93,69 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
           this.selectedExecution.comment = executionData.comment || '';
           this.selectedExecution.executed_by = executionData.executed_by;
           this.selectedExecution.executed_at = executionData.executed_at;
-          
           this.cdr.detectChanges();
-          
-          // Initialize editor after all data is loaded
-          this.waitForEditorContainerAndInit();
         }
       },
       error: (err) => {
         console.error('Error loading execution data:', err);
-        // Still initialize editor with test case data
-        this.waitForEditorContainerAndInit();
       }
     });
-  }
-
-  private async waitForEditorContainerAndInit() {
-    // Try multiple times to find the ViewChild after Angular renders it
-    for (let attempt = 0; attempt < 10; attempt++) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      if (this.scriptEditorContainer) {
-        console.log('Editor container found on attempt', attempt);
-        this.initializeScriptEditor();
-        return;
-      }
-      console.log('Waiting for editor container, attempt', attempt);
-    }
-    console.warn('Editor container never became available');
-  }
-
-  async initializeScriptEditor() {
-    console.log('initializeScriptEditor called', { hasContainer: !!this.scriptEditorContainer, hasEditor: !!this.scriptEditor, initializing: this.editorInitializing, disposed: this.editorDisposed });
-    if (!this.scriptEditorContainer || this.scriptEditor || this.editorInitializing || this.editorDisposed) return;
-    this.editorInitializing = true;
-    try {
-      const container = this.scriptEditorContainer.nativeElement;
-      this.cdr.detectChanges();
-      // wait for container size
-      let retries = 0;
-      while ((container.offsetWidth === 0 || container.offsetHeight === 0) && retries < 5) {
-        console.log('editor container has zero size, retry', { retries, offsetWidth: container.offsetWidth, offsetHeight: container.offsetHeight });
-        await new Promise(r => setTimeout(r, 100));
-        retries++;
-      }
-      if (container.offsetWidth === 0 || container.offsetHeight === 0) {
-        console.warn('Editor container still has no dimensions after retries', { offsetWidth: container.offsetWidth, offsetHeight: container.offsetHeight });
-        this.editorInitializing = false;
-        return;
-      }
-
-      this.scriptEditor = createCodeMirrorEditor(
-        container,
-        this.selectedExecution?.test_script || '',
-        (value: string) => {
-          if (this.selectedExecution) this.selectedExecution.test_script = value;
-        }
-      );
-      console.log('script editor initialized successfully');
-    } catch (e) {
-      console.warn('Failed to init script editor', e);
-    } finally {
-      this.editorInitializing = false;
-    }
-  }
-
-  disposeScriptEditor() {
-    if (this.scriptEditor) {
-      try { this.scriptEditor.destroy(); } catch (e) {}
-      this.scriptEditor = undefined;
-    }
   }
 
   addTestCase() {
     // TODO: Implement add test case to cycle functionality
     console.log('Add test case to cycle');
+  }
+
+  loadTestCycle() {
+    if (!this.testCycleKey) {
+      console.warn('No testCycleKey provided to loadTestCycle()');
+      return;
+    }
+
+    this.loading = true;
+    const url = `/api/tm/cycles/${this.testCycleKey}`;
+    console.log('Loading test cycle from URL:', url);
+
+    // Safety timeout to prevent infinite loading
+    const timeout = setTimeout(() => {
+      if (this.loading) {
+        console.warn('Request timeout - forcing error state');
+        this.apiError = 'Request timed out. Please try again.';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    }, 10000);
+
+    this.http.get<any>(url).subscribe({
+      next: (data) => {
+        clearTimeout(timeout);
+        console.log('Test cycle loaded in execution component:', data);
+        try {
+          this.testCycle.test_cycle_key = data.test_cycle_key || '';
+          this.testCycle.title = data.title || '';
+          this.testCycle.description = data.description || '';
+          this.testCycle.executions = data.executions || [];
+          console.log('Test cycle data set on child component');
+        } catch (error) {
+          console.error('Error processing test cycle data in child:', error);
+          this.apiError = 'Error processing test cycle data';
+        } finally {
+          this.loading = false;
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        clearTimeout(timeout);
+        console.error('Error loading test cycle in child component:', err);
+        this.apiError = `Failed to load test cycle: ${err.status} ${err.statusText || err.message}`;
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
+      complete: () => {
+        clearTimeout(timeout);
+        console.log('Child component request completed');
+      }
+    });
   }
 }

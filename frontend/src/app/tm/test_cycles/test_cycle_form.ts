@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -22,7 +22,7 @@ export interface TestCycleForm {
   templateUrl: './test_cycle_form.html'
 })
 
-export class TestCycleFormComponent implements OnInit {
+export class TestCycleFormComponent implements OnInit, AfterViewInit {
   @ViewChild(TestCycleExecutionComponent) executionComponent?: TestCycleExecutionComponent;
   
   route = inject(ActivatedRoute);
@@ -58,7 +58,7 @@ export class TestCycleFormComponent implements OnInit {
       if (this.isEditMode) {
         console.log('Edit mode - test cycle:', this.testCycleKey, 'for project:', this.projectKey);
         this.activeTab = 'test-executions';
-        this.loadTestCycle();
+        // loadTestCycle moved to child component; will invoke after view init
       } else {
         console.log('Create mode - project:', this.projectKey);
         this.activeTab = 'details';
@@ -66,40 +66,24 @@ export class TestCycleFormComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit() {
+    if (this.isEditMode) {
+      // ensure child is initialized then ask it to load the cycle
+      setTimeout(() => {
+        try {
+          this.executionComponent?.loadTestCycle();
+        } catch (err) {
+          console.error('Failed to call executionComponent.loadTestCycle():', err);
+        }
+      }, 0);
+    }
+  }
+
   onTabChange(tab: 'test-executions' | 'details') {
     this.activeTab = tab;
   }
 
-  loadTestCycle() {
-    this.loading = true;
-    const url = `/api/tm/cycles/${this.testCycleKey}`;
-    console.log('Loading test cycle from URL:', url);
-    
-    this.http.get<any>(url).subscribe({
-      next: (data) => {
-        console.log('Test cycle loaded:', data);
-        try {
-          this.testCycle.test_cycle_key = data.test_cycle_key || '';
-          this.testCycle.title = data.title || '';
-          this.testCycle.description = data.description || '';
-          this.testCycle.executions = data.executions || [];
-          console.log('Test cycle data processed successfully');
-        } catch (error) {
-          console.error('Error processing test cycle data:', error);
-          this.apiError = 'Error processing test cycle data';
-        } finally {
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
-      },
-      error: (err) => {
-        console.error('Error loading test cycle:', err);
-        this.apiError = `Failed to load test cycle: ${err.status} ${err.statusText || err.message}`;
-        this.loading = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
+  // loadTestCycle moved to TestCycleExecutionComponent
 
   goBack() {
     this.router.navigate(['/test-cycles', this.projectKey]);

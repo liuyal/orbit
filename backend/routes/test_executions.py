@@ -21,6 +21,7 @@ from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
     DB_COLLECTION_TE,
+    DB_COLLECTION_TC,
     TE_KEY_PREFIX,
     API_VERSION
 )
@@ -133,6 +134,7 @@ async def create_execution_by_test_case_key(request: Request,
     response = await get_test_case_by_key(request, project_key, test_case_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
+    tc_data = json.loads(response.body.decode())
 
     if execution:
         # Prepare request data from request data
@@ -191,6 +193,14 @@ async def create_execution_by_test_case_key(request: Request,
     # Create the test execution in the database
     db = request.app.state.mdb
     await db.create(DB_COLLECTION_TE, db_insert)
+
+    # Update the test case's last_execution_key
+    tc_data["updated_at"] = current_time
+    tc_data["last_execution_key"] = execution_key
+    await db.update(DB_COLLECTION_TC,
+                    {"project_key": project_key,
+                     "test_case_key": test_case_key},
+                    tc_data)
 
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content=request_data)
