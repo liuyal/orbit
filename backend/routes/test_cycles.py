@@ -262,7 +262,7 @@ async def add_execution_to_cycle(request: Request,
     # Add execution to cycle
     db = request.app.state.mdb
     exec_data = {execution_data["test_case_key"]: execution_key}
-    cycle_data["executions"].append(exec_data)
+    cycle_data["executions"].update(exec_data)
     await db.update(DB_COLLECTION_TCY,
                     {"test_cycle_key": test_cycle_key},
                     cycle_data)
