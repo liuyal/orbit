@@ -271,17 +271,19 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert len(response.json()) == n
 
         # Generate test executions for test cases
-        te_count = 3
-        tc_count = 2
+        te_count = 5
+        tc_count = 10
         for j in range(1, tc_count + 1):
             test_case_key = f"{project_key}-T{j}"
             for i in range(1, te_count + 1):
                 response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
-                d =  response.json()
                 assert response.status_code == 201
             response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
             assert response.status_code == 200
             assert len(response.json()) == te_count
+        response = requests.get(f"{self.__class__.url}/projects/{project_key}/executions")
+        assert response.status_code == 200
+        assert len(response.json()) == tc_count * te_count
 
         # Check no cycle exists
         response = requests.get(f"{self.__class__.url}/projects/{project_key}/cycles")
@@ -328,27 +330,19 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert response.status_code == 200
         assert len(response.json()) == 0
 
-        # Add executions to cycle
-        cycle_key = f"{project_key}-C{0}"
-        for i in range(0, 3):
-            execution_key = f"{project_key}-E{i}"
-            response = requests.post(f"{self.__class__.url}/cycles/{cycle_key}/executions?execution_key={execution_key}")
+        # Add executions to cycles
+        for j in range(1, 7):
+            cycle_key = f"{project_key}-C{j}"
+            for i in range(1, 4):
+                execution_key = f"{project_key}-E{i}"
+                response = requests.post(f"{self.__class__.url}/cycles/{cycle_key}/executions?execution_key={execution_key}")
+                assert response.status_code == 200, response.content
+            response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}/executions")
             assert response.status_code == 200
-        response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}/executions")
-        assert response.status_code == 200
-        assert len(response.json()) == 3
-
-        cycle_key = f"{project_key}-C{1}"
-        for i in range(0, 3):
-            execution_key = f"{project_key}-E{i}"
-            response = requests.post(f"{self.__class__.url}/cycles/{cycle_key}/executions?execution_key={execution_key}")
-            assert response.status_code == 200
-        response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}/executions")
-        assert response.status_code == 200
-        assert len(response.json()) == 3
+            assert len(response.json()) == 3
 
         # Delete existing cycle execution
-        cycle_key = f"{project_key}-C{1}"
+        cycle_key = f"{project_key}-C{7}"
         execution_key = f"{project_key}-E{0}"
         response = requests.delete(f"{self.__class__.url}/cycles/{cycle_key}/executions/{execution_key}")
         assert response.status_code == 200
@@ -357,7 +351,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert len(response.json()) == 2
 
         # Delete cycle
-        cycle_key = f"{project_key}-C{1}"
+        cycle_key = f"{project_key}-C{7}"
         response = requests.delete(f"{self.__class__.url}/cycles/{cycle_key}")
         assert response.status_code == 204
         response = requests.get(f"{self.__class__.url}/projects/{project_key}/cycles")

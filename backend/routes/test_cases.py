@@ -35,9 +35,11 @@ from backend.routes.projects import get_project_by_key
 router = APIRouter()
 
 
-@router.get(f"/api/{API_VERSION}/tm/test-cases",
-            tags=[DB_COLLECTION_TC],
-            response_model=list[TestCase])
+@router.get(
+    f"/api/{API_VERSION}/tm/test-cases",
+    tags=[DB_COLLECTION_TC],
+    response_model=list[TestCase],
+    status_code=status.HTTP_200_OK)
 async def get_all_test_cases(request: Request):
     """Get all test cases."""
 
@@ -49,9 +51,11 @@ async def get_all_test_cases(request: Request):
                         content=test_cases)
 
 
-@router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
-            tags=[DB_COLLECTION_TC],
-            response_model=list[TestCase])
+@router.get(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
+    tags=[DB_COLLECTION_TC],
+    response_model=list[TestCase],
+    status_code=status.HTTP_200_OK)
 async def get_all_test_cases_by_project(request: Request,
                                         project_key: str):
     """Get all test cases in the specified project."""
@@ -70,9 +74,10 @@ async def get_all_test_cases_by_project(request: Request,
                         content=test_cases)
 
 
-@router.post(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
-             tags=[DB_COLLECTION_TC],
-             status_code=status.HTTP_201_CREATED)
+@router.post(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
+    tags=[DB_COLLECTION_TC],
+    status_code=status.HTTP_201_CREATED)
 async def create_test_case_by_project(request: Request,
                                       project_key: str,
                                       test_case: Optional[TestCaseCreate] = None):
@@ -147,9 +152,10 @@ async def create_test_case_by_project(request: Request,
                         content=request_data)
 
 
-@router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
-               tags=[DB_COLLECTION_TC],
-               status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
+    tags=[DB_COLLECTION_TC],
+    status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_test_case_by_project(request: Request,
                                           project_key: str):
     """Delete all test cases in the specified project."""
@@ -171,9 +177,10 @@ async def delete_all_test_case_by_project(request: Request,
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",
-            tags=[DB_COLLECTION_TC],
-            response_model=TestCase)
+@router.get(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",
+    tags=[DB_COLLECTION_TC],
+    response_model=TestCase)
 async def get_test_case_by_key(request: Request,
                                project_key: str,
                                test_case_key: str):
@@ -200,9 +207,10 @@ async def get_test_case_by_key(request: Request,
             content=result)
 
 
-@router.put(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",
-            tags=[DB_COLLECTION_TC],
-            response_model=TestCase)
+@router.put(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",
+    tags=[DB_COLLECTION_TC],
+    response_model=TestCase)
 async def update_test_case_by_key(request: Request,
                                   project_key: str,
                                   test_case_key: str,
@@ -243,9 +251,10 @@ async def update_test_case_by_key(request: Request,
                         content=updated_test_case)
 
 
-@router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",
-               tags=[DB_COLLECTION_TC],
-               status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",
+    tags=[DB_COLLECTION_TC],
+    status_code=status.HTTP_204_NO_CONTENT)
 async def delete_test_case_by_key(request: Request,
                                   project_key: str,
                                   test_case_key: str):

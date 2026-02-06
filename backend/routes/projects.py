@@ -33,10 +33,11 @@ from backend.models.projects import (
 router = APIRouter()
 
 
-@router.get(f"/api/{API_VERSION}/tm/projects",
-            tags=[DB_COLLECTION_PRJ],
-            response_model=list[Project],
-            status_code=status.HTTP_200_OK)
+@router.get(
+    f"/api/{API_VERSION}/tm/projects",
+    tags=[DB_COLLECTION_PRJ],
+    response_model=list[Project],
+    status_code=status.HTTP_200_OK)
 async def get_all_projects(request: Request):
     """Endpoint to get projects"""
 
@@ -64,10 +65,11 @@ async def get_all_projects(request: Request):
                         content=projects)
 
 
-@router.post(f"/api/{API_VERSION}/tm/projects",
-             tags=[DB_COLLECTION_PRJ],
-             response_model=Project,
-             status_code=status.HTTP_201_CREATED)
+@router.post(
+    f"/api/{API_VERSION}/tm/projects",
+    tags=[DB_COLLECTION_PRJ],
+    response_model=Project,
+    status_code=status.HTTP_201_CREATED)
 async def create_project_by_key(request: Request,
                                 project: ProjectCreate):
     """Endpoint to create project."""
@@ -104,10 +106,11 @@ async def create_project_by_key(request: Request,
                         content=request_data)
 
 
-@router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}",
-            tags=[DB_COLLECTION_PRJ],
-            response_model=Project,
-            status_code=status.HTTP_200_OK)
+@router.get(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}",
+    tags=[DB_COLLECTION_PRJ],
+    response_model=Project,
+    status_code=status.HTTP_200_OK)
 async def get_project_by_key(request: Request,
                              project_key: str):
     """Endpoint to get project"""
@@ -143,10 +146,11 @@ async def get_project_by_key(request: Request,
                         content=project)
 
 
-@router.put(f"/api/{API_VERSION}/tm/projects/{{project_key}}",
-            tags=[DB_COLLECTION_PRJ],
-            response_model=Project,
-            status_code=status.HTTP_200_OK)
+@router.put(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}",
+    tags=[DB_COLLECTION_PRJ],
+    response_model=Project,
+    status_code=status.HTTP_200_OK)
 async def update_project_by_key(request: Request,
                                 project_key: str,
                                 project_update: ProjectUpdate):
@@ -190,9 +194,10 @@ async def update_project_by_key(request: Request,
                         content=updated_project)
 
 
-@router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}",
-               tags=[DB_COLLECTION_PRJ],
-               status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}",
+    tags=[DB_COLLECTION_PRJ],
+    status_code=status.HTTP_204_NO_CONTENT)
 async def delete_project_by_key(request: Request,
                                 project_key: str,
                                 force: dict = None):

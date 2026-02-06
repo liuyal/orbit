@@ -17,7 +17,6 @@ from fastapi import (
     status,
     Response
 )
-from backend.app.utility import get_current_utc_time
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
@@ -25,6 +24,7 @@ from backend.app.app_def import (
     TE_KEY_PREFIX,
     API_VERSION
 )
+from backend.app.utility import get_current_utc_time
 from backend.models.test_executions import (
     TestExecution,
     TestExecutionCreate,
@@ -36,12 +36,58 @@ from backend.routes.test_cases import get_test_case_by_key
 router = APIRouter()
 
 
-@router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",
-            tags=[DB_COLLECTION_TE],
-            response_model=list[TestExecution])
-async def get_all_executions_for_test_case(request: Request,
-                                           project_key: str,
-                                           test_case_key: str):
+@router.get(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/executions",
+    tags=[DB_COLLECTION_TE],
+    response_model=list[TestExecution],
+    status_code=status.HTTP_200_OK)
+async def get_all_executions_by_project(request: Request,
+                                        project_key: str):
+    """Get all test executions for a specific test case within a project."""
+
+    # Check project exists
+    response = await get_project_by_key(request, project_key)
+    if response.status_code == status.HTTP_404_NOT_FOUND:
+        return response
+
+    # Retrieve test execution matching project_key
+    db = request.app.state.mdb
+    test_executions = await db.find(DB_COLLECTION_TE,
+                                    {"project_key": project_key})
+
+    return JSONResponse(status_code=status.HTTP_200_OK,
+                        content=test_executions)
+
+
+@router.delete(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/executions",
+    tags=[DB_COLLECTION_TE],
+    status_code=status.HTTP_204_NO_CONTENT)
+async def delete_all_test_execution_by_project(request: Request,
+                                               project_key: str):
+    """Delete all test executions in the specified project."""
+
+    # Check project exists
+    response = await get_project_by_key(request, project_key)
+    if response.status_code == status.HTTP_404_NOT_FOUND:
+        return response
+
+    # Delete test executions from database matching project_key
+    db = request.app.state.mdb
+    await db.delete(DB_COLLECTION_TE,
+                    {"project_key": project_key})
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.get(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",
+    tags=[DB_COLLECTION_TE],
+    response_model=list[TestExecution],
+    status_code=status.HTTP_200_OK)
+async def get_all_executions_by_test_case_key(request: Request,
+                                              project_key: str,
+                                              test_case_key: str):
     """Get all test executions for a specific test case within a project."""
 
     # Check project exists
@@ -64,14 +110,15 @@ async def get_all_executions_for_test_case(request: Request,
                         content=test_executions)
 
 
-@router.post(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",
-             tags=[DB_COLLECTION_TE],
-             response_model=TestExecution,
-             status_code=status.HTTP_201_CREATED)
-async def create_execution_for_test_case(request: Request,
-                                         project_key: str,
-                                         test_case_key: str,
-                                         execution: Optional[TestExecutionCreate] = None):
+@router.post(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",
+    tags=[DB_COLLECTION_TE],
+    response_model=TestExecution,
+    status_code=status.HTTP_201_CREATED)
+async def create_execution_by_test_case_key(request: Request,
+                                            project_key: str,
+                                            test_case_key: str,
+                                            execution: Optional[TestExecutionCreate] = None):
     """Create a new test execution for a specific test case within a project."""
 
     # Get current time
@@ -100,9 +147,7 @@ async def create_execution_for_test_case(request: Request,
     if execution_key is None:
         # Auto-generate execution_key
         # get list of test execution to determine next key
-        response = await get_all_executions_for_test_case(request,
-                                                          project_key,
-                                                          test_case_key)
+        response = await get_all_executions_by_project(request, project_key)
         execution = json.loads(response.body.decode())
         if len(execution) < 1:
             # no test execution exist yet, start with 1
@@ -151,12 +196,13 @@ async def create_execution_for_test_case(request: Request,
                         content=request_data)
 
 
-@router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",
-               tags=[DB_COLLECTION_TE],
-               status_code=status.HTTP_204_NO_CONTENT)
-async def delete_all_execution_for_test_case(request: Request,
-                                             project_key: str,
-                                             test_case_key: str):
+@router.delete(
+    f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",
+    tags=[DB_COLLECTION_TE],
+    status_code=status.HTTP_204_NO_CONTENT)
+async def delete_all_execution_by_test_case_key(request: Request,
+                                                project_key: str,
+                                                test_case_key: str):
     """Delete all test executions for a specific test case within a project."""
 
     # Check project exists
@@ -183,9 +229,11 @@ async def delete_all_execution_for_test_case(request: Request,
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get(f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
-            tags=[DB_COLLECTION_TE],
-            response_model=TestExecution)
+@router.get(
+    f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
+    tags=[DB_COLLECTION_TE],
+    response_model=TestExecution,
+    status_code=status.HTTP_200_OK)
 async def get_execution_by_key(request: Request,
                                execution_key: str):
     """Retrieve a specific test execution by its ID."""
@@ -204,9 +252,10 @@ async def get_execution_by_key(request: Request,
                         content=test_execution)
 
 
-@router.put(f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
-            tags=[DB_COLLECTION_TE],
-            response_model=TestExecutionUpdate)
+@router.put(
+    f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
+    tags=[DB_COLLECTION_TE],
+    response_model=TestExecutionUpdate)
 async def update_execution_by_key(request: Request,
                                   execution_key: str,
                                   execution: TestExecutionUpdate):
@@ -242,9 +291,10 @@ async def update_execution_by_key(request: Request,
                         content=updated_test_execution)
 
 
-@router.delete(f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
-               tags=[DB_COLLECTION_TE],
-               status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
+    tags=[DB_COLLECTION_TE],
+    status_code=status.HTTP_204_NO_CONTENT)
 async def delete_execution_by_key(request: Request,
                                   execution_key: str):
     """Delete a specific test execution by its ID."""
