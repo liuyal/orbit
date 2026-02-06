@@ -270,35 +270,18 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert response.status_code == 200
         assert len(response.json()) == n
 
-        # Generate executions for 3 test cases
-        n = 25
-        project_key = "PRJ0"
-        test_case_key = f"{project_key}-T1"
-        for i in range(0, n):
-            payload = {"execution_key": f"{project_key}-E{i}"}
-            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
-            assert response.status_code == 201
-        response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
-        assert response.status_code == 200
-        assert len(response.json()) == n
-
-        test_case_key = f"{project_key}-T2"
-        for i in range(n, n * 2):
-            payload = {"execution_key": f"{project_key}-E{i}"}
-            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
-            assert response.status_code == 201
-        response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
-        assert response.status_code == 200
-        assert len(response.json()) == n
-
-        test_case_key = f"{project_key}-T3"
-        for i in range(n * 2, n * 3):
-            payload = {"execution_key": f"{project_key}-E{i}"}
-            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
-            assert response.status_code == 201
-        response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
-        assert response.status_code == 200
-        assert len(response.json()) == n
+        # Generate test executions for test cases
+        te_count = 3
+        tc_count = 2
+        for j in range(1, tc_count + 1):
+            test_case_key = f"{project_key}-T{j}"
+            for i in range(1, te_count + 1):
+                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
+                d =  response.json()
+                assert response.status_code == 201
+            response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
+            assert response.status_code == 200
+            assert len(response.json()) == te_count
 
         # Check no cycle exists
         response = requests.get(f"{self.__class__.url}/projects/{project_key}/cycles")

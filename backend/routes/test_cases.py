@@ -9,6 +9,7 @@
 
 import json
 import re
+from typing import Optional
 
 from fastapi import (
     APIRouter,
@@ -74,21 +75,26 @@ async def get_all_test_cases_by_project(request: Request,
              status_code=status.HTTP_201_CREATED)
 async def create_test_case_by_project(request: Request,
                                       project_key: str,
-                                      test_case: TestCaseCreate):
+                                      test_case: Optional[TestCaseCreate] = None):
     """Create a new test case in the specified project."""
 
+    # Get current time
     current_time = get_current_utc_time()
-
-    # Prepare request data
-    request_data = test_case.model_dump()
 
     # Check project exists
     response = await get_project_by_key(request, project_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
-    # Determine test_case_key
-    test_case_key = request_data.get("test_case_key", None)
+    if test_case:
+        # Prepare request data from request data
+        request_data = test_case.model_dump()
+        test_case_key = request_data.get("test_case_key", None)
+
+    else:
+        # No request body, create default test case
+        request_data = TestCaseCreate().model_dump()
+        test_case_key = None
 
     if test_case_key is None:
         # Auto-generate test_case_key
@@ -108,13 +114,6 @@ async def create_test_case_by_project(request: Request,
         request_data["test_case_key"] = test_case_key
 
     else:
-        # Check if test_case_key already exists
-        response = await get_test_case_by_key(request, project_key, test_case_key)
-        if response.status_code != status.HTTP_404_NOT_FOUND:
-            return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"test case {test_case_key} already exists."})
-
         # regex check for valid test_case_key format
         # Must be PRJ_KEY-T###
         pattern = rf"^{project_key}-{TC_KEY_PREFIX}\d+$"
@@ -123,6 +122,13 @@ async def create_test_case_by_project(request: Request,
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"test case key '{test_case_key}' is not valid. "
                                   f"Must be in format {project_key}-{TC_KEY_PREFIX}#"})
+
+        # Check if test_case_key already exists
+        response = await get_test_case_by_key(request, project_key, test_case_key)
+        if response.status_code != status.HTTP_404_NOT_FOUND:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"test case {test_case_key} already exists."})
 
     # Initialize counts and timestamps
     request_data["project_key"] = project_key
@@ -139,7 +145,6 @@ async def create_test_case_by_project(request: Request,
 
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content=request_data)
-
 
 
 @router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
@@ -204,6 +209,7 @@ async def update_test_case_by_key(request: Request,
                                   test_case: TestCaseUpdate):
     """Update a specific test case by its ID within the specified project."""
 
+    # Get current time
     current_time = get_current_utc_time()
 
     # Check project exists

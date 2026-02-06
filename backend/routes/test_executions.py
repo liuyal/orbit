@@ -9,6 +9,7 @@
 
 import json
 import re
+from typing import Optional
 
 from fastapi import (
     APIRouter,
@@ -16,6 +17,7 @@ from fastapi import (
     status,
     Response
 )
+from backend.app.utility import get_current_utc_time
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
@@ -69,14 +71,31 @@ async def get_all_executions_for_test_case(request: Request,
 async def create_execution_for_test_case(request: Request,
                                          project_key: str,
                                          test_case_key: str,
-                                         execution: TestExecutionCreate):
+                                         execution: Optional[TestExecutionCreate] = None):
     """Create a new test execution for a specific test case within a project."""
 
-    # Prepare request data
-    request_data = execution.model_dump()
+    # Get current time
+    current_time = get_current_utc_time()
 
-    # Determine test_case_key
-    execution_key = request_data.get("execution_key", None)
+    # Check project exists
+    response = await get_project_by_key(request, project_key)
+    if response.status_code == status.HTTP_404_NOT_FOUND:
+        return response
+
+    # Check if test_case_key exists
+    response = await get_test_case_by_key(request, project_key, test_case_key)
+    if response.status_code == status.HTTP_404_NOT_FOUND:
+        return response
+
+    if execution:
+        # Prepare request data from request data
+        request_data = execution.model_dump()
+        execution_key = request_data.get("execution_key", None)
+
+    else:
+        # Prepare request data with default values
+        request_data = TestExecutionCreate().model_dump()
+        execution_key = None
 
     if execution_key is None:
         # Auto-generate execution_key
@@ -98,16 +117,6 @@ async def create_execution_for_test_case(request: Request,
         request_data["execution_key"] = execution_key
 
     else:
-        # Check project exists
-        response = await get_project_by_key(request, project_key)
-        if response.status_code == status.HTTP_404_NOT_FOUND:
-            return response
-
-        # Check if test_case_key exists
-        response = await get_test_case_by_key(request, project_key, test_case_key)
-        if response.status_code == status.HTTP_404_NOT_FOUND:
-            return response
-
         # regex check for valid execution_key format
         # Must be PRJ_KEY-E###
         pattern = rf"^{project_key}-{TE_KEY_PREFIX}\d+$"
@@ -128,6 +137,7 @@ async def create_execution_for_test_case(request: Request,
     # Initialize missing keys
     request_data["project_key"] = project_key
     request_data["test_case_key"] = test_case_key
+    request_data["started_at"] = current_time
 
     # Assign _id
     db_insert = TestExecution(**request_data).model_dump()

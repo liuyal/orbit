@@ -20,7 +20,7 @@ class TestExecution(BaseModel):
     test_case_key: str
     test_cycle_key: str | None
     result: str | None
-    custom_fields: dict[str, str] | None
+    custom_fields: dict | None
     comments: str | None
     started_at: str | None
     finished_at: str | None
@@ -30,9 +30,10 @@ class TestExecution(BaseModel):
 
 class TestExecutionCreate(BaseModel):
     execution_key: str = None
+    test_case_key: str = None
     test_cycle_key: str = None
     result: str = None
-    custom_fields: dict[str, str] = None
+    custom_fields: dict = None
     comments: str = None
     started_at: str = None
     finished_at: str = None
@@ -41,9 +42,8 @@ class TestExecutionCreate(BaseModel):
 
 
 class TestExecutionUpdate(BaseModel):
-    test_cycle_key: str = None
     result: str = None
-    custom_fields: dict[str, str] = None
+    custom_fields: dict = None
     comments: str = None
     started_at: str = None
     finished_at: str = None

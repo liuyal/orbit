@@ -9,6 +9,7 @@
 
 import json
 import re
+from typing import Optional
 
 from fastapi import (
     APIRouter,
@@ -67,16 +68,26 @@ async def get_all_cycles_for_project(request: Request,
              status_code=status.HTTP_201_CREATED)
 async def create_cycle_for_project(request: Request,
                                    project_key: str,
-                                   cycle: TestCycleCreate):
+                                   cycle: Optional[TestCycleCreate] = None):
     """Create a new test cycle for project."""
 
+    # Get current time
     current_time = get_current_utc_time()
 
-    # Prepare request data
-    request_data = cycle.model_dump()
+    # Check project exists
+    response = await get_project_by_key(request, project_key)
+    if response.status_code == status.HTTP_404_NOT_FOUND:
+        return response
 
-    # Determine test_cycle_key
-    test_cycle_key = request_data.get("test_cycle_key", None)
+    if cycle:
+        # Prepare request data from request data
+        request_data = cycle.model_dump()
+        test_cycle_key = request_data.get("test_cycle_key", None)
+
+    else:
+        # Prepare default request data
+        request_data = TestCycleCreate().model_dump()
+        test_cycle_key = None
 
     if test_cycle_key is None:
         # Auto-generate test_cycle_key
@@ -96,11 +107,6 @@ async def create_cycle_for_project(request: Request,
         request_data["test_cycle_key"] = test_cycle_key
 
     else:
-        # Check project exists
-        response = await get_project_by_key(request, project_key)
-        if response.status_code == status.HTTP_404_NOT_FOUND:
-            return response
-
         # regex check for valid test_cycle_key format
         # Must be PRJ_KEY-C###
         pattern = rf"^{project_key}-{TCY_KEY_PREFIX}\d+$"
@@ -167,6 +173,7 @@ async def update_cycle_by_key(request: Request,
                               cycle: TestCycleUpdate):
     """Update a specific test cycle by its ID."""
 
+    # Get current time
     current_time = get_current_utc_time()
 
     # Prepare request data, excluding None values

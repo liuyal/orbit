@@ -72,6 +72,7 @@ async def create_project_by_key(request: Request,
                                 project: ProjectCreate):
     """Endpoint to create project."""
 
+    # Get current time
     current_time = get_current_utc_time()
 
     # Prepare request data
@@ -151,6 +152,7 @@ async def update_project_by_key(request: Request,
                                 project_update: ProjectUpdate):
     """Endpoint to update project"""
 
+    # Get current time
     current_time = get_current_utc_time()
 
     # Check project exists

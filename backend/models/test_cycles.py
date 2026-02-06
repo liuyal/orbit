@@ -31,7 +31,7 @@ class TestCycleCreate(BaseModel):
     title: str = None
     description: str = None
     status: str = None
-    executions: dict = []
+    executions: dict = {}
     model_config = {"extra": "forbid"}
 
 
@@ -39,5 +39,5 @@ class TestCycleUpdate(BaseModel):
     title: str = None
     description: str = None
     status: str = None
-    executions: dict = []
+    executions: dict = {}
     model_config = {"extra": "forbid"}
