@@ -67,8 +67,7 @@ async def get_all_test_cases_by_project(request: Request,
 
     # Retrieve test cases from database matching project_key
     db = request.app.state.mdb
-    test_cases = await db.find(DB_COLLECTION_TC,
-                               {"project_key": project_key})
+    test_cases = await db.find(DB_COLLECTION_TC, {"project_key": project_key})
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cases)
@@ -97,13 +96,12 @@ async def create_test_case_by_project(request: Request,
         test_case_key = request_data.get("test_case_key", None)
 
     else:
-        # No request body, create default test case
+        # No request body, create blank test case
         request_data = TestCaseCreate().model_dump()
         test_case_key = None
 
     if test_case_key is None:
         # Auto-generate test_case_key
-        # get list of test cases in project to determine next key
         response = await get_all_test_cases_by_project(request, project_key)
         cases = json.loads(response.body.decode())
         if len(cases) < 1:
@@ -111,21 +109,22 @@ async def create_test_case_by_project(request: Request,
             last_tc = 1
 
         else:
-            # extract numeric part of test_case_key to find last number
-            key_n = [int(case["_id"].split(TC_KEY_PREFIX)[-1]) for case in cases]
-            last_tc = max(key_n) + 1
+            # Get list of test cases in project to determine next key
+            # Extract numeric part of test_case_key to find last number
+            last_tc = max([int(case["_id"].split(TC_KEY_PREFIX)[-1]) for case in cases]) + 1
 
+        # Generate new test_case_key and assign to request data
         test_case_key = f"{project_key}-{TC_KEY_PREFIX}{last_tc}"
         request_data["test_case_key"] = test_case_key
 
     else:
         # regex check for valid test_case_key format
-        # Must be PRJ_KEY-T###
+        # Must be PRJ_KEY-T#
         pattern = rf"^{project_key}-{TC_KEY_PREFIX}\d+$"
         if not re.match(pattern, test_case_key):
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"test case key '{test_case_key}' is not valid. "
+                content={"error": f"Key '{test_case_key}' is not valid. "
                                   f"Must be in format {project_key}-{TC_KEY_PREFIX}#"})
 
         # Check if test_case_key already exists
@@ -156,8 +155,8 @@ async def create_test_case_by_project(request: Request,
     f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
     tags=[DB_COLLECTION_TC],
     status_code=status.HTTP_204_NO_CONTENT)
-async def delete_all_test_case_by_project(request: Request,
-                                          project_key: str):
+async def delete_all_test_case_from_project(request: Request,
+                                            project_key: str):
     """Delete all test cases in the specified project."""
 
     # Check project exists
@@ -172,7 +171,7 @@ async def delete_all_test_case_by_project(request: Request,
     await db.delete(DB_COLLECTION_TC,
                     {"project_key": project_key})
 
-    # TODO: check test case count
+    # TODO: Update project test case count
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -202,6 +201,7 @@ async def get_test_case_by_key(request: Request,
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"Test case {test_case_key} not found"})
     else:
+        # Found and return test case
         return JSONResponse(
             status_code=status.HTTP_200_OK,
             content=result)
@@ -277,5 +277,7 @@ async def delete_test_case_by_key(request: Request,
     await db.delete_one(DB_COLLECTION_TC,
                         {"test_case_key": test_case_key,
                          "project_key": project_key})
+
+    # TODO: Update project test case count
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

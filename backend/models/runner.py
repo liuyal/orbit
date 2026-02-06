@@ -20,7 +20,7 @@ class Runner(BaseModel):
     os: str
     status: str
     busy: bool
-    labels: list[dict]
+    labels: list
     queried_ts: int
     designation: str
     job: str

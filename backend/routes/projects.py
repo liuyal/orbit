@@ -123,16 +123,13 @@ async def get_project_by_key(request: Request,
     if project is None:
         # Project not found
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
-                            content={"error": f"Project {project_key} not found"})
+                            content={"error": f"{project_key} not found"})
 
     # Get count of test cases and cycles
-    test_cases = await db.find(DB_COLLECTION_TC,
-                               {"project_key": project["project_key"]})
+    test_cases = await db.find(DB_COLLECTION_TC, {"project_key": project_key})
+    test_cycles = await db.find(DB_COLLECTION_TCY, {"project_key": project_key})
 
-    test_cycles = await db.find(DB_COLLECTION_TCY,
-                                {"project_key": project["project_key"]})
-
-    # Assign value to dict
+    # Assign to project
     project["test_case_count"] = len(test_cases)
     project["test_cycle_count"] = len(test_cycles)
 
@@ -173,22 +170,20 @@ async def update_project_by_key(request: Request,
     db = request.app.state.mdb
 
     # Get count of test cases and cycles
-    test_cases = await db.find(DB_COLLECTION_TC,
-                               {"project_key": project_key})
-    test_cycles = await db.find(DB_COLLECTION_TCY,
-                                {"project_key": project_key})
+    test_cases = await db.find(DB_COLLECTION_TC, {"project_key": project_key})
+    test_cycles = await db.find(DB_COLLECTION_TCY, {"project_key": project_key})
 
     # Assign value to dict
     request_data["test_case_count"] = len(test_cases)
     request_data["test_cycle_count"] = len(test_cycles)
 
+    # Update count back into DB
     await db.update(DB_COLLECTION_PRJ,
                     {"project_key": project_key},
                     request_data)
 
     # Retrieve the updated project
-    updated_project = await db.find_one(DB_COLLECTION_PRJ,
-                                        {"project_key": project_key})
+    updated_project = await db.find_one(DB_COLLECTION_PRJ, {"project_key": project_key})
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=updated_project)
@@ -228,7 +223,6 @@ async def delete_project_by_key(request: Request,
         pass
 
     # Delete the project from the database
-    await db.delete(DB_COLLECTION_PRJ,
-                    {"project_key": project_key})
+    await db.delete(DB_COLLECTION_PRJ, {"project_key": project_key})
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

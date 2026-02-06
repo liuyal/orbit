@@ -78,6 +78,8 @@ async def delete_all_test_execution_by_project(request: Request,
     await db.delete(DB_COLLECTION_TE,
                     {"project_key": project_key})
 
+    # TODO: Update cycles and test cases to remove execution keys
+
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
