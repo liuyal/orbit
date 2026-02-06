@@ -321,15 +321,23 @@ async def remove_executions_from_cycle(request: Request,
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
-    # remote execution to cycle
+    # remove execution from cycle
     db = request.app.state.mdb
-    exec_data = {execution_data["test_case_key"]: execution_key}
-    cycle_data["executions"] = [e for e in cycle_data["executions"] if e != exec_data]
+
+    # Check execution in cycle
+    if execution_data["test_case_key"] not in cycle_data["executions"]:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"Execution {execution_key} "
+                              f"not in cycle {test_cycle_key}"})
+
+    # Remove execution from cycle
+    cycle_data["executions"].pop(execution_data["test_case_key"])
     await db.update(DB_COLLECTION_TCY,
                     {"test_cycle_key": test_cycle_key},
                     cycle_data)
 
-    # Update execution cycle id
+    # Update execution cycle key
     execution_data["test_cycle_key"] = None
     await db.update(DB_COLLECTION_TE,
                     {"execution_key": execution_key},

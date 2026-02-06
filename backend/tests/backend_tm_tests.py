@@ -340,13 +340,12 @@ class OrbitBackendSanityTest(unittest.TestCase):
 
         # Delete existing cycle execution
         cycle_key = f"{project_key}-C{6}"
-        execution_key = f"{project_key}-E{1}"
+        execution_key = f"{project_key}-E{5}"
         response = requests.delete(f"{self.__class__.url}/cycles/{cycle_key}/executions/{execution_key}")
         assert response.status_code == 200
-
         response = requests.get(f"{self.__class__.url}/cycles/{cycle_key}/executions")
         assert response.status_code == 200
-        assert len(response.json()) == 2
+        assert len(response.json()) == 9
 
         # Delete cycle
         cycle_key = f"{project_key}-C{6}"
@@ -354,7 +353,7 @@ class OrbitBackendSanityTest(unittest.TestCase):
         assert response.status_code == 204
         response = requests.get(f"{self.__class__.url}/projects/{project_key}/cycles")
         assert response.status_code == 200
-        assert len(response.json()) == 1
+        assert len(response.json()) == 5
 
         self.__class__.clean_up_db(self.__class__.generate)
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
