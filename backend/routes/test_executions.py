@@ -294,9 +294,29 @@ async def delete_all_execution_by_test_case_key(request: Request,
             content={"error": f"{test_case_key} not found"}
         )
 
-    # TODO: Update cycles and test case before removing execution keys
+    # Check project exists
+    test_cycles = await db.find(DB_COLLECTION_TCY, {
+        "project_key": project_key
+    })
+    for cycle in test_cycles:
+        if test_case_key in cycle.get("executions", {}):
+            # remove execution key from cycle
+            cycle["executions"].pop(test_case_key)
+            cycle["updated_at"] = get_current_utc_time()
+            await db.update(DB_COLLECTION_TCY, cycle, {
+                "test_cycle_key": cycle["test_cycle_key"]
+            })
 
-    # delete all test executions for the specified test case
+    # Update test case info
+    tc_data["updated_at"] = get_current_utc_time()
+    tc_data["last_execution_key"] = None
+    tc_data["last_result"] = "NOT_EXECUTED"
+    await db.update(DB_COLLECTION_TC, tc_data, {
+        "project_key": project_key,
+        "test_case_key": test_case_key
+    })
+
+    # Delete all test executions for the specified test case
     result, deleted_count = await db.delete(DB_COLLECTION_TE, {
         "project_key": project_key,
         "test_case_key": test_case_key

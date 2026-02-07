@@ -33,7 +33,9 @@ from backend.models.test_cycles import (
     TestCycleUpdate
 
 )
-from backend.routes.test_executions import TestExecution
+from backend.routes.test_executions import (
+    TestExecution
+)
 
 router = APIRouter()
 
