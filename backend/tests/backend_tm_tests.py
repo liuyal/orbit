@@ -167,8 +167,6 @@ class OrbitBackendSanityTest(unittest.TestCase):
                 assert response.status_code == 200
                 assert response.json()["title"] == title_updated
 
-                # TODO: add delete test
-
         # Delete all test cases for project PRJ0
         prj_key = "PRJ0"
         response = requests.delete(f"{self.__class__.url}/projects/{prj_key}/test-cases/")

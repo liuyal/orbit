@@ -270,7 +270,7 @@ async def delete_test_case_by_key(request: Request,
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
-    # TODO: Check if test case is linked to any test executions
+    # TODO: Check if test case has any test executions
 
     # Delete the test case from project from the database
     db = request.app.state.mdb

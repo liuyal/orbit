@@ -22,7 +22,7 @@ class Project(BaseModel):
     is_active: bool
     test_count: int | None
     test_cycle_count: int | None
-    labels: list | None = []
+    labels: list = []
     model_config = {"extra": "forbid"}
 
 

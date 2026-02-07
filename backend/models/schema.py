@@ -5,6 +5,7 @@
 # License: MIT
 # ================================================================
 
+# model/schema.py
 
 TYPE_MAP = {
     "string": "string",
@@ -15,7 +16,7 @@ TYPE_MAP = {
 
 
 def _build_object_schema(items_schema: dict) -> dict:
-    """Build a Pydantic-like schema dict from an items schema."""
+    """Build a Pydantic-like schema dict from an items' schema."""
 
     return {
         "type": "object",
@@ -25,29 +26,55 @@ def _build_object_schema(items_schema: dict) -> dict:
 
 
 def _convert_array_field(field: dict) -> dict | None:
-    """Convert array fields (list of strings or list of objects)."""
-
+    """Convert array fields (list of str, int, float, or dict)."""
     items = field.get("items", {})
     items_type = items.get("type")
 
-    if items_type == "object":
-        return {
-            "bsonType": "array",
-            "items": pydantic_to_mongo_jsonschema(_build_object_schema(items))
-        }
+    # Only support list of str, int, float, dict
     if items_type == "string":
         return {"bsonType": "array", "items": {"bsonType": "string"}}
+
+    if items_type == "integer":
+        return {"bsonType": "array", "items": {"bsonType": "int"}}
+
+    if items_type == "number":
+        return {"bsonType": "array", "items": {"bsonType": "double"}}
+
+    if items_type == "object":
+        return {"bsonType": "array", "items": {"bsonType": "object"}}
 
     return None
 
 
 def _convert_dict_field(field: dict) -> dict | None:
-    """Convert dict[str, str] fields."""
+    """Convert dict[str, str], dict[str, int], dict[str, float], dict[str, dict] fields."""
+    if field.get("type") == "object":
+        ap = field.get("additionalProperties", {})
 
-    if (field.get("type") == "object"
-            and not field.get("properties")
-            and field.get("additionalProperties", {}).get("type") == "string"):
-        return {"bsonType": "object", "additionalProperties": {"bsonType": "string"}}
+        # Only support dict[str, str], dict[str, int], dict[str, float], dict[str, dict]
+        if not field.get("properties"):
+            if isinstance(ap, dict):
+                ap_type = ap.get("type")
+                if ap_type == "string":
+                    return {"bsonType": "object", "additionalProperties": {"bsonType": "string"}}
+
+                if ap_type == "integer":
+                    return {"bsonType": "object", "additionalProperties": {"bsonType": "int"}}
+
+                if ap_type == "number":
+                    return {"bsonType": "object", "additionalProperties": {"bsonType": "double"}}
+
+                if ap_type == "object":
+                    return {"bsonType": "object", "additionalProperties": {"bsonType": "object"}}
+
+            elif isinstance(ap, bool):
+                # True means allow any type, False means no additional properties
+                if ap:
+                    return {"bsonType": "object"}  # allow any
+
+                else:
+                    return {"bsonType": "object", "additionalProperties": False}
+
     return None
 
 
@@ -62,25 +89,30 @@ def _convert_anyof_field(field: dict) -> dict | None:
 
     for option in field["anyOf"]:
         opt_type = option.get("type")
-
         if opt_type == "null":
             bson_types.add("null")
+
         elif opt_type == "array":
             array_result = _convert_array_field(option)
             if array_result:
                 anyof_list.append(array_result)
+
+        elif opt_type == "object":
+            dict_result = _convert_dict_field(option)
+            if dict_result:
+                anyof_list.append(dict_result)
+
         elif opt_type:
             bson_types.add(TYPE_MAP.get(opt_type, opt_type))
 
     anyof_list.extend({"bsonType": t} for t in bson_types)
-
     return anyof_list[0] if len(anyof_list) == 1 else {"anyOf": anyof_list}
 
 
 def _convert_field(field: dict) -> dict:
     """Convert a single Pydantic field to MongoDB JSON schema format."""
-    # Try each field type converter in order
 
+    # Try each field type converter in order
     if result := _convert_dict_field(field):
         return result
 
@@ -110,6 +142,7 @@ def _is_required(field: dict) -> bool:
     if "anyOf" in field:
         if any(opt.get("type") == "null" for opt in field["anyOf"]):
             return False
+
     return not field.get("nullable", False)
 
 
@@ -120,22 +153,11 @@ def _normalize_field_name(name: str) -> str:
 
 
 def pydantic_to_mongo_jsonschema(pydantic_schema: dict) -> dict:
+    """ Convert a Pydantic JSON schema to a MongoDB JSON schema.
+        Supports:
+            - string, integer, number, boolean, list, dict
     """
-    Convert a Pydantic JSON schema to a MongoDB JSON schema.
 
-    Supports:
-        - Simple types (string, integer, number, boolean)
-        - Optional fields (| None)
-        - List of strings (list[str])
-        - List of dicts (list[dict])
-        - Dict fields (dict[str, str])
-
-    Args:
-        pydantic_schema: A Pydantic model's JSON schema (from model.model_json_schema())
-
-    Returns:
-        A MongoDB-compatible JSON schema with bsonType annotations.
-    """
     properties = pydantic_schema.get("properties", {})
     required = pydantic_schema.get("required", [])
 

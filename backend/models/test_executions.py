@@ -24,7 +24,7 @@ class TestExecution(BaseModel):
     comments: str | None
     started_at: str | None
     finished_at: str | None
-    links: list | None
+    links: list = []
     model_config = {"extra": "forbid"}
 
 
@@ -33,19 +33,19 @@ class TestExecutionCreate(BaseModel):
     test_case_key: str = None
     test_cycle_key: str = None
     result: str = None
-    custom_fields: dict = None
+    custom_fields: dict = {}
     comments: str = None
     started_at: str = None
     finished_at: str = None
-    links: list = None
+    links: list = []
     model_config = {"extra": "forbid"}
 
 
 class TestExecutionUpdate(BaseModel):
     result: str = None
-    custom_fields: dict = None
+    custom_fields: dict = {}
     comments: str = None
     started_at: str = None
     finished_at: str = None
-    links: list = None
+    links: list = []
     model_config = {"extra": "forbid"}
