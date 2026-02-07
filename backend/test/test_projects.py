@@ -1,7 +1,6 @@
 # ================================================================
 # Orbit API
 # Description: FastAPI backend sanity test script for the Orbit application.
-# Version: 0.1.0
 # Author: Jerry
 # License: MIT
 # ================================================================
@@ -12,10 +11,10 @@ import unittest
 import pytest
 import requests
 
-from test_base import OrbitBackendBaseTest
+from test_base import OrbitTMBaseTest
 
 
-class OrbitBackendProjectsTest(OrbitBackendBaseTest):
+class OrbitTMProjectsTest(OrbitTMBaseTest):
 
     @pytest.mark.order(1)
     def test_get_all_projects(self):

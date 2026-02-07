@@ -1,24 +1,28 @@
 # ================================================================
 # Orbit API
 # Description: FastAPI backend sanity test script for the Orbit application.
-# Version: 0.1.0
 # Author: Jerry
 # License: MIT
 # ================================================================
 
 import unittest
 
-from test_projects import OrbitBackendProjectsTest
-
-# from test_cases import OrbitBackendTestCasesTest
-# from test_executions import OrbitBackendExecutionsTest
-# from test_cycles import OrbitBackendCyclesTest
-
+from test_cases import OrbitTMTestCasesTest
+from test_cycles import OrbitTMCyclesTest
+from test_executions import OrbitTMExecutionsTest
+from test_projects import OrbitTMProjectsTest
 
 if __name__ == "__main__":
-    project_tests = OrbitBackendProjectsTest
-    # test_cases_tests = OrbitBackendTestCasesTest
-    # executions_test = OrbitBackendExecutionsTest
-    # cycles_test = OrbitBackendCyclesTest
+    project_tests = OrbitTMProjectsTest()
+    test_cases_tests = OrbitTMTestCasesTest()
+    test_executions_test = OrbitTMExecutionsTest()
+    test_cycles_test = OrbitTMCyclesTest()
+
+    unittest.TestSuite([
+        project_tests,
+        test_cases_tests,
+        test_executions_test,
+        test_cycles_test
+    ])
 
     unittest.main()

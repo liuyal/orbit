@@ -1,7 +1,6 @@
 # ================================================================
 # Orbit API
 # Description: FastAPI backend for the Orbit application.
-# Version: 0.1.0
 # Author: Jerry
 # License: MIT
 # ================================================================
