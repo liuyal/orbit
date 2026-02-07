@@ -13,7 +13,8 @@ from fastapi import APIRouter, Request, status
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
-    API_VERSION
+    API_VERSION,
+    RUNNER_STATUS_CACHE
 )
 from backend.models.runner import Runner
 
@@ -30,7 +31,7 @@ async def get_runners_status(request: Request):
     """ Get the status of all runners. """
 
     # Retrieve status from cache
-    cache = getattr(request.app.state, "runner_status_cache", [])
+    cache = getattr(request.app.state, RUNNER_STATUS_CACHE, [])
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=cache)
@@ -46,7 +47,7 @@ async def get_runners_status_by_name(request: Request,
     """ Get the status of a runners. """
 
     # Retrieve runner from database
-    cache = getattr(request.app.state, "runner_status_cache", [])
+    cache = getattr(request.app.state, RUNNER_STATUS_CACHE, [])
 
     result = None
     for item in cache:

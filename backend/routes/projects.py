@@ -18,6 +18,7 @@ from starlette.responses import JSONResponse
 from backend.app.app_def import (
     DB_COLLECTION_PRJ,
     DB_COLLECTION_TC,
+    DB_COLLECTION_TE,
     DB_COLLECTION_TCY,
     API_VERSION
 )
@@ -47,22 +48,17 @@ async def get_all_projects(request: Request):
 
     for project in projects:
         # Get count for test cases and cycles
-        test_cases = await db.find(DB_COLLECTION_TC,
-                                   {"project_key": project["project_key"]})
-        test_cycles = await db.find(DB_COLLECTION_TCY,
-                                    {"project_key": project["project_key"]})
+        test_cases = await db.find(DB_COLLECTION_TC, {"project_key": project["project_key"]})
+        test_cycles = await db.find(DB_COLLECTION_TCY, {"project_key": project["project_key"]})
 
         # Assign value to dict
         project["test_case_count"] = len(test_cases)
         project["test_cycle_count"] = len(test_cycles)
 
         # Update count back into DB
-        await db.update(DB_COLLECTION_PRJ,
-                        {"project_key": project["project_key"]},
-                        project)
+        await db.update(DB_COLLECTION_PRJ, {"project_key": project["project_key"]}, project)
 
-    return JSONResponse(status_code=status.HTTP_200_OK,
-                        content=projects)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=projects)
 
 
 @router.post(
@@ -91,7 +87,7 @@ async def create_project_by_key(request: Request,
     # Initialize counts and timestamps
     request_data["created_at"] = current_time
     request_data["updated_at"] = current_time
-    request_data["test_count"] = 0
+    request_data["test_cases_count"] = 0
     request_data["test_cycle_count"] = 0
 
     # Assign _id
@@ -117,8 +113,7 @@ async def get_project_by_key(request: Request,
 
     # Retrieve project from database
     db = request.app.state.mdb
-    project = await db.find_one(DB_COLLECTION_PRJ,
-                                {"project_key": project_key})
+    project = await db.find_one(DB_COLLECTION_PRJ, {"project_key": project_key})
 
     if project is None:
         # Project not found
@@ -134,9 +129,7 @@ async def get_project_by_key(request: Request,
     project["test_cycle_count"] = len(test_cycles)
 
     # Update count back into DB
-    await db.update(DB_COLLECTION_PRJ,
-                    {"project_key": project["project_key"]},
-                    project)
+    await db.update(DB_COLLECTION_PRJ, {"project_key": project_key}, project)
 
     # Convert ObjectId to string
     return JSONResponse(status_code=status.HTTP_200_OK,
@@ -178,9 +171,7 @@ async def update_project_by_key(request: Request,
     request_data["test_cycle_count"] = len(test_cycles)
 
     # Update count back into DB
-    await db.update(DB_COLLECTION_PRJ,
-                    {"project_key": project_key},
-                    request_data)
+    await db.update(DB_COLLECTION_PRJ, {"project_key": project_key}, request_data)
 
     # Retrieve the updated project
     updated_project = await db.find_one(DB_COLLECTION_PRJ, {"project_key": project_key})
@@ -203,24 +194,37 @@ async def delete_project_by_key(request: Request,
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
-    # Get all test-cases for the project
     db = request.app.state.mdb
 
-    if force and force["force"] is False:
-        # TODO: add check for not existing test-executions, test-cycles linked
-        pass
+    # Check force flag
+    if force and force.get("force", None) is False:
+        # Check for existing test cases, test-executions, test-cycles linked to the project
+        test_cases_count = await db.count(DB_COLLECTION_TC, {"project_key": project_key})
+        if test_cases_count > 0:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"Project {project_key} has linked test-cases"}
+            )
 
-        # from backend.routes.test_cases import get_all_test_cases_by_project
-        # response = await get_all_test_cases_by_project(request, project_key)
-        # if len(json.loads(response.body.decode())) > 0:
-        #     # There are linked test-cases, cannot delete project
-        #     return JSONResponse(
-        #         status_code=status.HTTP_400_BAD_REQUEST,
-        #         content={"error": f"Project {project_key} has linked test-cases"})
+        test_executions_count = await db.count(DB_COLLECTION_TE, {"project_key": project_key})
+        if test_executions_count > 0:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"Project {project_key} has linked test-executions"}
+            )
+
+        test_cycles_count = await db.count(DB_COLLECTION_TCY, {"project_key": project_key})
+        if test_cycles_count > 0:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"Project {project_key} has linked test-cycles"}
+            )
 
     else:
-        # TODO: Delete all test-cases, executions, cycles linked to project
-        pass
+        # Force delete all linked test-cases, test-executions, test-cycles
+        await db.delete(DB_COLLECTION_TCY, {"project_key": project_key})
+        await db.delete(DB_COLLECTION_TE, {"project_key": project_key})
+        await db.delete(DB_COLLECTION_TC, {"project_key": project_key})
 
     # Delete the project from the database
     await db.delete(DB_COLLECTION_PRJ, {"project_key": project_key})

@@ -37,6 +37,22 @@ from backend.routes.test_cases import get_test_case_by_key
 router = APIRouter()
 
 
+async def update_test_case_last_execution(request: Request,
+                                          current_time: str,
+                                          project_key: str,
+                                          test_case_key: str,
+                                          execution_key: Optional[str] = None):
+    """Update the last_execution_key field of a test case"""
+
+    # # Update the test case's last_execution_key
+    # tc_data["updated_at"] = current_time
+    # tc_data["last_execution_key"] = execution_key
+    # await db.update(DB_COLLECTION_TC,
+    #                 {"project_key": project_key,
+    #                  "test_case_key": test_case_key},
+    #                 tc_data)
+
+
 @router.get(
     f"/api/{API_VERSION}/tm/projects/{{project_key}}/executions",
     tags=[DB_COLLECTION_TE],
@@ -53,8 +69,9 @@ async def get_all_executions_by_project(request: Request,
 
     # Retrieve test execution matching project_key
     db = request.app.state.mdb
-    test_executions = await db.find(DB_COLLECTION_TE,
-                                    {"project_key": project_key})
+    test_executions = await db.find(DB_COLLECTION_TE, {
+        "project_key": project_key
+    })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_executions)
@@ -73,12 +90,11 @@ async def delete_all_test_execution_by_project(request: Request,
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
+    # TODO: Update cycles and test cases before removing execution keys
+
     # Delete test executions from database matching project_key
     db = request.app.state.mdb
-    await db.delete(DB_COLLECTION_TE,
-                    {"project_key": project_key})
-
-    # TODO: Update cycles and test cases to remove execution keys
+    await db.delete(DB_COLLECTION_TE, {"project_key": project_key})
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -105,9 +121,10 @@ async def get_all_executions_by_test_case_key(request: Request,
 
     # Retrieve test execution matching project_key and test_case_key
     db = request.app.state.mdb
-    test_executions = await db.find(DB_COLLECTION_TE,
-                                    {"project_key": project_key,
-                                     "test_case_key": test_case_key})
+    test_executions = await db.find(DB_COLLECTION_TE, {
+        "project_key": project_key,
+        "test_case_key": test_case_key
+    })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_executions)
@@ -197,6 +214,10 @@ async def create_execution_by_test_case_key(request: Request,
     await db.create(DB_COLLECTION_TE, db_insert)
 
     # Update the test case's last_execution_key
+    # await update_test_case_last_execution(request,
+    #                                       project_key,
+    #                                       test_case_key,
+    #                                       execution_key)
     tc_data["updated_at"] = current_time
     tc_data["last_execution_key"] = execution_key
     await db.update(DB_COLLECTION_TC,
@@ -227,11 +248,15 @@ async def delete_all_execution_by_test_case_key(request: Request,
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
+    # TODO: Update cycles and test cases before removing execution keys
+
     # delete all test executions for the specified test case
     db = request.app.state.mdb
-    result, deleted_count = await db.delete(DB_COLLECTION_TE,
-                                            {"project_key": project_key,
-                                             "test_case_key": test_case_key})
+    result, deleted_count = await db.delete(DB_COLLECTION_TE, {
+        "project_key": project_key,
+        "test_case_key": test_case_key
+    })
+
     if deleted_count == 0:
         # Test case has no executions
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
@@ -252,8 +277,10 @@ async def get_execution_by_key(request: Request,
 
     # Retrieve test execution from database
     db = request.app.state.mdb
-    test_execution = await db.find_one(DB_COLLECTION_TE,
-                                       {"execution_key": execution_key})
+    test_execution = await db.find_one(DB_COLLECTION_TE, {
+        "execution_key": execution_key
+    })
+
     if test_execution is None:
         # test execution not found
         return JSONResponse(
@@ -284,10 +311,9 @@ async def update_execution_by_key(request: Request,
 
     # Update the execution in the database
     db = request.app.state.mdb
-    result, matched_count = await db.update(
-        DB_COLLECTION_TE,
-        {"execution_key": execution_key},
-        request_data)
+    result, matched_count = await db.update(DB_COLLECTION_TE, {
+        "execution_key": execution_key
+    }, request_data)
 
     if matched_count == 0:
         return JSONResponse(
@@ -295,9 +321,9 @@ async def update_execution_by_key(request: Request,
             content={"error": f"Test execution {execution_key} not found"})
 
     # Retrieve the updated test case
-    updated_test_execution = await db.find_one(
-        DB_COLLECTION_TE,
-        {"execution_key": execution_key})
+    updated_test_execution = await db.find_one(DB_COLLECTION_TE, {
+        "execution_key": execution_key
+    })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=updated_test_execution)
@@ -313,9 +339,9 @@ async def delete_execution_by_key(request: Request,
 
     # Delete the project from the database
     db = request.app.state.mdb
-    result, deleted_count = await db.delete_one(
-        DB_COLLECTION_TE,
-        {"execution_key": execution_key})
+    result, deleted_count = await db.delete_one(DB_COLLECTION_TE, {
+        "execution_key": execution_key
+    })
 
     if deleted_count == 0:
         # Test execution not found

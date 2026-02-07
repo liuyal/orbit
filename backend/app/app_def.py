@@ -74,6 +74,7 @@ GITHUB_REPOSITORY = os.getenv("GITHUB_REPOSITORY").split(",")
 
 # Runner Constants
 QUERY_API_INTERVAL = 60
+RUNNER_STATUS_CACHE = "runner_status_cache"
 TABLE_TIMESTAMP_STATS = "timestamp-stats"
 TABLE_RUNNER_STATS_HISTORIC = "runner-stats-historic"
 TABLE_RUNNER_STATS_CURRENT = "runner-stats-current"

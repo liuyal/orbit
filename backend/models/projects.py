@@ -20,7 +20,7 @@ class Project(BaseModel):
     created_at: str
     updated_at: str | None
     is_active: bool
-    test_count: int | None
+    test_cases_count: int | None
     test_cycle_count: int | None
     labels: list = []
     model_config = {"extra": "forbid"}

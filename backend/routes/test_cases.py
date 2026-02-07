@@ -20,7 +20,10 @@ from fastapi import (
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
+    DB_COLLECTION_PRJ,
     DB_COLLECTION_TC,
+    DB_COLLECTION_TE,
+    DB_COLLECTION_TCY,
     TC_KEY_PREFIX,
     API_VERSION
 )
@@ -67,7 +70,9 @@ async def get_all_test_cases_by_project(request: Request,
 
     # Retrieve test cases from database matching project_key
     db = request.app.state.mdb
-    test_cases = await db.find(DB_COLLECTION_TC, {"project_key": project_key})
+    test_cases = await db.find(DB_COLLECTION_TC, {
+        "project_key": project_key
+    })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cases)
@@ -164,14 +169,24 @@ async def delete_all_test_case_from_project(request: Request,
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
-    # TODO: Check if test case is linked to any test executions
-
-    # Delete test cases from database matching project_key
     db = request.app.state.mdb
-    await db.delete(DB_COLLECTION_TC,
-                    {"project_key": project_key})
 
-    # TODO: Update project test case count
+    # Delete all test cases, test executions, and test case associated with the project
+    await db.delete(DB_COLLECTION_TCY, {"project_key": project_key})
+    await db.delete(DB_COLLECTION_TE, {"project_key": project_key})
+    await db.delete(DB_COLLECTION_TC, {"project_key": project_key})
+
+    # Update project test counts to 0
+    project = await db.find_one(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    })
+
+    project["test_case_count"] = 0
+    project["test_cycle_count"] = 0
+
+    await db.update(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    }, project)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -237,15 +252,16 @@ async def update_test_case_by_key(request: Request,
 
     # Update the project in the database
     db = request.app.state.mdb
-    await db.update(DB_COLLECTION_TC,
-                    {"project_key": project_key,
-                     "test_case_key": test_case_key, },
-                    request_data)
+    await db.update(DB_COLLECTION_TC, {
+        "project_key": project_key,
+        "test_case_key": test_case_key,
+    }, request_data)
 
     # Retrieve the updated test case
-    updated_test_case = await db.find_one(DB_COLLECTION_TC,
-                                          {"test_case_key": test_case_key,
-                                           "project_key": project_key})
+    updated_test_case = await db.find_one(DB_COLLECTION_TC, {
+        "test_case_key": test_case_key,
+        "project_key": project_key
+    })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=updated_test_case)
@@ -264,20 +280,36 @@ async def delete_test_case_by_key(request: Request,
     response = await get_project_by_key(request, project_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
+    project_data = json.loads(response.body.decode())
 
     # Check if test_case_key exists
     response = await get_test_case_by_key(request, project_key, test_case_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
-    # TODO: Check if test case has any test executions
+    db = request.app.state.mdb
+
+    # Check if test case has any test executions
+    executions = await db.find(DB_COLLECTION_TE, {
+        "project_key": project_key,
+        "test_case_key": test_case_key
+    })
+    if executions:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": f"Test case {test_case_key} has "
+                              f"associated test executions and cannot be deleted."}
+        )
 
     # Delete the test case from project from the database
-    db = request.app.state.mdb
-    await db.delete_one(DB_COLLECTION_TC,
-                        {"test_case_key": test_case_key,
-                         "project_key": project_key})
+    await db.delete_one(DB_COLLECTION_TC, {
+        "test_case_key": test_case_key,
+        "project_key": project_key
+    })
 
-    # TODO: Update project test case count
+    # Update project test case count
+    test_cases = await db.find(DB_COLLECTION_TC, {"project_key": project_key})
+    project_data["test_case_count"] = len(test_cases)
+    await db.update(DB_COLLECTION_PRJ, {"project_key": project_key}, project_data)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
