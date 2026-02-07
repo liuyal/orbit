@@ -30,9 +30,8 @@ async def root(request: Request):
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-@router.get(
-    f"/api/{API_VERSION}",
-    tags=["root"])
+@router.get(f"/api/{API_VERSION}",
+            tags=["root"])
 async def root_api(request: Request):
     """ Root api endpoint to check service status. """
 
@@ -42,10 +41,9 @@ async def root_api(request: Request):
     return RedirectResponse(url=f"{base_url}/api/{API_VERSION}/docs")
 
 
-@router.post(
-    f"/api/{API_VERSION}/tm/reset",
-    tags=["root"],
-    status_code=status.HTTP_204_NO_CONTENT)
+@router.post(f"/api/{API_VERSION}/tm/reset",
+             tags=["root"],
+             status_code=status.HTTP_204_NO_CONTENT)
 async def reset_tm_server(request: Request):
     """ Root endpoint to reset server. """
 
