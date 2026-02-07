@@ -44,7 +44,7 @@ router = APIRouter()
             status_code=status.HTTP_200_OK)
 async def get_all_cycles_for_project(request: Request,
                                      project_key: str):
-    """Get all test cycles for project."""
+    """Get all test cycles for project"""
 
     db = request.app.state.mdb
 
@@ -74,7 +74,7 @@ async def get_all_cycles_for_project(request: Request,
 async def create_cycle_for_project(request: Request,
                                    project_key: str,
                                    cycle: Optional[TestCycleCreate] = None):
-    """Create a new test cycle for project."""
+    """Create a new test cycle for project"""
 
     db = request.app.state.mdb
 
@@ -130,7 +130,7 @@ async def create_cycle_for_project(request: Request,
         if response.status_code != status.HTTP_404_NOT_FOUND:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"{test_cycle_key} already exists."}
+                content={"error": f"{test_cycle_key} already exists"}
             )
 
     # Initialize counts and timestamps
@@ -156,7 +156,7 @@ async def create_cycle_for_project(request: Request,
             status_code=status.HTTP_200_OK)
 async def get_cycle_by_key(request: Request,
                            test_cycle_key: str):
-    """Get a specific test cycle by its ID."""
+    """Get a specific test cycle by its ID"""
 
     db = request.app.state.mdb
 
@@ -185,7 +185,7 @@ async def get_cycle_by_key(request: Request,
 async def update_cycle_by_key(request: Request,
                               test_cycle_key: str,
                               cycle: TestCycleUpdate):
-    """Update a specific test cycle by its ID."""
+    """Update a specific test cycle by its ID"""
 
     db = request.app.state.mdb
 
@@ -219,7 +219,7 @@ async def update_cycle_by_key(request: Request,
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_cycle_by_key(request: Request,
                               test_cycle_key: str):
-    """Delete a specific test cycle by its ID."""
+    """Delete a specific test cycle by its ID"""
 
     db = request.app.state.mdb
 
@@ -244,7 +244,7 @@ async def delete_cycle_by_key(request: Request,
             status_code=status.HTTP_200_OK)
 async def get_cycle_executions(request: Request,
                                test_cycle_key: str):
-    """Get all test executions associated with a specific test cycle."""
+    """Get all test executions associated with a specific test cycle"""
 
     response = await get_cycle_by_key(request, test_cycle_key)
     cycle_data = json.loads(response.body.decode())
@@ -260,7 +260,7 @@ async def get_cycle_executions(request: Request,
 async def add_execution_to_cycle(request: Request,
                                  test_cycle_key: str,
                                  execution_key: str):
-    """Add a test execution to a specific test cycle."""
+    """Add a test execution to a specific test cycle"""
 
     db = request.app.state.mdb
 
@@ -317,7 +317,7 @@ async def add_execution_to_cycle(request: Request,
 async def remove_executions_from_cycle(request: Request,
                                        test_cycle_key: str,
                                        execution_key: str):
-    """Remove test executions from a specific test cycle."""
+    """Remove test executions from a specific test cycle"""
 
     db = request.app.state.mdb
 

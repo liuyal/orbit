@@ -74,7 +74,7 @@ async def get_all_projects(request: Request):
              status_code=status.HTTP_201_CREATED)
 async def create_project_by_key(request: Request,
                                 project: ProjectCreate):
-    """Endpoint to create project."""
+    """Endpoint to create project"""
 
     db = request.app.state.mdb
 

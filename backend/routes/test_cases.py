@@ -41,7 +41,7 @@ router = APIRouter()
             response_model=list[TestCase],
             status_code=status.HTTP_200_OK)
 async def get_all_test_cases(request: Request):
-    """Get all test cases."""
+    """Get all test cases"""
 
     db = request.app.state.mdb
 
@@ -58,7 +58,7 @@ async def get_all_test_cases(request: Request):
             status_code=status.HTTP_200_OK)
 async def get_all_test_cases_by_project(request: Request,
                                         project_key: str):
-    """Get all test cases in the specified project."""
+    """Get all test cases in the specified project"""
 
     db = request.app.state.mdb
 
@@ -87,7 +87,7 @@ async def get_all_test_cases_by_project(request: Request,
 async def create_test_case_by_project(request: Request,
                                       project_key: str,
                                       test_case: Optional[TestCaseCreate] = None):
-    """Create a new test case in the specified project."""
+    """Create a new test case in the specified project"""
 
     db = request.app.state.mdb
 
@@ -143,7 +143,7 @@ async def create_test_case_by_project(request: Request,
         if response.status_code != status.HTTP_404_NOT_FOUND:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"{test_case_key} already exists."}
+                content={"error": f"{test_case_key} already exists"}
             )
 
     # Initialize counts and timestamps
@@ -168,7 +168,7 @@ async def create_test_case_by_project(request: Request,
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_test_case_from_project(request: Request,
                                             project_key: str):
-    """Delete all test cases in the specified project."""
+    """Delete all test cases in the specified project"""
 
     db = request.app.state.mdb
 
@@ -191,7 +191,7 @@ async def delete_all_test_case_from_project(request: Request,
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"error": f"Test cases in project {project_key} have "
-                              f"linked test executions and cannot be deleted."}
+                              f"linked test executions and cannot be deleted"}
         )
 
     # Delete all test cases under project
@@ -220,7 +220,7 @@ async def delete_all_test_case_from_project(request: Request,
 async def get_test_case_by_key(request: Request,
                                project_key: str,
                                test_case_key: str):
-    """Retrieve a specific test case by its ID within the specified project."""
+    """Retrieve a specific test case by its ID within the specified project"""
 
     db = request.app.state.mdb
 
@@ -259,7 +259,7 @@ async def update_test_case_by_key(request: Request,
                                   project_key: str,
                                   test_case_key: str,
                                   test_case: TestCaseUpdate):
-    """Update a specific test case by its ID within the specified project."""
+    """Update a specific test case by its ID within the specified project"""
 
     db = request.app.state.mdb
 
@@ -305,7 +305,7 @@ async def update_test_case_by_key(request: Request,
 async def delete_test_case_by_key(request: Request,
                                   project_key: str,
                                   test_case_key: str):
-    """Delete a specific test case by its ID within the specified project."""
+    """Delete a specific test case by its ID within the specified project"""
 
     # Check project exists
     db = request.app.state.mdb
@@ -335,7 +335,7 @@ async def delete_test_case_by_key(request: Request,
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"error": f"Test case {test_case_key} has "
-                              f"associated test executions and cannot be deleted."}
+                              f"associated test executions and cannot be deleted"}
         )
 
     # Delete the test case from project from the database

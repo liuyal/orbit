@@ -43,7 +43,7 @@ router = APIRouter()
             status_code=status.HTTP_200_OK)
 async def get_all_executions_by_project(request: Request,
                                         project_key: str):
-    """Get all test executions for a specific test case within a project."""
+    """Get all test executions for a specific test case within a project"""
 
     db = request.app.state.mdb
 
@@ -71,7 +71,7 @@ async def get_all_executions_by_project(request: Request,
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_test_execution_by_project(request: Request,
                                                project_key: str):
-    """Delete all test executions in the specified project."""
+    """Delete all test executions in the specified project"""
 
     db = request.app.state.mdb
 
@@ -123,7 +123,7 @@ async def delete_all_test_execution_by_project(request: Request,
 async def get_all_executions_by_test_case_key(request: Request,
                                               project_key: str,
                                               test_case_key: str):
-    """Get all test executions for a specific test case within a project."""
+    """Get all test executions for a specific test case within a project"""
 
     db = request.app.state.mdb
 
@@ -166,7 +166,7 @@ async def create_execution_by_test_case_key(request: Request,
                                             project_key: str,
                                             test_case_key: str,
                                             execution: Optional[TestExecutionCreate] = None):
-    """Create a new test execution for a specific test case within a project."""
+    """Create a new test execution for a specific test case within a project"""
 
     db = request.app.state.mdb
 
@@ -234,7 +234,7 @@ async def create_execution_by_test_case_key(request: Request,
         if response.status_code != status.HTTP_404_NOT_FOUND:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"{execution_key} already exists."}
+                content={"error": f"{execution_key} already exists"}
             )
 
     # Initialize missing keys
@@ -249,15 +249,11 @@ async def create_execution_by_test_case_key(request: Request,
 
     # Create the test execution in the database
     await db.create(DB_COLLECTION_TE, db_insert)
-
-    # Update the test case's last_execution_key
-    # await update_test_case_last_execution(request,
-    #                                       project_key,
-    #                                       test_case_key,
-    #                                       execution_key)
-
+    
+    # Update last_execution_key and updated_at for test case
     tc_data["updated_at"] = current_time
     tc_data["last_execution_key"] = execution_key
+    tc_data["last_result"] = request_data["result"]
     await db.update(DB_COLLECTION_TC, tc_data, {
         "project_key": project_key,
         "test_case_key": test_case_key
@@ -273,7 +269,7 @@ async def create_execution_by_test_case_key(request: Request,
 async def delete_all_execution_by_test_case_key(request: Request,
                                                 project_key: str,
                                                 test_case_key: str):
-    """Delete all test executions for a specific test case within a project."""
+    """Delete all test executions for a specific test case within a project"""
 
     db = request.app.state.mdb
 
@@ -323,7 +319,7 @@ async def delete_all_execution_by_test_case_key(request: Request,
             status_code=status.HTTP_200_OK)
 async def get_execution_by_key(request: Request,
                                execution_key: str):
-    """Retrieve a specific test execution by its ID."""
+    """Retrieve a specific test execution by its ID"""
 
     db = request.app.state.mdb
 
@@ -348,7 +344,7 @@ async def get_execution_by_key(request: Request,
 async def update_execution_by_key(request: Request,
                                   execution_key: str,
                                   execution: TestExecutionUpdate):
-    """Update a specific test execution by its ID."""
+    """Update a specific test execution by its ID"""
 
     db = request.app.state.mdb
 
@@ -385,7 +381,7 @@ async def update_execution_by_key(request: Request,
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_execution_by_key(request: Request,
                                   execution_key: str):
-    """Delete a specific test execution by its ID."""
+    """Delete a specific test execution by its ID"""
 
     db = request.app.state.mdb
 
