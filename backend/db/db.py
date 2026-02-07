@@ -14,7 +14,6 @@ from enum import Enum
 class DBType(Enum):
     """ Enumeration for supported database types. """
 
-    SQLITE = 'sqlite'
     MONGODB = 'mongodb'
 
 
@@ -111,7 +110,7 @@ class DatabaseClient(ABC):
         """Retrieve records from the database."""
 
     @abstractmethod
-    def update(self, table: str, query: dict, update_data: dict):
+    def update(self, table: str, query: dict, data: dict):
         """Update records in the database."""
 
     @abstractmethod

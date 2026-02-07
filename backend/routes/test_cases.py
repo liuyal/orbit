@@ -23,7 +23,6 @@ from backend.app.app_def import (
     DB_COLLECTION_PRJ,
     DB_COLLECTION_TC,
     DB_COLLECTION_TE,
-    DB_COLLECTION_TCY,
     TC_KEY_PREFIX,
     API_VERSION
 )
@@ -33,7 +32,6 @@ from backend.models.test_cases import (
     TestCaseCreate,
     TestCaseUpdate
 )
-from backend.routes.projects import get_project_by_key
 
 router = APIRouter()
 
@@ -46,8 +44,9 @@ router = APIRouter()
 async def get_all_test_cases(request: Request):
     """Get all test cases."""
 
-    # Retrieve all test cases from database
     db = request.app.state.mdb
+
+    # Retrieve all test cases from database
     test_cases = await db.find(DB_COLLECTION_TC, {})
 
     return JSONResponse(status_code=status.HTTP_200_OK,
@@ -63,13 +62,19 @@ async def get_all_test_cases_by_project(request: Request,
                                         project_key: str):
     """Get all test cases in the specified project."""
 
+    db = request.app.state.mdb
+
     # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    project = await db.find_one(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    })
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
 
     # Retrieve test cases from database matching project_key
-    db = request.app.state.mdb
     test_cases = await db.find(DB_COLLECTION_TC, {
         "project_key": project_key
     })
@@ -87,13 +92,17 @@ async def create_test_case_by_project(request: Request,
                                       test_case: Optional[TestCaseCreate] = None):
     """Create a new test case in the specified project."""
 
-    # Get current time
-    current_time = get_current_utc_time()
+    db = request.app.state.mdb
 
     # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    project = await db.find_one(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    })
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
 
     if test_case:
         # Prepare request data from request data
@@ -123,23 +132,25 @@ async def create_test_case_by_project(request: Request,
         request_data["test_case_key"] = test_case_key
 
     else:
-        # regex check for valid test_case_key format
-        # Must be PRJ_KEY-T#
+        # regex check for valid test_case_key format, must be PRJ_KEY-T#
         pattern = rf"^{project_key}-{TC_KEY_PREFIX}\d+$"
         if not re.match(pattern, test_case_key):
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"Key '{test_case_key}' is not valid. "
-                                  f"Must be in format {project_key}-{TC_KEY_PREFIX}#"})
+                                  f"Must be in format {project_key}-{TC_KEY_PREFIX}#"}
+            )
 
         # Check if test_case_key already exists
         response = await get_test_case_by_key(request, project_key, test_case_key)
         if response.status_code != status.HTTP_404_NOT_FOUND:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"test case {test_case_key} already exists."})
+                content={"error": f"{test_case_key} already exists."}
+            )
 
     # Initialize counts and timestamps
+    current_time = get_current_utc_time()
     request_data["project_key"] = project_key
     request_data["created_at"] = current_time
     request_data["updated_at"] = current_time
@@ -149,7 +160,6 @@ async def create_test_case_by_project(request: Request,
     db_insert["_id"] = test_case_key
 
     # Create the test case in the database
-    db = request.app.state.mdb
     await db.create(DB_COLLECTION_TC, db_insert)
 
     return JSONResponse(status_code=status.HTTP_201_CREATED,
@@ -164,17 +174,34 @@ async def delete_all_test_case_from_project(request: Request,
                                             project_key: str):
     """Delete all test cases in the specified project."""
 
-    # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
-
     db = request.app.state.mdb
 
-    # Delete all test cases, test executions, and test case associated with the project
-    await db.delete(DB_COLLECTION_TCY, {"project_key": project_key})
-    await db.delete(DB_COLLECTION_TE, {"project_key": project_key})
-    await db.delete(DB_COLLECTION_TC, {"project_key": project_key})
+    # Check project exists
+    project = await db.find_one(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    })
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
+
+    # Check if test cases has any test executions
+    executions = await db.find(DB_COLLECTION_TE, {
+        "project_key": project_key,
+    })
+
+    if executions:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": f"Test cases in project {project_key} have "
+                              f"linked test executions and cannot be deleted."}
+        )
+
+    # Delete all test cases under project
+    await db.delete(DB_COLLECTION_TC, {
+        "project_key": project_key
+    })
 
     # Update project test counts to 0
     project = await db.find_one(DB_COLLECTION_PRJ, {
@@ -184,9 +211,9 @@ async def delete_all_test_case_from_project(request: Request,
     project["test_case_count"] = 0
     project["test_cycle_count"] = 0
 
-    await db.update(DB_COLLECTION_PRJ, {
+    await db.update(DB_COLLECTION_PRJ, project, {
         "project_key": project_key
-    }, project)
+    })
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -200,26 +227,34 @@ async def get_test_case_by_key(request: Request,
                                test_case_key: str):
     """Retrieve a specific test case by its ID within the specified project."""
 
+    db = request.app.state.mdb
+
     # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    project = await db.find_one(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    })
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
 
     # Retrieve test case from database
-    db = request.app.state.mdb
-    result = await db.find_one(DB_COLLECTION_TC,
-                               {"test_case_key": test_case_key,
-                                "project_key": project_key})
+    result = await db.find_one(DB_COLLECTION_TC, {
+        "test_case_key": test_case_key,
+        "project_key": project_key
+    })
     if result is None:
         # test case not found
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"error": f"Test case {test_case_key} not found"})
+            content={"error": f"{test_case_key} not found"}
+        )
+
     else:
         # Found and return test case
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=result)
+        return JSONResponse(status_code=status.HTTP_200_OK,
+                            content=result)
 
 
 @router.put(
@@ -232,13 +267,17 @@ async def update_test_case_by_key(request: Request,
                                   test_case: TestCaseUpdate):
     """Update a specific test case by its ID within the specified project."""
 
-    # Get current time
-    current_time = get_current_utc_time()
+    db = request.app.state.mdb
 
     # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    project = await db.find_one(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    })
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
 
     # Check if test_case_key exists
     response = await get_test_case_by_key(request, project_key, test_case_key)
@@ -248,14 +287,13 @@ async def update_test_case_by_key(request: Request,
     # Prepare request data, excluding None values
     request_data = test_case.model_dump()
     request_data = {k: v for k, v in request_data.items() if v is not None}
-    request_data["updated_at"] = current_time
+    request_data["updated_at"] = get_current_utc_time()
 
     # Update the project in the database
-    db = request.app.state.mdb
-    await db.update(DB_COLLECTION_TC, {
+    await db.update(DB_COLLECTION_TC, request_data, {
         "project_key": project_key,
         "test_case_key": test_case_key,
-    }, request_data)
+    })
 
     # Retrieve the updated test case
     updated_test_case = await db.find_one(DB_COLLECTION_TC, {
@@ -277,23 +315,29 @@ async def delete_test_case_by_key(request: Request,
     """Delete a specific test case by its ID within the specified project."""
 
     # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
-    project_data = json.loads(response.body.decode())
+    db = request.app.state.mdb
+
+    # Check project exists
+    project = await db.find_one(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    })
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
 
     # Check if test_case_key exists
     response = await get_test_case_by_key(request, project_key, test_case_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
-    db = request.app.state.mdb
-
     # Check if test case has any test executions
     executions = await db.find(DB_COLLECTION_TE, {
         "project_key": project_key,
         "test_case_key": test_case_key
     })
+
     if executions:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -308,8 +352,12 @@ async def delete_test_case_by_key(request: Request,
     })
 
     # Update project test case count
-    test_cases = await db.find(DB_COLLECTION_TC, {"project_key": project_key})
-    project_data["test_case_count"] = len(test_cases)
-    await db.update(DB_COLLECTION_PRJ, {"project_key": project_key}, project_data)
+    test_cases = await db.find(DB_COLLECTION_TC, {
+        "project_key": project_key
+    })
+    project["test_case_count"] = len(test_cases)
+    await db.update(DB_COLLECTION_PRJ, project, {
+        "project_key": project_key
+    })
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

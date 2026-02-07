@@ -20,6 +20,7 @@ from fastapi import (
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
+    DB_COLLECTION_PRJ,
     DB_COLLECTION_TE,
     DB_COLLECTION_TCY,
     TCY_KEY_PREFIX,
@@ -32,11 +33,7 @@ from backend.models.test_cycles import (
     TestCycleUpdate
 
 )
-from backend.routes.projects import get_project_by_key
-from backend.routes.test_executions import (
-    TestExecution,
-    get_execution_by_key
-)
+from backend.routes.test_executions import TestExecution
 
 router = APIRouter()
 
@@ -50,15 +47,22 @@ async def get_all_cycles_for_project(request: Request,
                                      project_key: str):
     """Get all test cycles for project."""
 
+    db = request.app.state.mdb
+
     # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    project = await db.find_one(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    })
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
 
     # Retrieve all test cycles from the database matching project_key
-    db = request.app.state.mdb
-    test_cycles = await db.find(DB_COLLECTION_TCY,
-                                {"project_key": project_key})
+    test_cycles = await db.find(DB_COLLECTION_TCY, {
+        "project_key": project_key
+    })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cycles)
@@ -74,13 +78,17 @@ async def create_cycle_for_project(request: Request,
                                    cycle: Optional[TestCycleCreate] = None):
     """Create a new test cycle for project."""
 
-    # Get current time
-    current_time = get_current_utc_time()
+    db = request.app.state.mdb
 
     # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    project = await db.find_one(DB_COLLECTION_PRJ, {
+        "project_key": project_key
+    })
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
 
     if cycle:
         # Prepare request data from request data
@@ -110,23 +118,25 @@ async def create_cycle_for_project(request: Request,
         request_data["test_cycle_key"] = test_cycle_key
 
     else:
-        # regex check for valid test_cycle_key format
-        # Must be PRJ_KEY-C###
+        # regex check for valid test_cycle_key format, must be PRJ_KEY-C###
         pattern = rf"^{project_key}-{TCY_KEY_PREFIX}\d+$"
         if not re.match(pattern, test_cycle_key):
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"test cycle key '{test_cycle_key}' is not valid. "
-                                  f"Must be in format {project_key}-{TCY_KEY_PREFIX}#"})
+                                  f"Must be in format {project_key}-{TCY_KEY_PREFIX}#"}
+            )
 
         # Check if test_cycle already exists
         response = await get_cycle_by_key(request, test_cycle_key)
         if response.status_code != status.HTTP_404_NOT_FOUND:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"test cycle {test_cycle_key} already exists."})
+                content={"error": f"{test_cycle_key} already exists."}
+            )
 
     # Initialize counts and timestamps
+    current_time = get_current_utc_time()
     request_data["project_key"] = project_key
     request_data["created_at"] = current_time
     request_data["updated_at"] = current_time
@@ -136,7 +146,6 @@ async def create_cycle_for_project(request: Request,
     db_insert["_id"] = test_cycle_key
 
     # Create the test cycle in the database
-    db = request.app.state.mdb
     await db.create(DB_COLLECTION_TCY, db_insert)
 
     return JSONResponse(status_code=status.HTTP_201_CREATED,
@@ -152,23 +161,24 @@ async def get_cycle_by_key(request: Request,
                            test_cycle_key: str):
     """Get a specific test cycle by its ID."""
 
-    # Retrieve the test cycle from the database
     db = request.app.state.mdb
-    result = await db.find_one(
-        DB_COLLECTION_TCY,
-        {"test_cycle_key": test_cycle_key})
+
+    # Retrieve the test cycle from the database
+    result = await db.find_one(DB_COLLECTION_TCY, {
+        "test_cycle_key": test_cycle_key
+    })
 
     if result is None:
         # test case not found
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"error": f"Test cycle {test_cycle_key} not found"})
+            content={"error": f"{test_cycle_key} not found"}
+        )
 
     else:
         # test case found
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=result)
+        return JSONResponse(status_code=status.HTTP_200_OK,
+                            content=result)
 
 
 @router.put(
@@ -181,30 +191,28 @@ async def update_cycle_by_key(request: Request,
                               cycle: TestCycleUpdate):
     """Update a specific test cycle by its ID."""
 
-    # Get current time
-    current_time = get_current_utc_time()
+    db = request.app.state.mdb
 
     # Prepare request data, excluding None values
     request_data = cycle.model_dump()
     request_data = {k: v for k, v in request_data.items() if v is not None}
-    request_data["updated_at"] = current_time
+    request_data["updated_at"] = get_current_utc_time()
 
     # Update the cycle in the database
-    db = request.app.state.mdb
-    result, matched_count = await db.update(
-        DB_COLLECTION_TCY,
-        {"test_cycle_key": test_cycle_key},
-        request_data)
+    result, matched_count = await db.update(DB_COLLECTION_TCY, request_data, {
+        "test_cycle_key": test_cycle_key
+    })
 
     if matched_count == 0:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"error": f"Test cycle {test_cycle_key} not found"})
+            content={"error": f"{test_cycle_key} not found"}
+        )
 
     # Retrieve the updated test case
-    updated_test_cycle = await db.find_one(
-        DB_COLLECTION_TCY,
-        {"test_cycle_key": test_cycle_key})
+    updated_test_cycle = await db.find_one(DB_COLLECTION_TCY, {
+        "test_cycle_key": test_cycle_key
+    })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=updated_test_cycle)
@@ -218,17 +226,19 @@ async def delete_cycle_by_key(request: Request,
                               test_cycle_key: str):
     """Delete a specific test cycle by its ID."""
 
-    # Delete the test_cycle from the database
     db = request.app.state.mdb
-    result, deleted_count = await db.delete_one(
-        DB_COLLECTION_TCY,
-        {"test_cycle_key": test_cycle_key})
+
+    # Delete the test_cycle from the database
+    result, deleted_count = await db.delete_one(DB_COLLECTION_TCY, {
+        "test_cycle_key": test_cycle_key
+    })
 
     if deleted_count == 0:
         # Test case not found
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"error": f"Test cycle {test_cycle_key} not found"})
+            content={"error": f"{test_cycle_key} not found"}
+        )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -259,6 +269,8 @@ async def add_execution_to_cycle(request: Request,
                                  execution_key: str):
     """Add a test execution to a specific test cycle."""
 
+    db = request.app.state.mdb
+
     # Check cycle exists
     response = await get_cycle_by_key(request, test_cycle_key)
     cycle_data = json.loads(response.body.decode())
@@ -266,31 +278,37 @@ async def add_execution_to_cycle(request: Request,
         return response
 
     # Check execution exists
-    response = await get_execution_by_key(request, execution_key)
-    execution_data = json.loads(response.body.decode())
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    test_execution = await db.find_one(DB_COLLECTION_TE, {
+        "execution_key": execution_key
+    })
+
+    if test_execution is None:
+        # test execution not found
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{execution_key} not found"}
+        )
 
     # Check execution not already in cycle
     if execution_key in cycle_data["executions"]:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"error": f"Execution {execution_key} "
-                              f"already in cycle {test_cycle_key}"})
+                              f"already in cycle {test_cycle_key}"}
+        )
 
     # Add execution to cycle
-    db = request.app.state.mdb
-    exec_data = {execution_data["test_case_key"]: execution_key}
+    exec_data = {test_execution["test_case_key"]: execution_key}
     cycle_data["executions"].update(exec_data)
-    await db.update(DB_COLLECTION_TCY,
-                    {"test_cycle_key": test_cycle_key},
-                    cycle_data)
+    await db.update(DB_COLLECTION_TCY, cycle_data, {
+        "test_cycle_key": test_cycle_key
+    })
 
     # Update execution cycle id
-    execution_data["test_cycle_key"] = test_cycle_key
-    await db.update(DB_COLLECTION_TE,
-                    {"execution_key": execution_key},
-                    execution_data)
+    test_execution["test_cycle_key"] = test_cycle_key
+    await db.update(DB_COLLECTION_TE, test_execution, {
+        "execution_key": execution_key
+    })
 
     # return updated cycle_data
     response = await get_cycle_by_key(request, test_cycle_key)
@@ -309,6 +327,8 @@ async def remove_executions_from_cycle(request: Request,
                                        execution_key: str):
     """Remove test executions from a specific test cycle."""
 
+    db = request.app.state.mdb
+
     # Check cycle exists
     response = await get_cycle_by_key(request, test_cycle_key)
     cycle_data = json.loads(response.body.decode())
@@ -316,32 +336,36 @@ async def remove_executions_from_cycle(request: Request,
         return response
 
     # Check execution exists
-    response = await get_execution_by_key(request, execution_key)
-    execution_data = json.loads(response.body.decode())
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    test_execution = await db.find_one(DB_COLLECTION_TE, {
+        "execution_key": execution_key
+    })
 
-    # remove execution from cycle
-    db = request.app.state.mdb
+    if test_execution is None:
+        # test execution not found
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{execution_key} not found"}
+        )
 
     # Check execution in cycle
-    if execution_data["test_case_key"] not in cycle_data["executions"]:
+    if test_execution["test_case_key"] not in cycle_data["executions"]:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"Execution {execution_key} "
-                              f"not in cycle {test_cycle_key}"})
+                              f"not in cycle {test_cycle_key}"}
+        )
 
     # Remove execution from cycle
-    cycle_data["executions"].pop(execution_data["test_case_key"])
-    await db.update(DB_COLLECTION_TCY,
-                    {"test_cycle_key": test_cycle_key},
-                    cycle_data)
+    cycle_data["executions"].pop(test_execution["test_case_key"])
+    await db.update(DB_COLLECTION_TCY, cycle_data, {
+        "test_cycle_key": test_cycle_key
+    })
 
     # Update execution cycle key
-    execution_data["test_cycle_key"] = None
-    await db.update(DB_COLLECTION_TE,
-                    {"execution_key": execution_key},
-                    execution_data)
+    test_execution["test_cycle_key"] = None
+    await db.update(DB_COLLECTION_TE, test_execution, {
+        "execution_key": execution_key
+    })
 
     # return updated cycle_data
     response = await get_cycle_by_key(request, test_cycle_key)

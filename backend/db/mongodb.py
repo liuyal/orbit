@@ -117,12 +117,12 @@ class MongoClient(DatabaseClient):
 
     async def update(self,
                      table: str,
-                     query: dict,
-                     update_data: dict) -> tuple:
+                     data: dict,
+                     query: dict ) -> tuple:
         """Update records in the database."""
 
         result = await self._db_client[self._db_name][table].update_many(query,
-                                                                         {"$set": update_data})
+                                                                         {"$set": data})
         return result, result.matched_count
 
     async def delete(self,

@@ -57,7 +57,7 @@ async def get_runners_status_by_name(request: Request,
 
     if result is None:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
-                            content={"error": f"Runner {name} not found"})
+                            content={"error": f"{name} not found"})
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=result)
