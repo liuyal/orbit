@@ -38,6 +38,12 @@ class OrbitBackendProjectsTest(OrbitBackendBaseTest):
                 "labels": ["A", "B", "C"]
             })
             assert response.status_code == 201
+            assert response.json()["project_key"] == f"PRJ{i}"
+            assert response.json()["description"] == f"Project #{i}"
+            assert response.json()["is_active"] == active_list[i]
+            assert response.json()["labels"] == ["A", "B", "C"]
+            assert response.json()["test_case_count"] == 0
+            assert response.json()["test_cycle_count"] == 0
 
         # Check project list
         response = requests.get(f"{self.__class__.url}/projects")
@@ -88,6 +94,12 @@ class OrbitBackendProjectsTest(OrbitBackendBaseTest):
             "labels": ["A", "B", "C"]
         })
         assert response.status_code == 201
+        assert response.json()["project_key"] == f"PRJ-WDD"
+        assert response.json()["description"] == f"Project #WDD"
+        assert response.json()["is_active"] == True
+        assert response.json()["labels"] == ["A", "B", "C"]
+        assert response.json()["test_case_count"] == 0
+        assert response.json()["test_cycle_count"] == 0
 
         # Get project details
         response = requests.get(f"{self.__class__.url}/projects/PRJ-WDD")
@@ -139,6 +151,12 @@ class OrbitBackendProjectsTest(OrbitBackendBaseTest):
             "labels": ["A", "B", "C", "2", "32", "3"]
         })
         assert response.status_code == 201
+        assert response.json()["project_key"] == f"PRJ-SWW"
+        assert response.json()["description"] == f"Project #SDD"
+        assert response.json()["is_active"] == True
+        assert response.json()["labels"] == ["A", "B", "C", "2", "32", "3"]
+        assert response.json()["test_case_count"] == 0
+        assert response.json()["test_cycle_count"] == 0
 
         # Get project details
         response = requests.get(f"{self.__class__.url}/projects/PRJ-SWW")
@@ -163,6 +181,44 @@ class OrbitBackendProjectsTest(OrbitBackendBaseTest):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
         self.__class__.clean_up_db()
 
+        # Check no projects
+        response = requests.get(f"{self.__class__.url}/projects")
+        assert response.status_code == 200
+        assert len(response.json()) == 0
+
+        # Add valid test case
+        response = requests.post(f"{self.__class__.url}/projects", json={
+            "project_key": f"PRJ-A",
+            "description": f"Project #A",
+            "is_active": True,
+            "labels": ["A", "B", "C"]
+        })
+        assert response.status_code == 201
+        assert response.json()["project_key"] == f"PRJ-A"
+        assert response.json()["description"] == f"Project #A"
+        assert response.json()["is_active"] == True
+        assert response.json()["labels"] == ["A", "B", "C"]
+        assert response.json()["test_case_count"] == 0
+        assert response.json()["test_cycle_count"] == 0
+
+        # Check projects is 1
+        response = requests.get(f"{self.__class__.url}/projects")
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+        response = requests.put(f"{self.__class__.url}/projects/PRJ-A", json={
+            "description": f"Project #B++++++++",
+            "is_active": False,
+            "labels": ["1", "2", "3"]
+        })
+        assert response.status_code == 200
+        assert response.json()["project_key"] == f"PRJ-A"
+        assert response.json()["description"] == f"Project #B++++++++"
+        assert response.json()["is_active"] == False
+        assert response.json()["labels"] == ["1", "2", "3"]
+        assert response.json()["test_case_count"] == 0
+        assert response.json()["test_cycle_count"] == 0
+
         self.__class__.clean_up_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
@@ -170,6 +226,44 @@ class OrbitBackendProjectsTest(OrbitBackendBaseTest):
     def test_delete_project_by_key(self):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
         self.__class__.clean_up_db()
+
+        # Check no projects
+        response = requests.get(f"{self.__class__.url}/projects")
+        assert response.status_code == 200
+        assert len(response.json()) == 0
+
+        # Add valid test case
+        response = requests.post(f"{self.__class__.url}/projects", json={
+            "project_key": f"PRJ-A5",
+            "description": f"Project #A5",
+            "is_active": True,
+            "labels": ["A", "B", "C"]
+        })
+        assert response.status_code == 201
+        assert response.json()["project_key"] == f"PRJ-A5"
+        assert response.json()["description"] == f"Project #A5"
+        assert response.json()["is_active"] == True
+        assert response.json()["labels"] == ["A", "B", "C"]
+        assert response.json()["test_case_count"] == 0
+        assert response.json()["test_cycle_count"] == 0
+
+        # Check projects is 1
+        response = requests.get(f"{self.__class__.url}/projects")
+        assert response.status_code == 200
+        assert len(response.json()) == 1
+
+        # Delete project
+        response = requests.delete(f"{self.__class__.url}/projects/PRJ-A5")
+        assert response.status_code == 204
+
+        # Get deleted project
+        response = requests.get(f"{self.__class__.url}/projects/PRJ-A5")
+        assert response.status_code == 404
+
+        # Check no projects
+        response = requests.get(f"{self.__class__.url}/projects")
+        assert response.status_code == 200
+        assert len(response.json()) == 0
 
         self.__class__.clean_up_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
