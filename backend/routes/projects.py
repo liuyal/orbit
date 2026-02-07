@@ -82,6 +82,13 @@ async def create_project_by_key(request: Request,
     request_data = project.model_dump()
     project_key = request_data["project_key"]
 
+    # Check for duplicate labels
+    if len(request_data["labels"]) != len(set(request_data["labels"])):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": f"Duplicate labels are not allowed"}
+        )
+
     # Check project exists
     response = await get_project_by_key(request, project_key)
     if response.status_code != status.HTTP_404_NOT_FOUND:
@@ -171,6 +178,13 @@ async def update_project_by_key(request: Request,
     request_data = project_update.model_dump()
     request_data = {k: v for k, v in request_data.items() if v is not None}
     request_data["updated_at"] = get_current_utc_time()
+
+    # Check for duplicate labels
+    if len(request_data["labels"]) != len(set(request_data["labels"])):
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": f"Duplicate labels are not allowed"}
+        )
 
     # Get count of test cases and cycles
     test_cases = await db.find(DB_COLLECTION_TC, {
