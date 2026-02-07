@@ -35,10 +35,10 @@ class OrbitTMBaseTest(unittest.TestCase):
         """Teardown test class"""
 
         logging.info(f"Teardown tests...")
-        cls.clean_up_db()
+        cls.reset_db()
 
     @classmethod
-    def clean_up_db(cls):
+    def reset_db(cls):
         """Clean up the database"""
 
         response = requests.post(f"{cls.url}/reset")

@@ -18,7 +18,7 @@ class OrbitTMTestCasesTest(OrbitTMBaseTest):
     @pytest.mark.order(1)
     def test_get_all_test_cases(self):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
 
         # n = 3
         # k = 10
@@ -71,7 +71,7 @@ class OrbitTMTestCasesTest(OrbitTMBaseTest):
         # assert response.status_code == 200
         # assert len(response.json()) == n * k - k
 
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
 

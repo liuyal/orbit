@@ -19,7 +19,7 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
     @pytest.mark.order(1)
     def test_get_all_projects(self):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
 
         # Check no projects exist
         response = requests.get(f"{self.__class__.url}/projects")
@@ -57,13 +57,13 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
             assert response.json()[i]["test_case_count"] == 0
             assert response.json()[i]["test_cycle_count"] == 0
 
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
     @pytest.mark.order(2)
     def test_create_project_by_key(self):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
 
         # Check no projects
         response = requests.get(f"{self.__class__.url}/projects")
@@ -129,13 +129,13 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
         assert response.status_code == 200
         assert len(response.json()) == 1
 
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
     @pytest.mark.order(3)
     def test_get_project_by_key(self):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
 
         # Check no projects
         response = requests.get(f"{self.__class__.url}/projects")
@@ -172,13 +172,13 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
         assert response.status_code == 200
         assert len(response.json()) == 1
 
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
     @pytest.mark.order(4)
     def test_update_project_by_key(self):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
 
         # Check no projects
         response = requests.get(f"{self.__class__.url}/projects")
@@ -218,13 +218,13 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
         assert response.json()["test_case_count"] == 0
         assert response.json()["test_cycle_count"] == 0
 
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
     @pytest.mark.order(5)
     def test_delete_project_by_key(self):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
 
         # Check no projects
         response = requests.get(f"{self.__class__.url}/projects")
@@ -264,7 +264,7 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
         assert response.status_code == 200
         assert len(response.json()) == 0
 
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
 

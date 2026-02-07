@@ -18,7 +18,7 @@ class OrbitTMCyclesTest(OrbitTMBaseTest):
     @pytest.mark.order(1)
     def test_get_all_cycles_for_project(self):
         logging.info(f"--- Starting test: {self._testMethodName} ---")
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
 
         # n = 50
         # for i in range(0, n):
@@ -127,7 +127,7 @@ class OrbitTMCyclesTest(OrbitTMBaseTest):
         # assert response.status_code == 200
         # assert len(response.json()) == 5
 
-        self.__class__.clean_up_db()
+        self.__class__.reset_db()
         logging.info(f"--- Test: {self._testMethodName} Complete ---")
 
 
