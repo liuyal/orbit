@@ -39,7 +39,7 @@ class OrbitTMBaseTest(unittest.TestCase):
 
     @classmethod
     def reset_db(cls):
-        """Clean up the database"""
+        """Reset the database"""
 
         response = requests.post(f"{cls.url}/reset")
         assert response.status_code == 204
