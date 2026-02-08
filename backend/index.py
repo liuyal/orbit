@@ -28,28 +28,31 @@ async def lifespan(app):
         and shutdown events.
     """
 
+    global runner_task
+
     # Initialize mongo client
     mongodb_client = MongoClient()
     await mongodb_client.connect()
     await mongodb_client.configure()
 
-    # Start the background task to save runner status periodically
-    runner_task = asyncio.create_task(save_runner_status(app, mongodb_client))
-    logger.info("Started background task")
+    if args.skip_background_tasks:
+        # Start the background task to save runner status periodically
+        runner_task = asyncio.create_task(save_runner_status(app, mongodb_client))
+        logger.info("Started background task")
 
     # Attach the database client to the app state
     app.state.mdb = mongodb_client
 
-    # Startup complete
     yield
 
-    # Cleanup: Cancel the background task
-    runner_task.cancel()
-    try:
-        await runner_task
+    if args.skip_background_tasks:
+        # Cleanup: Cancel the background task
+        try:
+            runner_task.cancel()
+            await runner_task
 
-    except asyncio.CancelledError:
-        logger.info("Background task cancelled successfully")
+        except asyncio.CancelledError:
+            logger.info("Background task cancelled successfully")
 
     # Close the mongo client connection
     await mongodb_client.close()

@@ -84,7 +84,7 @@ async def get_all_test_cases_by_project(request: Request,
 @router.post(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
              tags=[DB_COLLECTION_TC],
              status_code=status.HTTP_201_CREATED)
-async def create_test_case_by_project(request: Request,
+async def create_test_case_in_project(request: Request,
                                       project_key: str,
                                       test_case: Optional[TestCaseCreate] = None):
     """Create a new test case in the specified project"""

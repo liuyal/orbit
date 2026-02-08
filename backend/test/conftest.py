@@ -1,6 +1,6 @@
 # ================================================================
 # Orbit API
-# Description: FastAPI backend sanity test script for the Orbit application.
+# Description: FastAPI backend test script for the Orbit application.
 # Author: Jerry
 # License: MIT
 # ================================================================
@@ -26,12 +26,6 @@ def pytest_addoption(parser):
         default=5000,
         help='Port of the backend server'
     )
-    parser.addoption(
-        '--log-level',
-        dest='log_level',
-        default='INFO',
-        help='Set logging level'
-    )
 
 
 def pytest_configure(config):
@@ -41,7 +35,11 @@ def pytest_configure(config):
 
     option_names = ['host', 'port', 'log_level']
     pytest.options = {opt: config.getoption(opt, None) for opt in option_names}
-    log_level_str = pytest.options["log_level"].upper()
+
+    log_level_str = "INFO"
+    if pytest.options.get("log_level"):
+        log_level_str = pytest.options.get("log_level").upper()
+
     log_level = getattr(logging, log_level_str, logging.INFO)
 
     logging.basicConfig(

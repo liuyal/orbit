@@ -1,25 +1,24 @@
 # ================================================================
 # Orbit API
-# Description: FastAPI backend sanity test script for the Orbit application.
+# Description: FastAPI backend test script for the Orbit application.
 # Author: Jerry
 # License: MIT
 # ================================================================
 
 import logging
-import unittest
 
 import pytest
 import requests
 
 
-class OrbitTMBaseTest(unittest.TestCase):
+class OrbitTMBaseTest:
     """Base class for Orbit backend tests."""
 
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         """Initialize test class"""
 
-        logging.info(f"Initialize tests...")
+        logging.debug(f"Initialize tests...")
 
         cls.host = pytest.options['host']
         cls.port = pytest.options['port']
@@ -31,11 +30,10 @@ class OrbitTMBaseTest(unittest.TestCase):
         assert response.status_code == 204
 
     @classmethod
-    def tearDownClass(cls):
+    def teardown_class(cls):
         """Teardown test class"""
 
-        logging.info(f"Teardown tests...")
-        cls.reset_db()
+        logging.debug(f"Teardown tests...")
 
     @classmethod
     def reset_db(cls):

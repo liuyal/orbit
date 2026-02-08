@@ -25,7 +25,6 @@ class TestCase(BaseModel):
     status: str | None
     priority: str | None
     test_script: str | None
-    test_script_type: str | None
     last_result: str | None
     last_execution_key: str | None
     test_frequency: list = []
@@ -42,7 +41,6 @@ class TestCaseCreate(BaseModel):
     status: str = None
     priority: str = None
     test_script: str = None
-    test_script_type: str = None
     last_result: str = None
     last_execution_key: str = None
     test_frequency: list = []
@@ -57,7 +55,6 @@ class TestCaseUpdate(BaseModel):
     status: str = None
     priority: str = None
     test_script: str = None
-    test_script_type: str = None
     last_result: str = None
     last_execution_key: str = None
     test_frequency: list = []

@@ -1,23 +1,22 @@
 # ================================================================
 # Orbit API
-# Description: FastAPI backend sanity test script for the Orbit application.
+# Description: FastAPI backend test script for the Orbit application.
 # Author: Jerry
 # License: MIT
 # ================================================================
 
 import logging
-import unittest
 
 import pytest
 
-from test_base import OrbitTMBaseTest
+from .test_base import OrbitTMBaseTest
 
 
-class OrbitTMCyclesTest(OrbitTMBaseTest):
+@pytest.mark.order(4)
+class TestOrbitTMCycles(OrbitTMBaseTest):
 
-    @pytest.mark.order(1)
-    def test_get_all_cycles_for_project(self):
-        logging.info(f"--- Starting test: {self._testMethodName} ---")
+    def test_get_all_cycles_for_project(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
         # n = 50
@@ -128,8 +127,53 @@ class OrbitTMCyclesTest(OrbitTMBaseTest):
         # assert len(response.json()) == 5
 
         self.__class__.reset_db()
-        logging.info(f"--- Test: {self._testMethodName} Complete ---")
+        logging.info(f"--- Test: {request.node.name} Complete ---")
 
+    def test_create_cycle_for_project(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
+        self.__class__.reset_db()
 
-if __name__ == "__main__":
-    unittest.main()
+        self.__class__.reset_db()
+        logging.info(f"--- Test: {request.node.name} Complete ---")
+
+    def test_get_cycle_by_key(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
+        self.__class__.reset_db()
+
+        self.__class__.reset_db()
+        logging.info(f"--- Test: {request.node.name} Complete ---")
+
+    def test_update_cycle_by_key(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
+        self.__class__.reset_db()
+
+        self.__class__.reset_db()
+        logging.info(f"--- Test: {request.node.name} Complete ---")
+
+    def test_delete_cycle_by_key(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
+        self.__class__.reset_db()
+
+        self.__class__.reset_db()
+        logging.info(f"--- Test: {request.node.name} Complete ---")
+
+    def test_get_cycle_executions(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
+        self.__class__.reset_db()
+
+        self.__class__.reset_db()
+        logging.info(f"--- Test: {request.node.name} Complete ---")
+
+    def test_add_execution_to_cycle(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
+        self.__class__.reset_db()
+
+        self.__class__.reset_db()
+        logging.info(f"--- Test: {request.node.name} Complete ---")
+
+    def test_remove_execution_from_cycle(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
+        self.__class__.reset_db()
+
+        self.__class__.reset_db()
+        logging.info(f"--- Test: {request.node.name} Complete ---")

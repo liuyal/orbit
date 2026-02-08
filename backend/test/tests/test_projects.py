@@ -1,24 +1,23 @@
 # ================================================================
 # Orbit API
-# Description: FastAPI backend sanity test script for the Orbit application.
+# Description: FastAPI backend test script for the Orbit application.
 # Author: Jerry
 # License: MIT
 # ================================================================
 
 import logging
-import unittest
 
 import pytest
 import requests
 
-from test_base import OrbitTMBaseTest
+from .test_base import OrbitTMBaseTest
 
 
-class OrbitTMProjectsTest(OrbitTMBaseTest):
+@pytest.mark.order(1)
+class TestOrbitTMProjects(OrbitTMBaseTest):
 
-    @pytest.mark.order(1)
-    def test_get_all_projects(self):
-        logging.info(f"--- Starting test: {self._testMethodName} ---")
+    def test_get_all_projects(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
         # Check no projects exist
@@ -58,11 +57,10 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
             assert response.json()[i]["test_cycle_count"] == 0
 
         self.__class__.reset_db()
-        logging.info(f"--- Test: {self._testMethodName} Complete ---")
+        logging.info(f"--- Test: {request.node.name} Complete ---")
 
-    @pytest.mark.order(2)
-    def test_create_project_by_key(self):
-        logging.info(f"--- Starting test: {self._testMethodName} ---")
+    def test_create_project_by_key(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
         # Check no projects
@@ -130,11 +128,10 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
         assert len(response.json()) == 1
 
         self.__class__.reset_db()
-        logging.info(f"--- Test: {self._testMethodName} Complete ---")
+        logging.info(f"--- Test: {request.node.name} Complete ---")
 
-    @pytest.mark.order(3)
-    def test_get_project_by_key(self):
-        logging.info(f"--- Starting test: {self._testMethodName} ---")
+    def test_get_project_by_key(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
         # Check no projects
@@ -173,11 +170,10 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
         assert len(response.json()) == 1
 
         self.__class__.reset_db()
-        logging.info(f"--- Test: {self._testMethodName} Complete ---")
+        logging.info(f"--- Test: {request.node.name} Complete ---")
 
-    @pytest.mark.order(4)
-    def test_update_project_by_key(self):
-        logging.info(f"--- Starting test: {self._testMethodName} ---")
+    def test_update_project_by_key(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
         # Check no projects
@@ -219,11 +215,10 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
         assert response.json()["test_cycle_count"] == 0
 
         self.__class__.reset_db()
-        logging.info(f"--- Test: {self._testMethodName} Complete ---")
+        logging.info(f"--- Test: {request.node.name} Complete ---")
 
-    @pytest.mark.order(5)
-    def test_delete_project_by_key(self):
-        logging.info(f"--- Starting test: {self._testMethodName} ---")
+    def test_delete_project_by_key(self, request):
+        logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
         # Check no projects
@@ -265,8 +260,4 @@ class OrbitTMProjectsTest(OrbitTMBaseTest):
         assert len(response.json()) == 0
 
         self.__class__.reset_db()
-        logging.info(f"--- Test: {self._testMethodName} Complete ---")
-
-
-if __name__ == "__main__":
-    unittest.main()
+        logging.info(f"--- Test: {request.node.name} Complete ---")
