@@ -37,7 +37,7 @@ def build_parser():
         help='Set tmp output directory (default: orbit/backend/tmp)'
     )
     parser.add_argument(
-        's', '--skip-background-tasks',
+        '-s', '--skip-background-tasks',
         dest='skip_background_tasks',
         action='store_true',
         help='Set skip background task mode'
