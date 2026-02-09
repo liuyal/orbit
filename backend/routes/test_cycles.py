@@ -276,7 +276,6 @@ async def add_execution_to_cycle(request: Request,
     test_execution = await db.find_one(DB_COLLECTION_TE, {
         "execution_key": execution_key
     })
-
     if test_execution is None:
         # test execution not found
         return JSONResponse(
@@ -284,8 +283,26 @@ async def add_execution_to_cycle(request: Request,
             content={"error": f"{execution_key} not found"}
         )
 
+    # check execution project matches cycle project
+    if test_execution["project_key"] != cycle_data["project_key"]:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": f"Execution {execution_key} "
+                              f"belongs to different project "
+                              f"{test_execution['project_key']}"}
+        )
+
+    # Check execution does not have cycle already
+    if test_execution.get("test_cycle_key", None) is not None:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"error": f"Execution {execution_key} "
+                              f"already in cycle "
+                              f"{test_execution['test_cycle_key']}"}
+        )
+
     # Check execution not already in cycle
-    if execution_key in cycle_data["executions"]:
+    if test_execution["test_case_key"] in cycle_data["executions"]:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"error": f"Execution {execution_key} "

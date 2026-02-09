@@ -18,6 +18,7 @@ class TestExecution(BaseModel):
     execution_key: str
     project_key: str
     test_case_key: str
+    test_cycle_key: str
     result: str | None
     custom_fields: dict | None
     comments: str | None
@@ -30,6 +31,7 @@ class TestExecution(BaseModel):
 class TestExecutionCreate(BaseModel):
     execution_key: str = None
     test_case_key: str = None
+    test_cycle_key: str = None
     result: str = None
     custom_fields: dict = {}
     comments: str = None
