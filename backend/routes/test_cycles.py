@@ -252,6 +252,12 @@ async def get_cycle_executions(request: Request,
     cycle_data = json.loads(response.body.decode())
     cycle_executions = cycle_data.get("executions")
 
+    # Retrieve each execution from the database using the execution keys in cycle_executions
+    for tc_key in cycle_executions:
+        cycle_executions[tc_key] = await request.app.state.mdb.find_one(DB_COLLECTION_TE, {
+            "execution_key": cycle_executions[tc_key]
+        })
+
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=cycle_executions)
 
