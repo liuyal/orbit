@@ -18,7 +18,7 @@ class TestExecution(BaseModel):
     execution_key: str
     project_key: str
     test_case_key: str
-    test_cycle_key: str
+    test_cycle_key: str | None
     result: str | None
     custom_fields: dict | None
     comments: str | None
