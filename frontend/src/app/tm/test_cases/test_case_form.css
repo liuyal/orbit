@@ -307,6 +307,7 @@
   height: 50px;
   font-size: 15px;
   box-sizing: border-box;
+  text-transform: uppercase;
 }
 
 .dropdown-toggle i {
@@ -344,6 +345,8 @@
 
 .dropdown-menu li .option-text {
   flex: 1;
+  font-size: 15px;
+  text-transform: uppercase;
 }
 
 .dropdown-menu li .selected-check {

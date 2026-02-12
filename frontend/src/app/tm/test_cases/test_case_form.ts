@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef, AfterViewInit, OnDestroy, ViewChild, ElementRef, PLATFORM_ID } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, AfterViewInit, OnDestroy, ViewChild, ElementRef, PLATFORM_ID, HostListener } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -36,6 +36,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   platformId = inject(PLATFORM_ID);
   
   @ViewChild('editorContainer', { static: false }) editorContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('frequencyDropdown', { static: false }) frequencyDropdown?: ElementRef<HTMLDivElement>;
   private editor?: EditorView;
   private isBrowser = false;
   private isEditorInitializing = false;
@@ -65,6 +66,10 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   // Currently selected labels for this test case
   selectedLabels: string[] = [];
   // (no dropdown state - using chip selection UI)
+  // Frequency options and selected frequencies (multi-select)
+  frequencyOptions: string[] = ['Nightly', 'Weekly', 'Not Scheduled'];
+  selectedFrequencies: string[] = ['Nightly'];
+  frequencyDropdownOpen = false;
   
   apiError = '';
   errors = {
@@ -76,21 +81,23 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     // Check if running in browser
     this.isBrowser = isPlatformBrowser(this.platformId);
     
+    // Subscribe once to route params, then load test case and project labels
     this.route.params.subscribe(params => {
       this.projectKey = params['projectKey'];
       this.testCaseKey = params['testCaseKey'];
       this.isEditMode = !!this.testCaseKey;
-      
+
       if (this.isEditMode) {
         console.log('Edit mode - test case:', this.testCaseKey, 'for project:', this.projectKey);
         this.loadTestCase();
       } else {
         console.log('Create mode - project:', this.projectKey);
       }
-    });
 
-    // Load labels from projects so we can offer them in a select
-    this.loadProjectLabels();
+      if (this.projectKey) {
+        this.loadProjectLabels();
+      }
+    });
   }
 
   ngAfterViewInit() {
@@ -100,6 +107,18 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.initializeEditor();
       }
     }, 100);
+  }
+
+  @HostListener('document:click', ['$event'])
+  handleDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (this.frequencyDropdown && this.frequencyDropdown.nativeElement) {
+      const el = this.frequencyDropdown.nativeElement as HTMLElement;
+      if (!el.contains(target) && this.frequencyDropdownOpen) {
+        this.frequencyDropdownOpen = false;
+        this.cdr.detectChanges();
+      }
+    }
   }
 
   // No document click handler needed for chip UI
@@ -209,7 +228,18 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loading = true;
     const url = `/api/tm/projects/${this.projectKey}/test-cases/${this.testCaseKey}`;
     console.log('Loading test case from URL:', url);
-    
+
+    // safety timeout to avoid spinner stuck if request never returns
+    const timeoutMs = 10000;
+    const timeoutId = setTimeout(() => {
+      if (this.loading) {
+        console.warn('Loading test case timed out');
+        this.apiError = 'Request timed out while loading test case';
+        this.loading = false;
+        this.cdr.detectChanges();
+      }
+    }, timeoutMs);
+
     this.http.get<any>(url).subscribe({
       next: (data) => {
         console.log('Test case loaded:', data);
@@ -221,7 +251,8 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
           this.testCase.folder = data.folder || '';
           this.testCase.status = data.status || 'DRAFT';
           this.testCase.priority = data.priority || 'MEDIUM';
-          this.testCase.test_frequency = (data.test_frequency && Array.isArray(data.test_frequency)) ? data.test_frequency.join(', ') : '';
+          this.selectedFrequencies = (data.test_frequency && Array.isArray(data.test_frequency)) ? [...data.test_frequency] : [];
+          this.testCase.test_frequency = this.selectedFrequencies.join(', ');
           this.selectedLabels = (data.labels && Array.isArray(data.labels)) ? [...data.labels] : [];
           // keep legacy string for compatibility
           this.testCase.labels = this.selectedLabels.join(', ');
@@ -231,25 +262,41 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
           console.error('Error processing test case data:', error);
           this.apiError = 'Error processing test case data';
         } finally {
+          clearTimeout(timeoutId);
           this.loading = false;
           this.cdr.detectChanges();
         }
       },
       error: (err) => {
+        clearTimeout(timeoutId);
         console.error('Error loading test case:', err);
         this.apiError = `Failed to load test case: ${err.status} ${err.statusText || err.message}`;
         this.loading = false;
         this.cdr.detectChanges();
+      },
+      complete: () => {
+        clearTimeout(timeoutId);
       }
     });
   }
 
   loadProjectLabels() {
-    this.http.get<any[]>('/api/tm/projects').subscribe({
+    // Add a timeout in case the projects API is unresponsive
+    const timeoutMs = 10000;
+    const timeoutId = setTimeout(() => {
+      console.warn('Loading project labels timed out');
+      this.cdr.detectChanges();
+    }, timeoutMs);
+
+    const url = `/api/tm/projects/${this.projectKey}`;
+    this.http.get<any>(url).subscribe({
       next: (data) => {
+        clearTimeout(timeoutId);
         const labelSet = new Set<string>();
-        for (const prj of data) {
-          if (Array.isArray(prj.labels)) {
+        // API may return a single project object or an array - normalize to array
+        const projects = Array.isArray(data) ? data : [data];
+        for (const prj of projects) {
+          if (prj && Array.isArray(prj.labels)) {
             prj.labels.forEach((l: string) => labelSet.add(l));
           }
         }
@@ -257,8 +304,10 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
+        clearTimeout(timeoutId);
         console.warn('Failed to load project labels:', err);
-      }
+      },
+      complete: () => clearTimeout(timeoutId)
     });
   }
 
@@ -271,6 +320,23 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.testCase.labels = this.selectedLabels.join(', ');
     this.cdr.detectChanges();
+  }
+
+  toggleFrequency(event: MouseEvent, freq: string) {
+    event.stopPropagation();
+    const idx = this.selectedFrequencies.indexOf(freq);
+    if (idx > -1) {
+      this.selectedFrequencies.splice(idx, 1);
+    } else {
+      this.selectedFrequencies.push(freq);
+    }
+    this.testCase.test_frequency = this.selectedFrequencies.join(', ');
+    this.cdr.detectChanges();
+  }
+
+  toggleFrequencyDropdown(event: MouseEvent) {
+    event.stopPropagation();
+    this.frequencyDropdownOpen = !this.frequencyDropdownOpen;
   }
 
   goBack() {
@@ -315,12 +381,9 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    // Only include test_frequency, labels, and links if they have values
-    if (this.testCase.test_frequency && this.testCase.test_frequency.trim()) {
-      const freqArray = this.testCase.test_frequency.split(',').map((s: string) => s.trim()).filter((s: string) => s);
-      if (freqArray.length > 0) {
-        payload.test_frequency = freqArray;
-      }
+    // Only include test_frequency (as array), labels, and links if they have values
+    if (this.selectedFrequencies && this.selectedFrequencies.length > 0) {
+      payload.test_frequency = [...this.selectedFrequencies];
     }
 
     if (this.selectedLabels && this.selectedLabels.length > 0) {
