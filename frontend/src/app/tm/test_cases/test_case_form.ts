@@ -59,6 +59,12 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     labels: '',
     links: ''
   };
+
+  // All available labels gathered from projects
+  allLabels: string[] = [];
+  // Currently selected labels for this test case
+  selectedLabels: string[] = [];
+  // (no dropdown state - using chip selection UI)
   
   apiError = '';
   errors = {
@@ -82,6 +88,9 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
         console.log('Create mode - project:', this.projectKey);
       }
     });
+
+    // Load labels from projects so we can offer them in a select
+    this.loadProjectLabels();
   }
 
   ngAfterViewInit() {
@@ -92,6 +101,8 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }, 100);
   }
+
+  // No document click handler needed for chip UI
 
   ngOnDestroy() {
     // Mark as disposed to prevent any pending operations
@@ -211,7 +222,9 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
           this.testCase.status = data.status || 'DRAFT';
           this.testCase.priority = data.priority || 'MEDIUM';
           this.testCase.test_frequency = (data.test_frequency && Array.isArray(data.test_frequency)) ? data.test_frequency.join(', ') : '';
-          this.testCase.labels = (data.labels && Array.isArray(data.labels)) ? data.labels.join(', ') : '';
+          this.selectedLabels = (data.labels && Array.isArray(data.labels)) ? [...data.labels] : [];
+          // keep legacy string for compatibility
+          this.testCase.labels = this.selectedLabels.join(', ');
           this.testCase.links = (data.links && Array.isArray(data.links)) ? data.links.join(', ') : '';
           console.log('Test case data processed successfully');
         } catch (error) {
@@ -229,6 +242,35 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  loadProjectLabels() {
+    this.http.get<any[]>('/api/tm/projects').subscribe({
+      next: (data) => {
+        const labelSet = new Set<string>();
+        for (const prj of data) {
+          if (Array.isArray(prj.labels)) {
+            prj.labels.forEach((l: string) => labelSet.add(l));
+          }
+        }
+        this.allLabels = Array.from(labelSet).sort();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.warn('Failed to load project labels:', err);
+      }
+    });
+  }
+
+  toggleLabel(label: string) {
+    const idx = this.selectedLabels.indexOf(label);
+    if (idx > -1) {
+      this.selectedLabels.splice(idx, 1);
+    } else {
+      this.selectedLabels.push(label);
+    }
+    this.testCase.labels = this.selectedLabels.join(', ');
+    this.cdr.detectChanges();
   }
 
   goBack() {
@@ -281,11 +323,8 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
 
-    if (this.testCase.labels && this.testCase.labels.trim()) {
-      const labelsArray = this.testCase.labels.split(',').map((s: string) => s.trim()).filter((s: string) => s);
-      if (labelsArray.length > 0) {
-        payload.labels = labelsArray;
-      }
+    if (this.selectedLabels && this.selectedLabels.length > 0) {
+      payload.labels = [...this.selectedLabels];
     }
 
     if (this.testCase.links && this.testCase.links.trim()) {
@@ -321,5 +360,13 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.apiError = errorMessage;
       }
     });
+  }
+
+  removeSelectedLabel(label: string) {
+    const idx = this.selectedLabels.indexOf(label);
+    if (idx > -1) {
+      this.selectedLabels.splice(idx, 1);
+      this.testCase.labels = this.selectedLabels.join(', ');
+    }
   }
 }

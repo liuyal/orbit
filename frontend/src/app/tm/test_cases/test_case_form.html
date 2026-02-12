@@ -94,8 +94,12 @@
                     </div>
                     <div class="form-group">
                         <label for="labels">Labels</label>
-                        <input type="text" id="labels" [(ngModel)]="testCase.labels" name="labels"
-                            placeholder="Enter labels" />
+                        <div class="chip-options">
+                            <span class="chip-option" *ngFor="let l of allLabels" [class.selected]="selectedLabels.includes(l)" (click)="toggleLabel(l)">
+                                {{ l }}
+                            </span>
+                        </div>
+
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>

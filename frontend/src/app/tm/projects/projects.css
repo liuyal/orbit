@@ -258,7 +258,8 @@
   background-color: #2769f7;
   color: #fff;
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 16px;
+  text-transform: uppercase;
 }
 
 .remove-label {
@@ -664,6 +665,7 @@
   }
 
   .label-chip {
+    text-transform: uppercase;
     background-color: #3b82f6;
   }
 
