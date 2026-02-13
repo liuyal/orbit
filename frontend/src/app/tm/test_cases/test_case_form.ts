@@ -61,6 +61,11 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     links: ''
   };
 
+  // Executions for this test case (loaded when viewing Executions tab)
+  executions: any[] = [];
+  executionsLoading: boolean = false;
+  executionsError: string = '';
+
   // All available labels gathered from projects
   allLabels: string[] = [];
   // Currently selected labels for this test case
@@ -208,12 +213,17 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onTabChange(tab: 'details' | 'script' | 'links' | 'executions') {
     const previousTab = this.activeTab;
-    
-    // Save script value before changing tabs
+
+    // If user clicked the currently active tab, do nothing
+    if (previousTab === tab) {
+      return;
+    }
+
+    // Save script value before changing tabs (only when leaving script)
     if (previousTab === 'script' && this.editor) {
       this.testCase.test_script = this.editor.state.doc.toString();
     }
-    
+
     this.activeTab = tab;
     
     // If switching to script tab, ensure editor exists (CodeMirror handles layout automatically)
@@ -222,6 +232,52 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.initializeEditor();
       }, 50);
     }
+
+    // If switching to executions tab in edit mode, load executions for this test case
+    if (tab === 'executions' && this.isEditMode && !this.executionsLoading && this.executions.length === 0) {
+      this.loadExecutions();
+    }
+  }
+
+  loadExecutions(force: boolean = false) {
+    if (!this.projectKey || !this.testCaseKey) {
+      this.executions = [];
+      return;
+    }
+
+    if (this.executionsLoading) return;
+    if (!force && this.executions && this.executions.length > 0) return;
+
+    this.executionsLoading = true;
+    this.executionsError = '';
+    const url = `/api/tm/projects/${this.projectKey}/test-cases/${this.testCaseKey}/executions`;
+
+    const timeoutMs = 1000;
+    const timeoutId = setTimeout(() => {
+      if (this.executionsLoading) {
+        console.warn('Loading executions timed out');
+        this.executionsError = 'Request timed out while loading executions';
+        this.executionsLoading = false;
+        this.cdr.detectChanges();
+      }
+    }, timeoutMs);
+
+    this.http.get<any[]>(url).subscribe({
+      next: (data) => {
+        clearTimeout(timeoutId);
+        this.executions = Array.isArray(data) ? data : [];
+        this.executionsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        clearTimeout(timeoutId);
+        console.error('Error loading executions:', err);
+        this.executionsError = `Failed to load executions: ${err.status} ${err.statusText || err.message}`;
+        this.executionsLoading = false;
+        this.cdr.detectChanges();
+      },
+      complete: () => clearTimeout(timeoutId)
+    });
   }
 
   loadTestCase() {

@@ -154,6 +154,8 @@ async def get_all_executions_by_test_case_key(request: Request,
         "test_case_key": test_case_key
     })
 
+    test_executions = list(reversed(test_executions))
+
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_executions)
 
@@ -249,7 +251,7 @@ async def create_execution_by_test_case_key(request: Request,
 
     # Create the test execution in the database
     await db.create(DB_COLLECTION_TE, db_insert)
-    
+
     # Update last_execution_key and updated_at for test case
     tc_data["updated_at"] = current_time
     tc_data["last_execution_key"] = execution_key

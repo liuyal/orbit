@@ -143,9 +143,44 @@
             </div>
             @if (isEditMode) {
             <div class="form-container" [class.hidden]="activeTab !== 'executions'">
-                <div class="executions-placeholder">
-                    <i class="fa-solid fa-list-check executions-icon"></i>
-                    <p>Test execution results will be displayed here.</p>
+                <div class="executions-panel">
+                    @if (executionsLoading) {
+                    <div class="loading-container">
+                        <div class="spinner"></div>
+                        <p>Loading executions...</p>
+                    </div>
+                    } @else if (executionsError) {
+                    <div class="alert-error">{{ executionsError }}</div>
+                    } @else {
+                    @if (executions && executions.length > 0) {
+                    <div class="executions-list">
+                        <div class="executions-header">
+                            <span class="col-status">Status</span>
+                            <span class="col-key">Key</span>
+                            <span class="col-cycle">Cycle Key</span>
+                            <span class="col-start">Start Date</span>
+                            <span class="col-end">End Date</span>
+                        </div>
+                        @for (exe of executions; track exe.execution_key) {
+                        <div class="execution-item" [attr.data-status]="exe.result || 'NOT_EXECUTED'">
+                            <div class="execution-row">
+                                <span class="col-status"><span class="execution-result">{{ exe.result || 'NOT_EXECUTED' }}</span></span>
+                                <span class="col-key">{{ exe.execution_key }}</span>
+                                <span class="col-cycle">{{ exe.test_cycle_key || '-' }}</span>
+                                <span class="col-start">{{ exe.started_at || '-' }}</span>
+                                <span class="col-end">{{ exe.finished_at || '-' }}</span>
+                            </div>
+                            <div class="execution-comment">{{ exe.comments || '' }}</div>
+                        </div>
+                        }
+                    </div>
+                    } @else {
+                    <div class="empty-message">
+                        <i class="fa-solid fa-flask"></i>
+                        <p>No executions found for this test case</p>
+                    </div>
+                    }
+                    }
                 </div>
             </div>
             }

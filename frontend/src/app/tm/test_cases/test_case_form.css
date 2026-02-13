@@ -285,6 +285,107 @@
   margin-bottom: 20px;
 }
 
+/* Executions list for test case */
+.executions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 8px 12px 0 12px;
+}
+
+.executions-header {
+  display: grid;
+  grid-template-columns: 20% 20% 20% 20% 20%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: #dadada;
+  font-size: 14px;
+  text-transform: uppercase;
+  align-items: center;
+}
+
+.execution-item {
+  padding: 10px 14px;
+  display: block;
+  border: none;
+  border-top: 1px solid #414141;
+  color: #dadada;
+  border-radius: 0;
+  font-size: 14px;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.execution-item:hover {
+  transform: translateY(-2px);
+}
+
+.execution-row {
+  display: grid;
+  grid-template-columns: 20% 20% 20% 20% 20%;
+  align-items: center;
+}
+
+.execution-key {
+  font-weight: 700;
+  color: #cfe9ff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.execution-result {
+  display: inline-block;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #333;
+  padding: 6px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/* Status badge colors */
+.execution-item[data-status="PASS"] .execution-result {
+  background-color: #2e7d32;
+}
+
+.execution-item[data-status="FAIL"] .execution-result {
+  background-color: #c62828;
+}
+
+.execution-item[data-status="BLOCKED"] .execution-result {
+  background-color: #2463eb;
+}
+
+.execution-item[data-status="NOT_EXECUTED"] .execution-result {
+  background-color: #616161;
+}
+
+.execution-comment {
+  color: #bdbdbd;
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+
+  .executions-header,
+  .execution-row {
+    grid-template-columns: 120px 1fr;
+    grid-auto-rows: auto;
+  }
+
+  .executions-header span:nth-child(n+3),
+  .execution-row span:nth-child(n+3) {
+    display: none;
+  }
+
+  .execution-comment {
+    padding-left: 0;
+  }
+}
+
 /* Labels dropdown and chips */
 .labels-dropdown {
   position: relative;
@@ -376,7 +477,7 @@
   border-radius: 5px;
   font-size: 18px;
   text-transform: uppercase;
-  
+
 }
 
 .label-chip {
@@ -415,7 +516,7 @@
   cursor: pointer;
   border: 1px solid rgb(53, 53, 53);
 }
-  
+
 .chip-option:hover {
   background-color: #252525;
 }
@@ -424,11 +525,12 @@
   background-color: #2769f7;
   color: #fff;
   border-color: #2769f7;
-.chip-option.selected {
-  background-color: #2769f7;
-  color: #fff;
-  border: #2769f7 solid 1px;
-}
+
+  .chip-option.selected {
+    background-color: #2769f7;
+    color: #fff;
+    border: #2769f7 solid 1px;
+  }
 }
 
 .chip-option .selected-check {
