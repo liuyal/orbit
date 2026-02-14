@@ -52,7 +52,7 @@ services:
     container_name: apache-app
     volumes:
         - ../:/usr/local/apache2/htdocs/files
-        - /datadrive/sftp_user/files:/usr/local/apache2/htdocs/files
+        - /datadrive/sftp_user/orbitfs:/usr/local/apache2/htdocs/files
     ports:
       - "8888:80"
       - "8443:443"
