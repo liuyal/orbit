@@ -17,28 +17,33 @@ export class Project implements OnInit {
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
+
   projects: any[] = [];
   isLoading = true;
   error = '';
   showCreateModal = false;
   showEditModal = false;
+  allLabels: string[] = [];
+
   newProject = {
     project_key: '',
     description: '',
     is_active: true,
     labels: [] as string[]
   };
+
   editProjectData = {
     project_key: '',
     description: '',
     is_active: true,
     labels: [] as string[]
   };
-  allLabels: string[] = [];
+
   errors = {
     project_key: '',
     description: ''
   };
+
   apiError = '';
 
   ngOnInit() {
@@ -75,7 +80,6 @@ export class Project implements OnInit {
         this.cdr.detectChanges();
       }
     });
-
     // Add a safety timeout to prevent infinite loading
     setTimeout(() => {
       if (this.isLoading) {
