@@ -1,4 +1,12 @@
 /* ========================================
+ Empty state icon and message styles moved from HTML
+  ======================================== */
+  
+.empty-state-message {
+  font-size: 14px;
+  margin-top: 10px;
+}
+/* ========================================
    PAGE LAYOUT
    ======================================== */
 

@@ -411,7 +411,6 @@
   color: #fff;
 }
 
-
 /* ========================================
    EMPTY STATE
    ======================================== */
@@ -436,6 +435,13 @@
   margin: 5px 0;
 }
 
+.empty-state-icon {
+  margin-bottom: 10px;
+}
+
+.empty-state-message {
+  font-size: 16px;
+}
 
 /* ========================================
    ERROR STATE
@@ -465,7 +471,6 @@
   margin: 5px 0;
   max-width: 600px;
 }
-
 
 /* ========================================
    ACTION BUTTONS
