@@ -83,12 +83,6 @@ export class TestExecutionComponent implements OnInit {
   }
 
   goBack() {
-    // If execution has project_key, return to its test-cases list, otherwise fallback home
-    const projectKey = this.execution?.project_key || '';
-    if (projectKey) {
-      this.router.navigate(['/test-cases', projectKey]);
-    } else {
-      this.router.navigate(['/']);
-    }
+    window.history.back();
   }
 }
