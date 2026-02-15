@@ -27,7 +27,8 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
             project_key = f"PRJ{i}"
             response = requests.post(f"{self.__class__.url}/projects", json={
                 "project_key": project_key,
-                "description": f"Project #{i}"
+                "description": f"Project #{i}",
+                "labels": ["A", "B", "C"]
             })
             assert response.status_code == 201
 

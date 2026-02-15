@@ -317,10 +317,6 @@
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
-.execution-item:hover {
-  transform: translateY(-2px);
-}
-
 .execution-row {
   display: grid;
   grid-template-columns: 20% 20% 20% 20% 20%;
@@ -366,6 +362,16 @@
 .execution-comment {
   color: #bdbdbd;
   font-size: 13px;
+}
+
+/* Clickable execution rows */
+.execution-item.clickable {
+  cursor: pointer;
+}
+
+.execution-item.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4);
 }
 
 @media (max-width: 900px) {

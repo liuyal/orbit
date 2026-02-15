@@ -1,6 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
-
-/* Navbar Styles */
+/* =============================
+   NAVBAR CONTAINER (nav.navbar)
+   ============================= */
 .navbar {
   background-color: #1e1e1e;
   border-bottom: 2px solid #0057ad;
@@ -15,6 +15,9 @@
   gap: 15px;
 }
 
+/* =============================
+   BRAND (a.navbar-brand)
+   ============================= */
 .navbar-brand {
   display: flex;
   align-items: center;
@@ -27,16 +30,17 @@
   cursor: pointer;
   transition: opacity 0.2s;
 }
-
 .navbar-brand:hover {
   opacity: 0.9;
 }
-
 .navbar-brand i {
   color: #0057ad;
   font-size: 28px;
 }
 
+/* =============================
+   API DOCS BUTTON (a.api-docs-button)
+   ============================= */
 .api-docs-button {
   display: flex;
   align-items: center;
@@ -49,11 +53,13 @@
   transition: all 0.2s;
   font-size: 26px;
 }
-
 .api-docs-button:hover {
   color: white;
 }
 
+/* =============================
+   BACK BUTTON (button.back-button)
+   ============================= */
 .back-button {
   background: none;
   border: 1px solid #0057ad;
@@ -67,31 +73,7 @@
   gap: 8px;
   transition: all 0.2s;
 }
-
 .back-button:hover {
   background-color: #0057ad;
   color: white;
-}
-
-.create-button {
-  background-color: #28a745;
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  margin-left: auto;
-}
-
-.create-button:hover {
-  background-color: #218838;
-}
-
-.create-button i {
-  font-size: 16px;
 }

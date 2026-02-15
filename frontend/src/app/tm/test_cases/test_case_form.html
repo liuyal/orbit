@@ -22,9 +22,10 @@
                 Links
             </button>
             @if (isEditMode) {
-            <button type="button" class="tab" [class.active]="activeTab === 'executions'" (click)="onTabChange('executions')">
+            <button type="button" class="tab" [class.active]="activeTab === 'executions'"
+                (click)="onTabChange('executions')">
                 <i class="fa-solid fa-list-check"></i>
-                 Executions
+                Executions
             </button>
             }
         </div>
@@ -40,8 +41,8 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="test_case_key">Test Case Key</label>
-                            <input type="text" id="test_case_key" [(ngModel)]="testCase.test_case_key" name="test_case_key"
-                                placeholder="Enter test case key" [required]="!isEditMode"
+                            <input type="text" id="test_case_key" [(ngModel)]="testCase.test_case_key"
+                                name="test_case_key" placeholder="Enter test case key" [required]="!isEditMode"
                                 [class.error]="errors.test_case_key" [disabled]="isEditMode" />
                             @if (errors.test_case_key) {
                             <span class="error-message">{{ errors.test_case_key }}</span>
@@ -71,15 +72,22 @@
                             <label for="test_frequency">Test Frequency</label>
                             <div class="labels-dropdown" #frequencyDropdown>
                                 <button type="button" class="dropdown-toggle" (click)="toggleFrequencyDropdown($event)">
-                                    {{ selectedFrequencies.length ? (selectedFrequencies.join(', ')) : 'Select frequency' }}
+                                    {{ selectedFrequencies.length ? (selectedFrequencies.join(', ')) : 'Select
+                                    frequency' }}
                                     <i class="fa-solid fa-caret-down"></i>
                                 </button>
-                                <ul class="dropdown-menu" *ngIf="frequencyDropdownOpen">
-                                    <li *ngFor="let f of frequencyOptions" (click)="toggleFrequency($event, f)">
+                                @if (frequencyDropdownOpen) {
+                                <ul class="dropdown-menu">
+                                    @for (f of frequencyOptions; track f) {
+                                    <li (click)="toggleFrequency($event, f)">
                                         <span class="option-text">{{ f }}</span>
-                                        <i *ngIf="selectedFrequencies.includes(f)" class="fa-solid fa-check selected-check"></i>
+                                        @if (selectedFrequencies.includes(f)) {
+                                        <i class="fa-solid fa-check selected-check"></i>
+                                        }
                                     </li>
+                                    }
                                 </ul>
+                                }
                             </div>
                         </div>
                         <div class="form-group">
@@ -102,9 +110,11 @@
                     <div class="form-group">
                         <label for="labels">Labels</label>
                         <div class="chip-options">
-                            <span class="chip-option" *ngFor="let l of allLabels" [class.selected]="selectedLabels.includes(l)" (click)="toggleLabel(l)">
+                            @for (l of allLabels; track l) {
+                            <span class="chip-option" [class.selected]="selectedLabels.includes(l)" (click)="toggleLabel(l)">
                                 {{ l }}
                             </span>
+                            }
                         </div>
 
                     </div>
@@ -122,7 +132,8 @@
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-                        <button type="submit" class="btn btn-primary" (click)="submitTestCase()">{{ isEditMode ? 'Update' :
+                        <button type="submit" class="btn btn-primary" (click)="submitTestCase()">{{ isEditMode ?
+                            'Update' :
                             'Create' }}</button>
                     </div>
                 </form>
@@ -136,7 +147,8 @@
                     </div>
                     <div class="form-actions">
                         <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-                        <button type="submit" class="btn btn-primary" (click)="submitTestCase()">{{ isEditMode ? 'Update' :
+                        <button type="submit" class="btn btn-primary" (click)="submitTestCase()">{{ isEditMode ?
+                            'Update' :
                             'Create' }}</button>
                     </div>
                 </form>
@@ -162,9 +174,11 @@
                             <span class="col-end">End Date</span>
                         </div>
                         @for (exe of executions; track exe.execution_key) {
-                        <div class="execution-item" [attr.data-status]="exe.result || 'NOT_EXECUTED'">
+                        <div class="execution-item clickable" [attr.data-status]="exe.result || 'NOT_EXECUTED'"
+                            (click)="openExecution(exe.execution_key)">
                             <div class="execution-row">
-                                <span class="col-status"><span class="execution-result">{{ exe.result || 'NOT_EXECUTED' }}</span></span>
+                                <span class="col-status"><span class="execution-result">{{ exe.result || 'NOT_EXECUTED'
+                                        }}</span></span>
                                 <span class="col-key">{{ exe.execution_key }}</span>
                                 <span class="col-cycle">{{ exe.test_cycle_key || '-' }}</span>
                                 <span class="col-start">{{ exe.started_at || '-' }}</span>

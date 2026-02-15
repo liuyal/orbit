@@ -1,10 +1,9 @@
-<app-navbar [showCreateButton]="true" [createButtonAction]="create.bind(this)" [showApiButton]="true"></app-navbar>
+<app-navbar [showApiButton]="true"></app-navbar>
 
 <div class="projects-container">
   @if (isLoading) {
     <div class="loading-container">
       <div class="spinner"></div>
-      <span>Loading Projects...</span>
     </div>
   } @else if (error) {
     <div class="error-state">
@@ -27,7 +26,11 @@
             <th># TESTS</th>
             <th># CYCLES</th>
             <th>STATUS</th>
-            <th></th>
+            <th>
+              <button class="create-button" (click)="create()">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </th>
         </tr>
       </thead>
       <tbody>

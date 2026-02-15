@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -13,7 +13,7 @@ import { NavbarComponent } from '../../navbar/navbar';
   templateUrl: './projects.html'
 })
 
-export class Project {
+export class Project implements OnInit {
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
@@ -291,7 +291,7 @@ export class Project {
       event.preventDefault();
       const input = event.target as HTMLInputElement;
       const label = input.value.trim();
-      
+
       if (label) {
         const targetLabels = isEdit ? this.editProjectData.labels : this.newProject.labels;
         if (!targetLabels.includes(label)) {

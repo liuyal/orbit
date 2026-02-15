@@ -34,20 +34,20 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
   platformId = inject(PLATFORM_ID);
-  
+
   @ViewChild('editorContainer', { static: false }) editorContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('frequencyDropdown', { static: false }) frequencyDropdown?: ElementRef<HTMLDivElement>;
   private editor?: EditorView;
   private isBrowser = false;
   private isEditorInitializing = false;
   private editorDisposed = false;
-  
+
   projectKey = '';
   testCaseKey = '';
   isEditMode = false;
   loading = false;
   activeTab: 'details' | 'script' | 'links' | 'executions' = 'details';
-  
+
   testCase: TestCaseForm = {
     test_case_key: '',
     title: '',
@@ -75,7 +75,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   frequencyOptions: string[] = ['Nightly', 'Weekly', 'Not Scheduled'];
   selectedFrequencies: string[] = ['Nightly'];
   frequencyDropdownOpen = false;
-  
+
   apiError = '';
   errors = {
     test_case_key: '',
@@ -85,7 +85,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     // Check if running in browser
     this.isBrowser = isPlatformBrowser(this.platformId);
-    
+
     // Subscribe once to route params, then load test case and project labels
     this.route.params.subscribe(params => {
       this.projectKey = params['projectKey'];
@@ -131,7 +131,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy() {
     // Mark as disposed to prevent any pending operations
     this.editorDisposed = true;
-    
+
     // Save current value before disposing
     if (this.editor) {
       try {
@@ -140,7 +140,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
         // Ignore errors during cleanup
       }
     }
-    
+
     // Clean up editor
     this.disposeEditor();
   }
@@ -162,20 +162,20 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const container = this.editorContainer.nativeElement;
-      
+
       // Verify container has dimensions with retry logic
       let retries = 0;
       while ((container.offsetWidth === 0 || container.offsetHeight === 0) && retries < 5) {
         await new Promise(resolve => setTimeout(resolve, 100));
         retries++;
       }
-      
+
       if (container.offsetWidth === 0 || container.offsetHeight === 0) {
         console.warn('Editor container still has no dimensions after retries');
         this.isEditorInitializing = false;
         return;
       }
-      
+
       // Final check before creating editor
       if (this.editorDisposed || this.editor || !this.editorContainer) {
         this.isEditorInitializing = false;
@@ -207,7 +207,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.editor = undefined;
     }
-    
+
     this.isEditorInitializing = false;
   }
 
@@ -225,7 +225,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.activeTab = tab;
-    
+
     // If switching to script tab, ensure editor exists (CodeMirror handles layout automatically)
     if (tab === 'script' && !this.editor && !this.isEditorInitializing && this.editorContainer) {
       setTimeout(() => {
@@ -399,6 +399,11 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/test-cases', this.projectKey]);
   }
 
+  openExecution(executionKey: string) {
+    if (!executionKey) return;
+    this.router.navigate(['/test-cases', this.projectKey, 'executions', executionKey]);
+  }
+
   cancel() {
     this.router.navigate(['/test-cases', this.projectKey]);
   }
@@ -419,7 +424,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.apiError = '';
     console.log(this.isEditMode ? 'Updating test case:' : 'Creating test case:', this.testCase);
-    
+
     const payload: any = {
       title: this.testCase.title,
       description: this.testCase.description,
