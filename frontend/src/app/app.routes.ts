@@ -18,5 +18,5 @@ export const routes: Routes = [
   { path: 'test-cases/:projectKey/executions/:executionKey', component: TestExecutionComponent },
   { path: 'test-cycles/:projectKey', component: TestCycles },
   { path: 'test-cycles/:projectKey/create', component: TestCycleFormComponent },
-  { path: 'test-cycles/:projectKey/edit/:testCycleKey', component: TestCycleFormComponent }
+  { path: 'test-cycles/:projectKey/cycle/:testCycleKey', component: TestCycleFormComponent }
 ];

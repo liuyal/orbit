@@ -106,7 +106,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #0057adff;
+  background-color: #28a745;
   color: white;
   margin-right: 10px;
   margin-top: 8px;
@@ -114,7 +114,7 @@
 }
 
 .create-btn-tab:hover {
-  background-color: #004090;
+  background-color: #218838;
 }
 
 .tab-content {

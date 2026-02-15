@@ -3,8 +3,6 @@ import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { createCodeMirrorEditor } from '../test_cases/codemirror-config';
-import type { EditorView } from 'codemirror';
 
 @Component({
   selector: 'test-cycle-execution',
@@ -127,6 +125,9 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
       }
     }, 10000);
 
+
+
+    
     this.http.get<any>(url).subscribe({
       next: (data) => {
         clearTimeout(timeout);
@@ -157,5 +158,13 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
         console.log('Child component request completed');
       }
     });
+
+
+
+
+
+
+
+
   }
 }

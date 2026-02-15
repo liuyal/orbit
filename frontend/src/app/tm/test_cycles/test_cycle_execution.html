@@ -7,23 +7,21 @@
             </div>
             <div class="test-cases-list">
                 @if (testCycle.executions && testCycle.executions.length > 0) {
-                    @for (execution of testCycle.executions; track execution.test_case_key) {
-                    <div class="test-case-item" 
-                         [class.selected]="selectedExecution === execution"
-                         [attr.data-status]="execution.result || 'NOT_EXECUTED'"
-                         (click)="selectExecution(execution)">
-                        <div class="test-case-header">
-                            <span class="test-case-key">{{ execution.test_case_key }}</span>
-                        </div>
-                        <div class="test-case-title">{{ execution.title || 'Untitled' }}</div>
+                @for (execution of testCycle.executions; track execution.test_case_key) {
+                <div class="test-case-item" [class.selected]="selectedExecution === execution"
+                    [attr.data-status]="execution.result || 'NOT_EXECUTED'" (click)="selectExecution(execution)">
+                    <div class="test-case-header">
+                        <span class="test-case-key">{{ execution.test_case_key }}</span>
                     </div>
-                    }
+                    <div class="test-case-title">{{ execution.title || 'Untitled' }}</div>
+                </div>
+                }
                 } @else {
-                    <div class="empty-message">
-                        <i class="fa-solid fa-flask"></i>
-                        <p>No test cases added to this cycle</p>
-                        <p class="hint">Click "Add Test Case" to get started</p>
-                    </div>
+                <div class="empty-message">
+                    <i class="fa-solid fa-flask"></i>
+                    <p>No test cases added to this cycle</p>
+                    <p class="hint">Click "Add Test Case" to get started</p>
+                </div>
                 }
             </div>
         </div>
@@ -49,13 +47,11 @@
                     <label>Description</label>
                     <p>{{ selectedExecution.description || 'N/A' }}</p>
                 </div>
-                
+
                 <div class="details-section">
                     <label>Comment</label>
-                    <textarea [(ngModel)]="selectedExecution.comment" 
-                              name="comment"
-                              placeholder="Add execution notes or comments..."
-                              rows="4"></textarea>
+                    <textarea [(ngModel)]="selectedExecution.comment" name="comment"
+                        placeholder="Add execution notes or comments..." rows="4"></textarea>
                 </div>
                 <div class="details-section">
                     <label>Test Script</label>

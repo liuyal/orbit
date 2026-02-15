@@ -101,14 +101,15 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
       this.isEditMode = !!this.testCaseKey;
 
       this.route.queryParams.subscribe(query => {
-        const shouldLoadExecutions = query['loadExecutions'] === 'true';
+        const tabParam = query['tab'];
+        if (tabParam && ['details', 'script', 'links', 'executions'].includes(tabParam)) {
+          this.activeTab = tabParam;
+        }
 
         if (this.isEditMode) {
           console.log('Edit mode - test case:', this.testCaseKey, 'for project:', this.projectKey);
           this.loadTestCase();
-          if (shouldLoadExecutions) {
-            this.loadExecutions(true);
-          }
+          this.loadExecutions(true);
         } else {
           console.log('Create mode - project:', this.projectKey);
         }

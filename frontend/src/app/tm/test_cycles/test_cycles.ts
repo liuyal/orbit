@@ -100,7 +100,7 @@ export class TestCycles implements OnInit {
   }
 
   editTestCycle(testCycle: TestCycle) {
-    this.router.navigate(['/test-cycles', this.projectKey, 'edit', testCycle.test_cycle_key]);
+    this.router.navigate(['/test-cycles', this.projectKey, 'cycle', testCycle.test_cycle_key]);
   }
 
   deleteTestCycle(testCycle: TestCycle) {

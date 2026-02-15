@@ -115,9 +115,7 @@ export class TestCases implements OnInit {
       this.projectKey,
       'edit',
       testCase.test_case_key
-    ], {
-      queryParams: { loadExecutions: 'true' }
-    });
+    ]);
   }
 
   createTestCase() {
