@@ -5,14 +5,17 @@
 .test-executions-container {
   border-radius: 0;
   background-color: #1e1e1e;
-  border-bottom: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 0;
 }
 
 .split-view {
-  display: flex;
   flex: 1;
   overflow: hidden;
-  height: 100vh;
+  display: flex;
+  min-height: 0;
 }
 
 .test-cases-panel {
@@ -59,8 +62,11 @@
 }
 
 .test-cases-list {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .test-case-item {
@@ -142,53 +148,83 @@
 }
 
 .details-content {
-  padding: 30px;
+  padding: 20px 40px 0px 40px;
   overflow-y: auto;
   flex: 1;
+  font-size: 16px;
 }
 
 .details-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
+  padding: 20px 40px 0px 40px;
   border-bottom: 1px solid #333;
+  position: static;
 }
 
 .details-header h4 {
-  margin: 0;
   color: #4da6ff;
   font-size: 20px;
   font-weight: 600;
-}
-
-.result-selector {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.result-selector label {
-  color: #e0e0e0;
-  font-weight: 500;
-  font-size: 14px;
+  gap: 0px;
 }
 
 .result-selector select {
   padding: 8px 15px;
-  border: 1px solid #444;
-  font-size: 14px;
-  background-color: #2a2a2a;
+  border: 0px;
   color: #e0e0e0;
   border-radius: 4px;
   cursor: pointer;
-  min-width: 150px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  text-align-last: center;
+  direction: rtl;
+  appearance: none;
+  background-image: none;
+  padding-right: 12px;
 }
 
-.result-selector select:focus {
-  outline: none;
-  border-color: #0057adff;
+.result-selector option {
+  background-color: #202020;
+  border-radius: 4px;
+  border: 1px solid #363636;
+  text-align: center;
+  direction: ltr;
+  color: #e0e0e0;
+}
+
+.result-selector select::-ms-value {
+  text-align: center;
+}
+
+.result-selector select.status-NOT_EXECUTED {
+  background-color: rgba(255,255,255,0.02);
+  color: #757575;
+  border: 2px solid #757575;
+  box-shadow: none;
+}
+
+.result-selector select.status-PASS {
+  background-color: rgba(255,255,255,0.02);
+  color: #4caf50;
+  border: 2px solid #4caf50;
+  box-shadow: none;
+}
+
+.result-selector select.status-FAIL {
+  background-color: rgba(255,255,255,0.02);
+  color: #f44336;
+  border: 2px solid #f44336;
+  box-shadow: none;
+}
+
+.result-selector select.status-BLOCKED {
+  background-color: rgba(255,255,255,0.02);
+  color: #2196f3;
+  border: 2px solid #2196f3;
+  box-shadow: none;
 }
 
 .details-section {
@@ -199,7 +235,6 @@
   display: block;
   color: #e0e0e0;
   font-weight: 600;
-  font-size: 13px;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -207,7 +242,7 @@
 
 .details-section p {
   color: #b0b0b0;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.6;
   margin: 0;
 }
@@ -236,6 +271,7 @@
   resize: vertical;
   font-family: inherit;
   box-sizing: border-box;
+  margin-top: 20px;
 }
 
 .details-section textarea:focus {
@@ -271,67 +307,4 @@
 .no-selection p {
   font-size: 16px;
   margin: 0;
-}
-
-/* Code editor container */
-.monaco-editor-container {
-  width: 100%;
-  height: 540px;
-  border: 1px solid #444;
-  margin-top: 8px;
-  position: relative;
-  overflow: hidden;
-  background-color: #1e1e1e;
-}
-
-.monaco-editor-container .cm-editor {
-  height: 100%;
-  font-size: 14px;
-}
-
-.monaco-editor-container .cm-scroller {
-  overflow: auto;
-}
-
-.monaco-editor-container .cm-gutters {
-  background-color: #1e1e1e;
-  border-right: 1px solid #444;
-}
-
-/* Button styles */
-.btn {
-  padding: 12px 30px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 500;
-  transition: all 0.2s;
-  width: 120px;
-}
-
-.btn-primary {
-  background-color: #0057adff;
-  color: white;
-}
-
-.btn-primary:hover {
-  background-color: #004090;
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background-color: #444;
-  color: white;
-  border: 1px solid #555;
-}
-
-.btn-secondary:hover {
-  background-color: #555;
-  border-color: #666;
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }

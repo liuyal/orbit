@@ -13,7 +13,15 @@
                     <div class="test-case-header">
                         <span class="test-case-key">{{ execution.test_case_key }}</span>
                     </div>
-                    <div class="test-case-title">{{ execution.title || 'Untitled' }}</div>
+                    <div class="test-case-title">
+                        @if (execution.title === undefined) {
+                        -
+                        } @else if (!execution.title) {
+                        Untitled
+                        } @else {
+                        {{ execution.title }}
+                        }
+                    </div>
                 </div>
                 }
                 } @else {
@@ -27,39 +35,47 @@
         </div>
         <div class="execution-details-panel">
             @if (selectedExecution) {
-            <div class="details-content">
                 <div class="details-header">
                     <h4>{{ selectedExecution.test_case_key }}</h4>
                     <div class="result-selector">
-                        <select [(ngModel)]="selectedExecution.result" name="result">
-                            <option value="NOT_EXECUTED">Not Executed</option>
-                            <option value="PASS">Pass</option>
-                            <option value="FAIL">Fail</option>
-                            <option value="BLOCKED">Blocked</option>
+                        <select id="status-dropdown" [(ngModel)]="selectedExecution.result" name="status"
+                            [ngClass]="'status-' + selectedExecution.result">
+                            <option value="NOT_EXECUTED">NOT_EXECUTED</option>
+                            <option value="PASS">PASS</option>
+                            <option value="FAIL">FAIL</option>
+                            <option value="BLOCKED">BLOCKED</option>
                         </select>
                     </div>
                 </div>
-                <div class="details-section">
-                    <label>Title</label>
-                    <p>{{ selectedExecution.title || 'N/A' }}</p>
-                </div>
+                <div class="details-content">
+                    <div class="details-section">
+                        <label>Title</label>
+                        <p>{{ selectedExecution.title || 'N/A' }}</p>
+                    </div>
                 <div class="details-section">
                     <label>Description</label>
                     <p>{{ selectedExecution.description || 'N/A' }}</p>
                 </div>
-
+                <div class="details-section">
+                    <label>Execution Key</label>
+                    <p>{{ selectedExecution.execution_key || 'N/A' }}</p>
+                </div>
+                <div class="details-section">
+                    <label>Execution Start</label>
+                    <p>{{ selectedExecution.started_at || 'N/A' }}</p>
+                </div>
+                <div class="details-section">
+                    <label>Execution End</label>
+                    <p>{{ selectedExecution.finised_at || 'N/A' }}</p>
+                </div>
+                <div class="details-section">
+                    <label>Custom Fields</label>
+                    <p>{{ selectedExecution.custom_fields || 'N/A' }}</p>
+                </div>
                 <div class="details-section">
                     <label>Comment</label>
                     <textarea [(ngModel)]="selectedExecution.comment" name="comment"
                         placeholder="Add execution notes or comments..." rows="4"></textarea>
-                </div>
-                <div class="details-section">
-                    <label>Test Script</label>
-                    <div #scriptEditorContainer class="monaco-editor-container"></div>
-                </div>
-                <div class="details-actions">
-                    <button type="button" class="btn btn-secondary">Remove</button>
-                    <button type="button" class="btn btn-primary">Save</button>
                 </div>
             </div>
             } @else {
