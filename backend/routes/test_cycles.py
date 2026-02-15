@@ -65,6 +65,8 @@ async def get_all_cycles_for_project(request: Request,
         "project_key": project_key
     })
 
+    test_cycles = list(reversed(test_cycles))
+
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cycles)
 
