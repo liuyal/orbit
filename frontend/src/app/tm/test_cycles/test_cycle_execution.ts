@@ -35,6 +35,10 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
 
   ngOnInit() {
     this.isBrowser = isPlatformBrowser(this.platformId);
+    // Load test cycle if we have a key on initialization (e.g., after page refresh)
+    if (this.testCycleKey) {
+      this.loadTestCycle();
+    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
