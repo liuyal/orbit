@@ -1,7 +1,7 @@
 /* Details tab (form) styles for test case form */
 .form-container {
   background-color: #1e1e1e;
-  padding: 30px;
+  padding: 20px;
   border: none;
   overflow-y: auto;
   flex: 1;

@@ -162,14 +162,15 @@
 .comment-box {
   width: 100%;
   padding: 16px;
+  margin: 0px 0px 20px 0px;
   border: 1px solid #444;
   font-size: 15px;
   box-sizing: border-box;
   background-color: #252525;
   color: #e0e0e0;
   border-radius: 4px;
-  min-height: 120px;
-  line-height: 1.6;
+  min-height: 140px;
+  line-height: 1;
   white-space: pre-wrap;
   word-wrap: break-word;
 }

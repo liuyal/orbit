@@ -24,21 +24,20 @@
   padding: 10px 12px;
   border-radius: 6px;
   color: #dadada;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   text-transform: uppercase;
   align-items: center;
 }
 
 .execution-item {
-  padding: 10px 14px;
+  padding: 10px 12px;
   display: block;
   border: none;
   border-top: 1px solid #414141;
   color: #dadada;
   border-radius: 0;
   font-size: 14px;
-  transition: transform 120ms ease, box-shadow 120ms ease;
 }
 
 .execution-row {
