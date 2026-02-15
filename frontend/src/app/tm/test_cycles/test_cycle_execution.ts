@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./test_cycle_execution.css'],
   templateUrl: './test_cycle_execution.html'
 })
+
 export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() testCycle: any;
   @Input() projectKey: string = '';
@@ -20,13 +21,13 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
   cdr = inject(ChangeDetectorRef);
   platformId = inject(PLATFORM_ID);
 
+  selectedExecution: any = null;
   loading: boolean = false;
   apiError: string = '';
 
-  @ViewChild('scriptEditorContainer', { static: false }) scriptEditorContainer?: ElementRef<HTMLDivElement>;
+  @ViewChild('scriptEditorContainer', { static: false })
+  scriptEditorContainer?: ElementRef<HTMLDivElement>;
   private isBrowser = false;
-
-  selectedExecution: any = null;
 
   ngOnInit() {
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -125,9 +126,6 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
       }
     }, 10000);
 
-
-
-    
     this.http.get<any>(url).subscribe({
       next: (data) => {
         clearTimeout(timeout);
@@ -158,13 +156,5 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
         console.log('Child component request completed');
       }
     });
-
-
-
-
-
-
-
-
   }
 }

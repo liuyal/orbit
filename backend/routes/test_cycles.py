@@ -318,7 +318,10 @@ async def add_execution_to_cycle(request: Request,
         )
 
     # Add execution to cycle
-    exec_data = {test_execution["test_case_key"]: execution_key}
+    exec_data = {test_execution["test_case_key"]: {
+        "execution_key": execution_key,
+        "result": test_execution.get("result", None)
+    }}
     cycle_data["executions"].update(exec_data)
     await db.update(DB_COLLECTION_TCY, cycle_data, {
         "test_cycle_key": test_cycle_key
