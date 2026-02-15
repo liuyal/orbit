@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef, AfterViewInit, OnDestroy, ViewChild, ElementRef, PLATFORM_ID, HostListener } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, AfterViewInit, OnDestroy, ViewChild, ElementRef, PLATFORM_ID, HostListener, NgZone } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -24,7 +24,14 @@ export interface TestCaseForm {
   selector: 'test-case-form',
   standalone: true,
   imports: [CommonModule, FormsModule, NavbarComponent],
-  styleUrls: ['./test_case_form.css'],
+  styleUrls: [
+    './test_case_form.css',
+    './test_case_form_tabs.css',
+    './test_case_form_details.css',
+    './test_case_form_script.css',
+    './test_case_form_links.css',
+    './test_case_form_executions.css',
+  ],
   templateUrl: './test_case_form.html'
 })
 
@@ -34,6 +41,7 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
   http = inject(HttpClient);
   cdr = inject(ChangeDetectorRef);
   platformId = inject(PLATFORM_ID);
+  zone = inject(NgZone);
 
   @ViewChild('editorContainer', { static: false }) editorContainer?: ElementRef<HTMLDivElement>;
   @ViewChild('frequencyDropdown', { static: false }) frequencyDropdown?: ElementRef<HTMLDivElement>;
@@ -86,22 +94,29 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
     // Check if running in browser
     this.isBrowser = isPlatformBrowser(this.platformId);
 
-    // Subscribe once to route params, then load test case and project labels
+    // Subscribe once to route params and query params, then load test case and project labels
     this.route.params.subscribe(params => {
       this.projectKey = params['projectKey'];
       this.testCaseKey = params['testCaseKey'];
       this.isEditMode = !!this.testCaseKey;
 
-      if (this.isEditMode) {
-        console.log('Edit mode - test case:', this.testCaseKey, 'for project:', this.projectKey);
-        this.loadTestCase();
-      } else {
-        console.log('Create mode - project:', this.projectKey);
-      }
+      this.route.queryParams.subscribe(query => {
+        const shouldLoadExecutions = query['loadExecutions'] === 'true';
 
-      if (this.projectKey) {
-        this.loadProjectLabels();
-      }
+        if (this.isEditMode) {
+          console.log('Edit mode - test case:', this.testCaseKey, 'for project:', this.projectKey);
+          this.loadTestCase();
+          if (shouldLoadExecutions) {
+            this.loadExecutions(true);
+          }
+        } else {
+          console.log('Create mode - project:', this.projectKey);
+        }
+
+        if (this.projectKey) {
+          this.loadProjectLabels();
+        }
+      });
     });
   }
 
@@ -298,37 +313,41 @@ export class TestCaseFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.http.get<any>(url).subscribe({
       next: (data) => {
-        console.log('Test case loaded:', data);
-        try {
-          this.testCase.test_case_key = data.test_case_key || '';
-          this.testCase.title = data.title || '';
-          this.testCase.description = data.description || '';
-          this.testCase.test_script = data.test_script || '';
-          this.testCase.folder = data.folder || '';
-          this.testCase.status = data.status || 'DRAFT';
-          this.testCase.priority = data.priority || 'MEDIUM';
-          this.selectedFrequencies = (data.test_frequency && Array.isArray(data.test_frequency)) ? [...data.test_frequency] : [];
-          this.testCase.test_frequency = this.selectedFrequencies.join(', ');
-          this.selectedLabels = (data.labels && Array.isArray(data.labels)) ? [...data.labels] : [];
-          // keep legacy string for compatibility
-          this.testCase.labels = this.selectedLabels.join(', ');
-          this.testCase.links = (data.links && Array.isArray(data.links)) ? data.links.join(', ') : '';
-          console.log('Test case data processed successfully');
-        } catch (error) {
-          console.error('Error processing test case data:', error);
-          this.apiError = 'Error processing test case data';
-        } finally {
-          clearTimeout(timeoutId);
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
+        this.zone.run(() => {
+          console.log('Test case loaded:', data);
+          try {
+            this.testCase.test_case_key = data.test_case_key || '';
+            this.testCase.title = data.title || '';
+            this.testCase.description = data.description || '';
+            this.testCase.test_script = data.test_script || '';
+            this.testCase.folder = data.folder || '';
+            this.testCase.status = data.status || 'DRAFT';
+            this.testCase.priority = data.priority || 'MEDIUM';
+            this.selectedFrequencies = (data.test_frequency && Array.isArray(data.test_frequency)) ? [...data.test_frequency] : [];
+            this.testCase.test_frequency = this.selectedFrequencies.join(', ');
+            this.selectedLabels = (data.labels && Array.isArray(data.labels)) ? [...data.labels] : [];
+            // keep legacy string for compatibility
+            this.testCase.labels = this.selectedLabels.join(', ');
+            this.testCase.links = (data.links && Array.isArray(data.links)) ? data.links.join(', ') : '';
+            console.log('Test case data processed successfully');
+          } catch (error) {
+            console.error('Error processing test case data:', error);
+            this.apiError = 'Error processing test case data';
+          } finally {
+            clearTimeout(timeoutId);
+            this.loading = false;
+            this.cdr.detectChanges();
+          }
+        });
       },
       error: (err) => {
-        clearTimeout(timeoutId);
-        console.error('Error loading test case:', err);
-        this.apiError = `Failed to load test case: ${err.status} ${err.statusText || err.message}`;
-        this.loading = false;
-        this.cdr.detectChanges();
+        this.zone.run(() => {
+          clearTimeout(timeoutId);
+          console.error('Error loading test case:', err);
+          this.apiError = `Failed to load test case: ${err.status} ${err.statusText || err.message}`;
+          this.loading = false;
+          this.cdr.detectChanges();
+        });
       },
       complete: () => {
         clearTimeout(timeoutId);

@@ -110,7 +110,14 @@ export class TestCases implements OnInit {
   }
 
   editTestCase(testCase: TestCase) {
-    this.router.navigate(['/test-cases', this.projectKey, 'edit', testCase.test_case_key]);
+    this.router.navigate([
+      '/test-cases',
+      this.projectKey,
+      'edit',
+      testCase.test_case_key
+    ], {
+      queryParams: { loadExecutions: 'true' }
+    });
   }
 
   createTestCase() {

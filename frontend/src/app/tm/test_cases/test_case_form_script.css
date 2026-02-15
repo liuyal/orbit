@@ -1,0 +1,30 @@
+/* Script tab styles for test case form */
+#test_script {
+  min-height: 540px;
+  resize: vertical;
+}
+
+.monaco-editor-container {
+  width: 100%;
+  height: 540px;
+  border: 1px solid #444;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+  background-color: #1e1e1e;
+}
+
+/* CodeMirror 6 styling */
+.monaco-editor-container .cm-editor {
+  height: 100%;
+  font-size: 14px;
+}
+
+.monaco-editor-container .cm-scroller {
+  overflow: auto;
+}
+
+.monaco-editor-container .cm-gutters {
+  background-color: #1e1e1e;
+  border-right: 1px solid #444;
+}
