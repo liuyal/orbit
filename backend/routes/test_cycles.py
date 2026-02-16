@@ -22,7 +22,7 @@ from starlette.responses import JSONResponse
 from backend.app.app_def import (
     DB_COLLECTION_PRJ,
     DB_COLLECTION_TE,
-    DB_COLLECTION_TC,
+DB_COLLECTION_TC,
     DB_COLLECTION_TCY,
     TCY_KEY_PREFIX,
     API_VERSION
@@ -263,14 +263,9 @@ async def get_cycle_executions(request: Request,
 
     # Retrieve each execution from the database using the execution keys in cycle_executions
     for tc_key in cycle_executions:
-        te_data = await request.app.state.mdb.find_one(DB_COLLECTION_TE, {
+        cycle_executions[tc_key] = await request.app.state.mdb.find_one(DB_COLLECTION_TE, {
             "execution_key": cycle_executions[tc_key]
         })
-        tc_data = await request.app.state.mdb.find_one(DB_COLLECTION_TC, {
-            "test_case_key": tc_key
-        })
-        te_data.update(tc_data)
-        cycle_executions[tc_key] = te_data
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=cycle_executions)
@@ -329,8 +324,18 @@ async def add_execution_to_cycle(request: Request,
                               f"already in cycle {test_cycle_key}"}
         )
 
+    # Get test case data
+    tc_data = await db.find_one(DB_COLLECTION_TC, {
+        "test_case_key": test_execution["test_case_key"],
+        "project_key": cycle_data["project_key"]
+    })
+
     # Add execution to cycle
-    exec_data = {test_execution["test_case_key"]: execution_key}
+    exec_data = {test_execution["test_case_key"]: {
+        "test_cycle_key": test_cycle_key,
+        "title": tc_data["title"],
+        "result": test_execution["result"]
+    }}
     cycle_data["executions"].update(exec_data)
     await db.update(DB_COLLECTION_TCY, cycle_data, {
         "test_cycle_key": test_cycle_key
