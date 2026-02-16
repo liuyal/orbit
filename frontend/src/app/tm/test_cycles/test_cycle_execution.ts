@@ -106,14 +106,13 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
   loadTestCaseAndExecutionData(testCaseKey: string, testExecutionKey: string) {
     console.log('Loading test case and execution data for:', testCaseKey);
 
-    // Fetch test case data
-    const testCaseUrl = `/api/tm/projects/${this.projectKey}/test-cases/${testCaseKey}`;
-    const testCaseRequest = this.http.get<any>(testCaseUrl);
-
-        // Fetch execution data
+    // Fetch execution data
     const executionUrl = `/api/tm/executions/${testExecutionKey}`;
     const executionRequest = this.http.get<any>(executionUrl);
 
+    // Fetch test case data
+    const testCaseUrl = `/api/tm/projects/${this.projectKey}/test-cases/${testCaseKey}`;
+    const testCaseRequest = this.http.get<any>(testCaseUrl);
 
     // Wait for both requests to complete. Keep subscriptions so we can cancel if user selects another execution.
     this.testCaseSub = testCaseRequest.subscribe({
@@ -128,8 +127,6 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
           if (testCaseData.status !== undefined) this.selectedExecution.status = testCaseData.status;
           if (testCaseData.priority !== undefined) this.selectedExecution.priority = testCaseData.priority;
           if (testCaseData.execution_key !== undefined) this.selectedExecution.execution_key = testCaseData.execution_key;
-
-          this.cdr.detectChanges();
         }
       },
       error: (err) => {
@@ -145,13 +142,14 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
           if (executionData.comment !== undefined) this.selectedExecution.comment = executionData.comment;
           if (executionData.executed_by !== undefined) this.selectedExecution.executed_by = executionData.executed_by;
           if (executionData.executed_at !== undefined) this.selectedExecution.executed_at = executionData.executed_at;
-          this.cdr.detectChanges();
         }
       },
       error: (err) => {
         console.error('Error loading execution data:', err);
       }
     });
+
+     this.cdr.detectChanges();
   }
 
   addTestCase() {
