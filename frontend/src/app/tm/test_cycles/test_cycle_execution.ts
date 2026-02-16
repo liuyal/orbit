@@ -91,7 +91,7 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
     // Fetch both test case data and execution data from backend
     this.loadTestCaseAndExecutionData(execution.test_case_key, execution.execution_key);
 
-     // Use the execution object from the list so updates remain consistent
+    // Use the execution object from the list so updates remain consistent
     this.selectedExecution = execution;
     // Ensure placeholder fields exist so UI doesn't appear empty
     if (this.selectedExecution) {
@@ -138,7 +138,9 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
       next: (executionData) => {
         console.log('Execution data loaded:', executionData);
         if (this.selectedExecution && executionData && typeof executionData === 'object') {
-          if (executionData.result !== undefined) this.selectedExecution.result = executionData.result;
+          // Only assign result when the backend returns a non-null/undefined value
+          // This prevents overwriting a valid default (e.g. 'NOT_EXECUTED') with null
+          if (executionData.result != null) this.selectedExecution.result = executionData.result;
           if (executionData.comment !== undefined) this.selectedExecution.comment = executionData.comment;
           if (executionData.executed_by !== undefined) this.selectedExecution.executed_by = executionData.executed_by;
           if (executionData.executed_at !== undefined) this.selectedExecution.executed_at = executionData.executed_at;
@@ -148,13 +150,13 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
         console.error('Error loading execution data:', err);
       }
     });
-
-     this.cdr.detectChanges();
+    this.cdr.detectChanges();
   }
 
   addTestCase() {
     // TODO: Implement add test case to cycle functionality
     console.log('Add test case to cycle');
+    this.cdr.detectChanges();
   }
 
 
@@ -180,6 +182,7 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
       console.warn('No testCycleKey provided to loadTestCycle()');
       return;
     }
+
     // Avoid duplicate concurrent loads
     if (this.loading) {
       console.debug('loadTestCycle skipped: already loading');
@@ -211,29 +214,29 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
         clearTimeout(timeout);
         console.log('Test cycle loaded in execution component:', data);
         try {
-            this.testCycle = this.testCycle || {};
-            this.testCycle.test_cycle_key = data.test_cycle_key || '';
-            this.testCycle.title = data.title || '';
-            this.testCycle.description = data.description || '';
-            // preserve current selection key so we can re-link after replacing executions
-            const previousSelectedKey = this.selectedExecution ? (this.selectedExecution.execution_key || this.selectedExecution.test_case_key) : null;
-            const newExecutions = data.executions
+          this.testCycle = this.testCycle || {};
+          this.testCycle.test_cycle_key = data.test_cycle_key || '';
+          this.testCycle.title = data.title || '';
+          this.testCycle.description = data.description || '';
+          // preserve current selection key so we can re-link after replacing executions
+          const previousSelectedKey = this.selectedExecution ? (this.selectedExecution.execution_key || this.selectedExecution.test_case_key) : null;
+          const newExecutions = data.executions
             ? Object.entries(data.executions).map(([test_case_key, exec]) => {
-                const execObj: any = (exec && typeof exec === 'object') ? exec : {};
-                return {
-                  test_case_key,
-                  ...execObj,
-                  result: execObj.result ?? 'NOT_EXECUTED'
-                };
-              }) : [];
-            this.testCycle.executions = newExecutions;
-            // If we had a selected execution, try to find the matching object in the new array and re-assign
-            if (previousSelectedKey && Array.isArray(this.testCycle.executions)) {
-              const matched = this.testCycle.executions.find((e: any) => (e.execution_key && e.execution_key === previousSelectedKey) || e.test_case_key === previousSelectedKey);
-              if (matched) {
-                this.selectedExecution = matched;
-              }
+              const execObj: any = (exec && typeof exec === 'object') ? exec : {};
+              return {
+                test_case_key,
+                ...execObj,
+                result: execObj.result ?? 'NOT_EXECUTED'
+              };
+            }) : [];
+          this.testCycle.executions = newExecutions;
+          // If we had a selected execution, try to find the matching object in the new array and re-assign
+          if (previousSelectedKey && Array.isArray(this.testCycle.executions)) {
+            const matched = this.testCycle.executions.find((e: any) => (e.execution_key && e.execution_key === previousSelectedKey) || e.test_case_key === previousSelectedKey);
+            if (matched) {
+              this.selectedExecution = matched;
             }
+          }
           this.populateExecutionTitles();
           // mark this key as loaded so subsequent duplicate calls are ignored
           this.lastLoadedKey = this.testCycleKey;
