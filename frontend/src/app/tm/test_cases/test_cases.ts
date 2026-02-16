@@ -63,7 +63,7 @@ export class TestCases implements OnInit {
     this.error = '';
     console.log('Loading test cases for project:', this.projectKey);
     console.log('API URL:', `/api/tm/projects/${this.projectKey}/test-cases`);
-    
+
     // Safety timeout to prevent infinite loading
     const timeout = setTimeout(() => {
       if (this.loading) {
@@ -73,7 +73,7 @@ export class TestCases implements OnInit {
         this.cdr.detectChanges();
       }
     }, 10000); // 10 second timeout
-    
+
     this.http.get<TestCase[]>(`/api/tm/projects/${this.projectKey}/test-cases`)
       .subscribe({
         next: (data) => {
@@ -110,12 +110,7 @@ export class TestCases implements OnInit {
   }
 
   editTestCase(testCase: TestCase) {
-    this.router.navigate([
-      '/test-cases',
-      this.projectKey,
-      'edit',
-      testCase.test_case_key
-    ]);
+    this.router.navigate(['/test-cases', this.projectKey, 'test-case', testCase.test_case_key]);
   }
 
   createTestCase() {
@@ -146,7 +141,7 @@ export class TestCases implements OnInit {
 
   updateFolders() {
     const folderMap = new Map<string, number>();
-    
+
     this.testCases.forEach(tc => {
       if (tc.folder) {
         folderMap.set(tc.folder, (folderMap.get(tc.folder) || 0) + 1);
@@ -168,17 +163,17 @@ export class TestCases implements OnInit {
     if (this.selectedFolder === null) {
       this.filteredTestCases = [...this.testCases];
     } else {
-      this.filteredTestCases = this.testCases.filter(tc => 
+      this.filteredTestCases = this.testCases.filter(tc =>
         tc.folder === this.selectedFolder
       );
     }
   }
 
   deleteFolder(folderName: string) {
-    const hasTestCases = this.testCases.some(tc => 
+    const hasTestCases = this.testCases.some(tc =>
       tc.folder === folderName
     );
-    
+
     if (hasTestCases) {
       alert('Cannot delete folder with test cases. Please move or delete test cases first.');
       return;
