@@ -162,19 +162,38 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
 
   // Fetch the title for each execution and set it
   populateExecutionTitles() {
-    if (!this.testCycle || !this.testCycle.executions) return;
-    for (const execution of this.testCycle.executions) {
-      const testCaseUrl = `/api/tm/projects/${this.projectKey}/test-cases/${execution.test_case_key}`;
-      this.http.get<any>(testCaseUrl).subscribe({
-        next: (testCaseData) => {
-          execution.title = testCaseData.title;
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error('Error loading test case title:', err);
+    // Use single API to fetch all executions for the cycle (includes title and result)
+    if (!this.testCycle) return;
+    const cycleKey = this.testCycle.test_cycle_key || this.testCycleKey;
+    if (!cycleKey) return;
+
+    const url = `/api/tm/cycles/${encodeURIComponent(cycleKey)}/executions`;
+    this.http.get<any[]>(url).subscribe({
+      next: (data) => {
+        if (!Array.isArray(data)) return;
+        // Build lookup by execution_key and test_case_key
+        const lookup = new Map<string, any>();
+        for (const item of data) {
+          if (item.execution_key) lookup.set(item.execution_key, item);
+          if (item.test_case_key) lookup.set(item.test_case_key, item);
         }
-      });
-    }
+
+        if (Array.isArray(this.testCycle.executions)) {
+          for (const execution of this.testCycle.executions) {
+            const key = execution.execution_key || execution.test_case_key;
+            const remote = lookup.get(key);
+            if (remote) {
+              if (remote.title !== undefined) execution.title = remote.title;
+              if (remote.result !== undefined && remote.result != null) execution.result = remote.result;
+            }
+          }
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error loading executions for cycle:', err);
+      }
+    });
   }
 
   loadTestCycle() {
@@ -196,8 +215,6 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
     }
 
     this.loading = true;
-    const url = `/api/tm/cycles/${this.testCycleKey}`;
-    console.log('Loading test cycle from URL:', url);
 
     // Safety timeout to prevent infinite loading
     const timeout = setTimeout(() => {
@@ -209,7 +226,7 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
       }
     }, 10000);
 
-    this.http.get<any>(url).subscribe({
+    this.http.get<any>(`/api/tm/cycles/${this.testCycleKey}`).subscribe({
       next: (data) => {
         clearTimeout(timeout);
         console.log('Test cycle loaded in execution component:', data);
@@ -218,18 +235,22 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
           this.testCycle.test_cycle_key = data.test_cycle_key || '';
           this.testCycle.title = data.title || '';
           this.testCycle.description = data.description || '';
-         
+
           // preserve current selection key so we can re-link after replacing executions
-          const previousSelectedKey = this.selectedExecution ? (this.selectedExecution.execution_key || this.selectedExecution.test_case_key) : null;
+          const previousSelectedKey = this.selectedExecution ? (
+            this.selectedExecution.execution_key || this.selectedExecution.test_case_key
+          ) : null;
           const newExecutions = data.executions ? Object.entries(data.executions).map(([test_case_key, exec]) => {
             const execObj: any = (exec && typeof exec === 'object') ? exec : {};
             return { test_case_key, ...execObj, result: execObj.result ?? 'NOT_EXECUTED' };
           }) : [];
           this.testCycle.executions = newExecutions;
-          
+
           // If selected execution, try to find the matching object in the new array and re-assign
           if (previousSelectedKey && Array.isArray(this.testCycle.executions)) {
-            const matched = this.testCycle.executions.find((e: any) => (e.execution_key && e.execution_key === previousSelectedKey) || e.test_case_key === previousSelectedKey);
+            const matched = this.testCycle.executions.find((e: any) =>
+              (e.execution_key && e.execution_key === previousSelectedKey) || e.test_case_key === previousSelectedKey
+            );
             if (matched) {
               this.selectedExecution = matched;
             }
