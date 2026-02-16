@@ -390,7 +390,8 @@ async def update_execution_by_key(request: Request,
 
     # Get the test case
     tc_data = await db.find_one(DB_COLLECTION_TC, {
-        "test_case_key": request_data["test_case_key"]
+        "test_case_key": request_data["test_case_key"],
+        "last_execution_key": execution_key
     })
     if tc_data is None:
         return JSONResponse(
@@ -401,7 +402,8 @@ async def update_execution_by_key(request: Request,
     tc_data["updated_at"] = get_current_utc_time()
     tc_data["last_result"] = request_data["result"]
     await db.update(DB_COLLECTION_TC, tc_data, {
-        "test_case_key": request_data["test_case_key"]
+        "test_case_key": request_data["test_case_key"],
+        "last_execution_key": execution_key
     })
 
     # Retrieve the updated test execution from the database
