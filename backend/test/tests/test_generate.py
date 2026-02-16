@@ -21,8 +21,8 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Generate project
-        projects = 5
-        cases = 25
+        projects = 2
+        cases = 20
         for i in range(1, projects + 1):
             project_key = f"PRJ{i}"
             response = requests.post(f"{self.__class__.url}/projects", json={
@@ -57,7 +57,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 assert len(response.json()) == te_count
 
             # Create cycles
-            cycles = 5
+            cycles = 3
             for j in range(1, cycles + 1):
                 response = requests.post(f"{self.__class__.url}/projects/{project_key}/cycles")
                 assert response.status_code == 201

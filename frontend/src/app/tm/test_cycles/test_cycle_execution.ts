@@ -218,28 +218,27 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
           this.testCycle.test_cycle_key = data.test_cycle_key || '';
           this.testCycle.title = data.title || '';
           this.testCycle.description = data.description || '';
+         
           // preserve current selection key so we can re-link after replacing executions
           const previousSelectedKey = this.selectedExecution ? (this.selectedExecution.execution_key || this.selectedExecution.test_case_key) : null;
-          const newExecutions = data.executions
-            ? Object.entries(data.executions).map(([test_case_key, exec]) => {
-              const execObj: any = (exec && typeof exec === 'object') ? exec : {};
-              return {
-                test_case_key,
-                ...execObj,
-                result: execObj.result ?? 'NOT_EXECUTED'
-              };
-            }) : [];
+          const newExecutions = data.executions ? Object.entries(data.executions).map(([test_case_key, exec]) => {
+            const execObj: any = (exec && typeof exec === 'object') ? exec : {};
+            return { test_case_key, ...execObj, result: execObj.result ?? 'NOT_EXECUTED' };
+          }) : [];
           this.testCycle.executions = newExecutions;
-          // If we had a selected execution, try to find the matching object in the new array and re-assign
+          
+          // If selected execution, try to find the matching object in the new array and re-assign
           if (previousSelectedKey && Array.isArray(this.testCycle.executions)) {
             const matched = this.testCycle.executions.find((e: any) => (e.execution_key && e.execution_key === previousSelectedKey) || e.test_case_key === previousSelectedKey);
             if (matched) {
               this.selectedExecution = matched;
             }
           }
+
           this.populateExecutionTitles();
           // mark this key as loaded so subsequent duplicate calls are ignored
           this.lastLoadedKey = this.testCycleKey;
+
         } catch (error) {
           console.error('Error processing test cycle data in child:', error);
           this.apiError = 'Error processing test cycle data';
