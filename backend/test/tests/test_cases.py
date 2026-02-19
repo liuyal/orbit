@@ -41,7 +41,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
 
             # Create test cases for the project
             for j in range(1, cases + 1):
-                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json={
+                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json={
                     "test_case_key": f"{project_key}-T{j}",
                     "project_key": project_key,
                 })
@@ -80,7 +80,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
 
             # Create test cases for the project
             for j in range(1, cases + 1):
-                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json={
+                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json={
                     "test_case_key": f"{project_key}-T{j}",
                     "project_key": project_key
                 })
@@ -113,7 +113,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         for i in range(1, projects + 1):
             # Create Test cases for non-existent project (should fail)
             project_key = f"PRJ{i}"
-            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases")
+            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case")
             assert response.status_code == 404
 
             # Create project
@@ -126,7 +126,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
             # Create test cases for the project
             for j in range(1, cases + 1):
                 count += 1
-                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json={
+                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json={
                     "test_case_key": f"{project_key}-T{j}",
                     "project_key": project_key,
                     "title": f"Test Case {j} for {project_key}",
@@ -193,7 +193,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
             # Create test cases for the project
             for j in range(1, cases + 1):
                 count += 1
-                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json={
+                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json={
                     "test_case_key": f"{project_key}-T{j}",
                     "project_key": project_key,
                 })
@@ -239,7 +239,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         # Create test cases for the project
         cases = 20
         for j in range(1, cases + 1):
-            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json={
+            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json={
                 "test_case_key": f"{project_key}-T{j}",
                 "project_key": project_key,
                 "title": f"Test Case {j} for {project_key}",
@@ -292,7 +292,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
 
         # Create test cases for the project
         j = 1
-        response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json={
+        response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json={
             "test_case_key": f"{project_key}-T{j}",
             "project_key": project_key,
             "title": f"Test Case {j} for {project_key}",
@@ -387,7 +387,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         cases = 10
         project_key = f"PRJ{1}"
         for j in range(1, cases + 1):
-            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json={
+            response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json={
                 "test_case_key": f"{project_key}-T{j}",
                 "project_key": project_key,
             })

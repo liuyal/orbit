@@ -36,7 +36,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
             execution_list = []
             for j in range(1, cases + 1):
                 test_case_key = f"{project_key}-T{j}"
-                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json={
+                response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json={
                     "test_case_key": test_case_key,
                     "project_key": project_key,
                     "title": f"Test Case #{j} ({project_key})"

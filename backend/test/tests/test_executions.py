@@ -33,7 +33,7 @@ class TestOrbitTMExecutions(OrbitTMBaseTest):
         # project_key = "PRJ0"
         # for i in range(0, n):
         #     payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
-        #     response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json=payload)
+        #     response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json=payload)
         #     assert response.status_code == 201
         #
         # response = requests.get(f"{self.__class__.url}/test-cases")
@@ -43,7 +43,7 @@ class TestOrbitTMExecutions(OrbitTMBaseTest):
         # project_key = "PRJ1"
         # for i in range(0, n):
         #     payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
-        #     response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases", json=payload)
+        #     response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json=payload)
         #     assert response.status_code == 201
         #
         # response = requests.get(f"{self.__class__.url}/test-cases")
