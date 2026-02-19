@@ -234,6 +234,12 @@
   font-weight: bold;
 }
 
+.status-badge[data-status="EXPECTED FAIL"] {
+  background-color: #5209a5;
+  color: #fff;
+  font-weight: bold;
+}
+
 .status-badge[data-status="ACTIVE"] {
   background-color: #4caf50;
   color: #fff;

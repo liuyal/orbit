@@ -353,6 +353,12 @@
   font-weight: bold;
 }
 
+.status-badge[data-status="EXPECTED FAIL"] {
+  background-color: #5209a5;
+  color: #fff;
+  font-weight: bold;
+}
+
 /* Priority Badge Variants */
 .priority-badge[data-priority="HIGH"] {
   background-color: #ff1100;
