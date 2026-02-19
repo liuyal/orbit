@@ -71,7 +71,6 @@
                 <th>Key</th>
                 <th>Title</th>
                 <th>Status</th>
-                <th>Priority</th>
                 <th>Result</th>
                 <th></th>
               </tr>
@@ -84,11 +83,6 @@
                 <td>
                   <span class="status-badge" [attr.data-status]="testCase.status">
                     {{ testCase.status || 'N/A' }}
-                  </span>
-                </td>
-                <td>
-                  <span class="priority-badge" [attr.data-priority]="testCase.priority">
-                    {{ testCase.priority || 'N/A' }}
                   </span>
                 </td>
                 <td>
