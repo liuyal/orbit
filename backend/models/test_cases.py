@@ -27,6 +27,7 @@ class TestCase(BaseModel):
     test_script: str | None
     last_result: str | None
     last_execution_key: str | None
+    failing_steps: str | None
     test_frequency: list = []
     labels: list = []
     links: list = []
@@ -43,6 +44,7 @@ class TestCaseCreate(BaseModel):
     test_script: str = None
     last_result: str = None
     last_execution_key: str = None
+    failing_steps: str = None
     test_frequency: list = []
     labels: list = []
     links: list = []
@@ -57,6 +59,7 @@ class TestCaseUpdate(BaseModel):
     test_script: str = None
     last_result: str = None
     last_execution_key: str = None
+    failing_steps: str = None
     test_frequency: list = []
     labels: list = []
     links: list = []
