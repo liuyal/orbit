@@ -40,6 +40,7 @@ def build_parser():
         '-s', '--skip-background-tasks',
         dest='skip_background_tasks',
         action='store_true',
+        default=False,
         help='Set skip background task mode'
     )
     parser.add_argument(
