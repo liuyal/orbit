@@ -51,7 +51,7 @@ TEST_CASE_SCHEMA = pydantic_to_mongo_jsonschema(TestCase.model_json_schema())
 TEST_EXECUTION_SCHEMA = pydantic_to_mongo_jsonschema(TestExecution.model_json_schema())
 TEST_CYCLE_SCHEMA = pydantic_to_mongo_jsonschema(TestCycle.model_json_schema())
 
-DB_COLLECTIONS = [
+TM_DB_COLLECTIONS = [
     (DB_COLLECTION_PRJ, PROJECT_SCHEMA),
     (DB_COLLECTION_TC, TEST_CASE_SCHEMA),
     (DB_COLLECTION_TE, TEST_EXECUTION_SCHEMA),

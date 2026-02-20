@@ -12,7 +12,7 @@ import logging
 from fastapi import APIRouter, Request, status, Response
 from fastapi.responses import RedirectResponse
 
-from backend.app.app_def import API_VERSION, DB_COLLECTIONS
+from backend.app.app_def import API_VERSION, TM_DB_COLLECTIONS
 
 router = APIRouter()
 
@@ -49,7 +49,7 @@ async def reset_server_db(request: Request):
 
     # Reset the database
     db = request.app.state.mdb
-    await db.configure(clean_db=True)
+    await db.configure(clean_db="all")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -62,11 +62,6 @@ async def reset_tm_server_db(request: Request):
 
     # Reset the database
     db = request.app.state.mdb
-
-    # Initialize required collections
-    for collection, schema in DB_COLLECTIONS:
-        await db.db_client[db.db_name].drop_collection(collection)
-        await db.db_client[db.db_name].create_collection(collection,
-                                                         validator={"$jsonSchema": schema})
+    await db.configure(clean_db="tm")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

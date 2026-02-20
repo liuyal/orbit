@@ -18,7 +18,7 @@ from backend.app.app_def import (
     MONGODB_HOST,
     MONGODB_PORT,
     MONGODB_USER,
-    DB_COLLECTIONS
+    TM_DB_COLLECTIONS
 )
 from backend.db.db import (
     DatabaseClient,
@@ -68,10 +68,14 @@ class MongoClient(DatabaseClient):
                         **kwargs) -> None:
         """Configure database connection parameters"""
 
-        # Drop the database if in debug mode
-        clean_db = "clean_db" in kwargs and kwargs["clean_db"]
-        if clean_db:
+        if "clean_db" in kwargs and kwargs["clean_db"] == "all":
+            # Clean up entire database
             await self._db_client.drop_database(self._db_name)
+
+        elif "clean_db" in kwargs and kwargs["clean_db"] == "tm":
+            # Clean up collection only in tm
+            for collection, schema in TM_DB_COLLECTIONS:
+                await self._db_client[self._db_name].drop_collection(collection)
 
         # Initialize the database
         if self._db_name not in await self._db_client.list_database_names():
@@ -80,7 +84,7 @@ class MongoClient(DatabaseClient):
 
         # Initialize required collections
         collections = await self._db_client[self._db_name].list_collection_names()
-        for collection, schema in DB_COLLECTIONS:
+        for collection, schema in TM_DB_COLLECTIONS:
             if collection not in collections:
                 await self._db_client[self._db_name].create_collection(collection,
                                                                        validator={"$jsonSchema": schema})
@@ -118,7 +122,7 @@ class MongoClient(DatabaseClient):
     async def update(self,
                      table: str,
                      data: dict,
-                     query: dict ) -> tuple:
+                     query: dict) -> tuple:
         """Update records in the database."""
 
         result = await self._db_client[self._db_name][table].update_many(query,
