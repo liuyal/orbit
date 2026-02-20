@@ -9,7 +9,7 @@
 
 import json
 import re
-from typing import Optional, Union
+from typing import Optional
 
 from fastapi import (
     APIRouter,
@@ -22,7 +22,7 @@ from starlette.responses import JSONResponse
 from backend.app.app_def import (
     DB_COLLECTION_PRJ,
     DB_COLLECTION_TE,
-DB_COLLECTION_TC,
+    DB_COLLECTION_TC,
     DB_COLLECTION_TCY,
     TCY_KEY_PREFIX,
     API_VERSION
@@ -33,12 +33,6 @@ from backend.models.test_cycles import (
     TestCycleCreate,
     TestCycleUpdate
 
-)
-from backend.routes.test_cases import (
-    TestCase
-)
-from backend.routes.test_executions import (
-    TestExecution
 )
 
 router = APIRouter()
@@ -254,6 +248,8 @@ async def get_cycle_executions(request: Request,
                                test_cycle_key: str):
     """Get all test executions associated with a specific test cycle"""
 
+    db = request.app.state.mdb
+
     response = await get_cycle_by_key(request, test_cycle_key)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
@@ -261,8 +257,21 @@ async def get_cycle_executions(request: Request,
     cycle_data = json.loads(response.body.decode())
     cycle_executions = cycle_data.get("executions")
 
+    result_data = {}
+    for tc_key, exec_key in cycle_executions.items():
+        # Retrieve test execution data
+        exec_data = await db.find_one(DB_COLLECTION_TE, {
+            "execution_key": exec_key["execution_key"]
+        })
+        tc_data = await db.find_one(DB_COLLECTION_TC, {
+            "test_case_key": tc_key
+        })
+        exec_data.update(tc_data)
+
+        result_data[tc_key] = exec_data
+
     return JSONResponse(status_code=status.HTTP_200_OK,
-                        content=cycle_executions)
+                        content=result_data)
 
 
 @router.post(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}/executions",
@@ -318,17 +327,9 @@ async def add_execution_to_cycle(request: Request,
                               f"already in cycle {test_cycle_key}"}
         )
 
-    # Get test case data
-    tc_data = await db.find_one(DB_COLLECTION_TC, {
-        "test_case_key": test_execution["test_case_key"],
-        "project_key": cycle_data["project_key"]
-    })
-
     # Add execution to cycle
     exec_data = {test_execution["test_case_key"]: {
-        "execution_key": execution_key,
-        "title": tc_data["title"],
-        "result": test_execution["result"]
+        "execution_key": execution_key
     }}
     cycle_data["executions"].update(exec_data)
     await db.update(DB_COLLECTION_TCY, cycle_data, {

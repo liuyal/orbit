@@ -388,25 +388,28 @@ async def update_execution_by_key(request: Request,
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{execution_key} not found"})
 
+    # Retrieve the updated test execution from the database
+    updated_test_execution = await db.find_one(DB_COLLECTION_TE, {
+        "execution_key": execution_key
+    })
+
+    # get the test case key from the updated test execution
+    test_case_key = updated_test_execution["test_case_key"]
+
     # Get the test case
     tc_data = await db.find_one(DB_COLLECTION_TC, {
-        "test_case_key": request_data["test_case_key"]
+        "test_case_key": test_case_key
     })
     if tc_data is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"error": f"{request_data['test_case_key']} not found"}
+            content={"error": f"{test_case_key} not found"}
         )
     # Update test case info
     tc_data["updated_at"] = get_current_utc_time()
     tc_data["last_result"] = request_data["result"]
     await db.update(DB_COLLECTION_TC, tc_data, {
-        "test_case_key": request_data["test_case_key"]
-    })
-
-    # Retrieve the updated test execution from the database
-    updated_test_execution = await db.find_one(DB_COLLECTION_TE, {
-        "execution_key": execution_key
+        "test_case_key": test_case_key
     })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
