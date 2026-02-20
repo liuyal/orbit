@@ -25,6 +25,9 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
   selectedExecution: any = null;
   loading: boolean = false;
   apiError: string = '';
+  
+  // Local executions array - populated from API, used by template
+  executions: any[] = [];
 
   @ViewChild('scriptEditorContainer', { static: false })
   scriptEditorContainer?: ElementRef<HTMLDivElement>;
@@ -78,7 +81,6 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
   }
 
   ngOnDestroy() {
-    // Dispose CodeMirror editor if present
   }
 
   selectExecution(execution: any) {
@@ -159,35 +161,63 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
     this.cdr.detectChanges();
   }
 
-
   // Fetch the title for each execution and set it
   populateExecutionTitles() {
     // Use single API to fetch all executions for the cycle (includes title and result)
-    if (!this.testCycle) return;
-    const cycleKey = this.testCycle.test_cycle_key || this.testCycleKey;
-    if (!cycleKey) return;
+    const cycleKey = this.testCycle?.test_cycle_key || this.testCycleKey;
+    if (!cycleKey) {
+      console.warn('populateExecutionTitles: no cycle key available');
+      return;
+    }
+
+    // Ensure testCycle object exists
+    if (!this.testCycle) {
+      this.testCycle = { test_cycle_key: cycleKey, executions: [] };
+    }
 
     const url = `/api/tm/cycles/${encodeURIComponent(cycleKey)}/executions`;
-    this.http.get<any[]>(url).subscribe({
+    console.log('populateExecutionTitles: fetching', url);
+
+    this.http.get<any>(url).subscribe({
       next: (data) => {
-        if (!Array.isArray(data)) return;
-        // Build lookup by execution_key and test_case_key
-        const lookup = new Map<string, any>();
-        for (const item of data) {
-          if (item.execution_key) lookup.set(item.execution_key, item);
-          if (item.test_case_key) lookup.set(item.test_case_key, item);
+        console.log('populateExecutionTitles: received data', data);
+        if (!data) {
+          console.warn('populateExecutionTitles: no data received');
+          return;
         }
 
-        if (Array.isArray(this.testCycle.executions)) {
-          for (const execution of this.testCycle.executions) {
-            const key = execution.execution_key || execution.test_case_key;
-            const remote = lookup.get(key);
-            if (remote) {
-              if (remote.title !== undefined) execution.title = remote.title;
-              if (remote.result !== undefined && remote.result != null) execution.result = remote.result;
-            }
+        // Normalize response into an array of execution-like objects.
+        // API returns object keyed by test_case_key: {LIB-T2: {...}, LIB-T3: {...}}
+        let items: any[] = [];
+        if (Array.isArray(data)) {
+          items = data;
+        } else if (data && typeof data === 'object') {
+          try {
+            items = Object.entries(data).map(([key, exec]: [string, any]) => {
+              // exec already contains the full execution object with test_case_key, title, result, etc.
+              return { ...exec, test_case_key: exec?.test_case_key || key };
+            });
+          } catch (e) {
+            console.error('Error normalizing executions response:', e);
+            return;
           }
         }
+
+        console.log('populateExecutionTitles: normalized items count:', items.length);
+
+        // Replace executions array with enriched data from the API response
+        // This ensures the sidebar shows titles and results
+        this.executions = items.map((item: any) => ({
+          ...item,
+          result: item.result ?? 'NOT_EXECUTED'
+        }));
+        
+        // Also update testCycle.executions for consistency
+        if (this.testCycle) {
+          this.testCycle.executions = this.executions;
+        }
+        
+        console.log('populateExecutionTitles: updated executions count:', this.executions.length);
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -228,37 +258,26 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
 
     this.http.get<any>(`/api/tm/cycles/${this.testCycleKey}`).subscribe({
       next: (data) => {
+
         clearTimeout(timeout);
         console.log('Test cycle loaded in execution component:', data);
+        
         try {
           this.testCycle = this.testCycle || {};
           this.testCycle.test_cycle_key = data.test_cycle_key || '';
           this.testCycle.title = data.title || '';
           this.testCycle.description = data.description || '';
 
-          // preserve current selection key so we can re-link after replacing executions
-          const previousSelectedKey = this.selectedExecution ? (
-            this.selectedExecution.execution_key || this.selectedExecution.test_case_key
-          ) : null;
-          const newExecutions = data.executions ? Object.entries(data.executions).map(([test_case_key, exec]) => {
-            const execObj: any = (exec && typeof exec === 'object') ? exec : {};
-            return { test_case_key, ...execObj, result: execObj.result ?? 'NOT_EXECUTED' };
-          }) : [];
-          this.testCycle.executions = newExecutions;
+          // Initialize executions as empty array - populateExecutionTitles() will fill it
+          // with complete data including titles and results from the executions API
+          this.testCycle.executions = [];
 
-          // If selected execution, try to find the matching object in the new array and re-assign
-          if (previousSelectedKey && Array.isArray(this.testCycle.executions)) {
-            const matched = this.testCycle.executions.find((e: any) =>
-              (e.execution_key && e.execution_key === previousSelectedKey) || e.test_case_key === previousSelectedKey
-            );
-            if (matched) {
-              this.selectedExecution = matched;
-            }
-          }
-
-          this.populateExecutionTitles();
           // mark this key as loaded so subsequent duplicate calls are ignored
           this.lastLoadedKey = this.testCycleKey;
+
+          // Fetch execution details (titles/results) and populate the sidebar list.
+          // This is the primary source of execution data.
+          this.populateExecutionTitles();
 
         } catch (error) {
           console.error('Error processing test cycle data in child:', error);
