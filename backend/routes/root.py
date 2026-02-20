@@ -64,13 +64,9 @@ async def reset_tm_server_db(request: Request):
     db = request.app.state.mdb
 
     # Initialize required collections
-    collections = await db[db.db_name].list_collection_names()
     for collection, schema in DB_COLLECTIONS:
-        await db[db.db_name].drop_collection(collection)
-        await db[db.db_name].create_collection(collection)
-
-        if collection not in collections:
-            await db[db.db_name].create_collection(collection,
-                                                   validator={"$jsonSchema": schema})
+        await db.db_client[db.db_name].drop_collection(collection)
+        await db.db_client[db.db_name].create_collection(collection,
+                                                         validator={"$jsonSchema": schema})
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
