@@ -216,44 +216,20 @@
 }
 
 /* Status Badge Variants */
-.status-badge[data-status="APPROVED"] {
-  background-color: #4caf50;
-  color: #fff;
-  font-weight: bold;
-}
-
-.status-badge[data-status="DRAFT"] {
-  background-color: #ffd700;
-  color: #222222;
-  font-weight: bold;
-}
-
-.status-badge[data-status="DEPRECATED"] {
-  background-color: #9c27b0;
-  color: #fff;
-  font-weight: bold;
-}
-
-.status-badge[data-status="EXPECTED FAIL"] {
-  background-color: #5209a5;
-  color: #fff;
-  font-weight: bold;
-}
-
-.status-badge[data-status="ACTIVE"] {
-  background-color: #4caf50;
-  color: #fff;
-  font-weight: bold;
-}
-
-.status-badge[data-status="COMPLETED"] {
-  background-color: #2196f3;
-  color: #fff;
-  font-weight: bold;
-}
-
-.status-badge[data-status="ARCHIVED"] {
+.status-badge[data-status="NOT_STARTED"] {
   background-color: #757575;
+  color: #fff;
+  font-weight: bold;
+}
+
+.status-badge[data-status="IN_PROGRESS"] {
+  background-color: #4caf50;
+  color: #fff;
+  font-weight: bold;
+}
+
+.status-badge[data-status="DONE"] {
+  background-color: #2196f3;
   color: #fff;
   font-weight: bold;
 }
