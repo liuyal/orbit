@@ -128,13 +128,13 @@
   width: 15%;
 }
 .test-cycles-list th:nth-child(2) {
-  width: 50%;
+  width: 40%;
 }
 .test-cycles-list th:nth-child(3) {
-  width: 25%;
+  width: 20%;
 }
 .test-cycles-list th:nth-child(4) {
-  width: 25%;
+  width: 15%;
 }
 
 .test-cycles-list {
@@ -247,7 +247,6 @@
   font-weight: bold;
 }
 
-
 /* ========================================
    EMPTY STATE
    ======================================== */
@@ -271,7 +270,6 @@
 .empty-state p {
   margin: 5px 0;
 }
-
 
 /* ========================================
    ERROR STATE
@@ -302,14 +300,12 @@
   max-width: 600px;
 }
 
-
 /* ========================================
    ACTION BUTTONS
    ======================================== */
 
 .action-buttons {
   display: flex;
-  gap: 8px;
   justify-content: flex-end;
 }
 
@@ -325,15 +321,6 @@
   justify-content: center;
 }
 
-.action-btn.edit {
-  background-color: #0057adff;
-  color: #fff;
-}
-
-.action-btn.edit:hover {
-  background-color: #0069d9;
-}
-
 .action-btn.delete {
   background-color: #dc3545;
   color: #fff;
@@ -341,8 +328,4 @@
 
 .action-btn.delete:hover {
   background-color: #c82333;
-}
-
-.action-btn i {
-  font-size: 14px;
 }

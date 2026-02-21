@@ -59,9 +59,6 @@
             <td>{{ testCycle.executions?.length || 0 }}</td>
             <td>
               <div class="action-buttons">
-                <button class="action-btn edit" (click)="$event.stopPropagation(); editTestCycle(testCycle)">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </button>
                 <button class="action-btn delete" (click)="$event.stopPropagation(); deleteTestCycle(testCycle)">
                   <i class="fa-solid fa-trash"></i>
                 </button>

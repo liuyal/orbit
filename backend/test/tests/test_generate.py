@@ -42,6 +42,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                     "test_case_key": test_case_key,
                     "project_key": project_key,
                     "title": f"Test Case #{j} ({project_key}) - {uuid.uuid4()}",
+                    "description": f"Description for Test Case #{j} in {project_key} - {uuid.uuid4()}",
                     "status": random.choice(["APPROVED", "DRAFT"]),
                     "test_frequency": [random.choice(["NIGHTLY", "WEEKLY"])],
                     "labels": random.sample(["A", "B", "C"], k=random.randint(1, 3))
@@ -76,7 +77,11 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                     # Add execution to cycle
                     execution = execution_list.pop()
                     response = requests.post(f"{self.__class__.url}/cycles/{cycle_key}/executions", params={
-                        "execution_key": execution
+                        "execution_key": execution,
+                        "custom_field_values": {
+                            "custom_field_1": f"Value {i} for {execution}",
+                            "custom_field_2": f"Value {i} for {execution}"
+                        }
                     })
                     assert response.status_code == 200
 

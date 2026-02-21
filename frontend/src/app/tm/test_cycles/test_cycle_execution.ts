@@ -140,11 +140,8 @@ export class TestCycleExecutionComponent implements OnInit, AfterViewInit, OnDes
       next: (executionData) => {
         console.log('Execution data loaded:', executionData);
         if (this.selectedExecution && executionData && typeof executionData === 'object') {
-          // Only assign result when the backend returns a non-null/undefined value
-          // This prevents overwriting a valid default (e.g. 'NOT_EXECUTED') with null
           if (executionData.result != null) this.selectedExecution.result = executionData.result;
-          if (executionData.comment !== undefined) this.selectedExecution.comment = executionData.comment;
-          if (executionData.executed_by !== undefined) this.selectedExecution.executed_by = executionData.executed_by;
+          if (executionData.comments !== undefined) this.selectedExecution.comments = executionData.comments;
           if (executionData.executed_at !== undefined) this.selectedExecution.executed_at = executionData.executed_at;
         }
       },
