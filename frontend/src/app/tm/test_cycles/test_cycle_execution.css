@@ -72,7 +72,7 @@
 .test-case-item {
   padding: 15px 20px;
   border-bottom: 1px solid #2a2a2a;
-  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -83,23 +83,23 @@
 
 .test-case-item.selected {
   background-color: #2a2a2a;
-  border-left: 3px solid #0057adff;
+  border-right: 3px solid #0057adff;
 }
 
 .test-case-item[data-status="PASS"] {
-  border-right-color: #4caf50;
+  border-left-color: #4caf50;
 }
 
 .test-case-item[data-status="FAIL"] {
-  border-right-color: #f44336;
+  border-left-color: #f44336;
 }
 
 .test-case-item[data-status="BLOCKED"] {
-  border-right-color: #2196f3;
+  border-left-color: #2196f3;
 }
 
 .test-case-item[data-status="NOT_EXECUTED"] {
-  border-right-color: #757575;
+  border-left-color: #757575;
 }
 
 .test-case-header {
