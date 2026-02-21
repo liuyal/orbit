@@ -53,6 +53,7 @@ export class Project implements OnInit {
   loadProjects() {
     this.isLoading = true;
     this.error = '';
+
     this.http.get<any[]>('/api/tm/projects').subscribe({
       next: (data) => {
         this.projects = data;
@@ -80,6 +81,7 @@ export class Project implements OnInit {
         this.cdr.detectChanges();
       }
     });
+
     // Add a safety timeout to prevent infinite loading
     setTimeout(() => {
       if (this.isLoading) {
@@ -97,10 +99,6 @@ export class Project implements OnInit {
 
   closeModal() {
     this.showCreateModal = false;
-    this.resetForm();
-  }
-
-  resetForm() {
     this.newProject = {
       project_key: '',
       description: '',
@@ -148,10 +146,8 @@ export class Project implements OnInit {
       error: (error) => {
         console.error('Error creating project:', error);
         console.log('Error object:', JSON.stringify(error, null, 2));
-
         // Extract error message from API response
         let errorMessage = 'Failed to create project. Please try again.';
-
         if (error.error) {
           // If error.error is a string, use it directly
           if (typeof error.error === 'string') {
@@ -188,10 +184,6 @@ export class Project implements OnInit {
 
   closeEditModal() {
     this.showEditModal = false;
-    this.resetEditForm();
-  }
-
-  resetEditForm() {
     this.editProjectData = {
       project_key: '',
       description: '',
@@ -215,7 +207,7 @@ export class Project implements OnInit {
     console.log('Submitting edited project:', this.editProjectData);
     const url = `/api/tm/projects/${this.editProjectData.project_key}`;
 
-    // Prepare the update payload (description, is_active, and labels)
+    // Prepare the update payload
     const updatePayload = {
       description: this.editProjectData.description,
       is_active: this.editProjectData.is_active,
@@ -228,29 +220,10 @@ export class Project implements OnInit {
         this.closeEditModal();
         this.loadProjects();
       },
+
       error: (error) => {
         console.error('Error updating project:', error);
-        console.log('Error object:', JSON.stringify(error, null, 2));
-
-        // Extract error message from API response
-        let errorMessage = 'Failed to update project. Please try again.';
-
-        if (error.error) {
-          if (typeof error.error === 'string') {
-            errorMessage = error.error;
-          }
-          else if (typeof error.error === 'object') {
-            errorMessage = error.error.message
-              || error.error.detail
-              || error.error.error
-              || JSON.stringify(error.error);
-          }
-        } else if (error.message) {
-          errorMessage = error.message;
-        } else if (error.statusText) {
-          errorMessage = `${error.status}: ${error.statusText}`;
-        }
-        this.apiError = errorMessage;
+        this.apiError = error.error || 'Failed to update project. Please try again.';
         this.cdr.detectChanges();
       }
     });
@@ -273,20 +246,15 @@ export class Project implements OnInit {
     }
   }
 
-  navigateToTestCases(projectKey: string) {
-    console.log('Navigating to test cases for project:', projectKey);
-    this.router.navigate(['/test-cases', projectKey]);
-  }
-
   onProjectClick(event: MouseEvent, projectKey: string) {
-    if (event.button === 1) { // Middle mouse button
+    if (event.button === 1) {
+      // Middle mouse button
       event.preventDefault();
-      const url = this.router.serializeUrl(
-        this.router.createUrlTree(['/test-cases', projectKey])
-      );
+      const url = this.router.serializeUrl(this.router.createUrlTree(['/test-cases', projectKey]));
       window.open(url, '_blank');
-    } else if (event.button === 0) { // Left mouse button
-      this.navigateToTestCases(projectKey);
+    } else if (event.button === 0) {
+      // Left mouse button
+      this.router.navigate(['/test-cases', projectKey]);
     }
   }
 
@@ -295,7 +263,6 @@ export class Project implements OnInit {
       event.preventDefault();
       const input = event.target as HTMLInputElement;
       const label = input.value.trim();
-
       if (label) {
         const targetLabels = isEdit ? this.editProjectData.labels : this.newProject.labels;
         if (!targetLabels.includes(label)) {

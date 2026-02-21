@@ -71,6 +71,8 @@
                 <th>Key</th>
                 <th>Title</th>
                 <th>Status</th>
+                <th>Frequency</th>
+                <th>Appliance</th>
                 <th>Result</th>
                 <th></th>
               </tr>
@@ -85,6 +87,8 @@
                     {{ testCase.status || 'N/A' }}
                   </span>
                 </td>
+                <td>{{ testCase.test_frequency || '-' }}</td>
+                <td>{{ ((testCase.labels | slice:0) || []).sort().join(',') || '-' }}</td>
                 <td>
                   <span class="result-badge" [attr.data-result]="testCase.last_result || 'NOT_EXECUTED'"
                     [attr.title]="testCase.last_result || 'Not Executed'">

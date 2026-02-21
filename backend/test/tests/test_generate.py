@@ -6,6 +6,8 @@
 # ================================================================
 
 import logging
+import random
+import uuid
 
 import pytest
 import requests
@@ -22,7 +24,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
 
         # Generate project
         projects = 2
-        cases = 20
+        cases = 50
         for i in range(1, projects + 1):
             project_key = f"PRJ{i}"
             response = requests.post(f"{self.__class__.url}/projects", json={
@@ -39,17 +41,22 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json={
                     "test_case_key": test_case_key,
                     "project_key": project_key,
-                    "title": f"Test Case #{j} ({project_key})"
+                    "title": f"Test Case #{j} ({project_key}) - {uuid.uuid4()}",
+                    "status": random.choice(["APPROVED", "DRAFT"]),
+                    "test_frequency": [random.choice(["NIGHTLY", "WEEKLY"])],
+                    "labels": random.sample(["A", "B", "C"], k=random.randint(1, 3))
                 })
                 assert response.status_code == 201
 
                 # Generate test executions for test cases
-                te_count = 20
+                te_count = 1
                 for l in range(1, te_count + 1):
-                    response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
+                    response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json={
+                        "result": random.choice(["PASS", "FAIL", "BLOCKED", "NOT_EXECUTED"]),
+                        "comments": f"Execution {l} for {test_case_key} - {uuid.uuid4()}"
+                    })
                     assert response.status_code == 201
-                    if l == 3:
-                        execution_list.append(response.json().get("execution_key"))
+                    execution_list.append(response.json().get("execution_key"))
 
                 # Check test executions created for test case
                 response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
@@ -63,11 +70,11 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 assert response.status_code == 201
                 cycle_key = response.json().get("test_cycle_key")
 
-                for i in range(1, 5 + 1):
+                for i in range(1, len(execution_list) + 1):
                     # Add execution to cycle
-                    last_execution = execution_list.pop()
+                    execution = execution_list.pop()
                     response = requests.post(f"{self.__class__.url}/cycles/{cycle_key}/executions", params={
-                        "execution_key": last_execution
+                        "execution_key": execution
                     })
                     assert response.status_code == 200
 

@@ -269,8 +269,27 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 2px solid #004090;
-  width: 20%;
   background-color: #0057ad;
+}
+
+/* Column width layout: 10% / 30% / 30% / 30% for first four columns */
+.test-cases-list th:nth-child(1) {
+  width: 10%;
+}
+.test-cases-list th:nth-child(2) {
+  width: 40%;
+}
+.test-cases-list th:nth-child(3) {
+  width: 13%;
+}
+.test-cases-list th:nth-child(4) {
+  width: 13%;
+}
+.test-cases-list th:nth-child(5) {
+  width: 13%;
+}
+.test-cases-list th:nth-child(6) {
+  width: 13%;
 }
 
 .test-cases-list th:first-child {
