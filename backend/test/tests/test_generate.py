@@ -66,7 +66,9 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
             # Create cycles
             cycles = 3
             for j in range(1, cycles + 1):
-                response = requests.post(f"{self.__class__.url}/projects/{project_key}/cycles")
+                response = requests.post(f"{self.__class__.url}/projects/{project_key}/cycles", json={
+                    "title": f"Cycle #{j} ({project_key}) - {uuid.uuid4()}"
+                })
                 assert response.status_code == 201
                 cycle_key = response.json().get("test_cycle_key")
 
