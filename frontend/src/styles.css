@@ -1,14 +1,1 @@
 /* You can add global styles to this file, and also import other style files */
-/* Disable Pico CSS button outline on click/focus */
-button:focus,
-button:active {
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100vh;
-  overflow: hidden;
-}

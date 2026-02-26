@@ -11,6 +11,7 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.app_def import API_VERSION, ROOT_DIR
 from backend.app.build_parser import build_parser
@@ -69,6 +70,15 @@ app = FastAPI(title="ORBIT",
               openapi_url=f"/api/{API_VERSION}/openapi.json",
               debug=args.debug,
               lifespan=lifespan)
+
+# Configure CORS to allow browser requests from frontend during development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 for router in routers:
     app.include_router(router)
