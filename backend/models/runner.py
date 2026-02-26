@@ -25,5 +25,5 @@ class Runner(BaseModel):
     designation: str
     job: str
     job_url: str
-    user: str
+    job_trigger_user: str
     model_config = {"extra": "forbid"}

@@ -112,14 +112,14 @@ def fetch_runner_status():
                     if job['runner_id'] == runner['id']:
                         runner["job"] = job["path"]
                         runner["job_url"] = job["html_url"]
-                        runner["user"] = job["triggering_actor"]["login"]
+                        runner["job_trigger_user"] = job["triggering_actor"]["login"]
                         break
 
             else:
                 # Runner is idle
                 runner["job"] = "-"
                 runner["job_url"] = "-"
-                runner["user"] = "-"
+                runner["job_trigger_user"] = "-"
 
         return runners
 

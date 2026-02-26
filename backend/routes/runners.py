@@ -23,9 +23,10 @@ router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.get(    f"/api/{API_VERSION}/runners/status",
-    tags=["runners"],
-    status_code=status.HTTP_200_OK)
+@router.get(f"/api/{API_VERSION}/runners/status",
+            tags=["runners"],
+            response_model=Runner,
+            status_code=status.HTTP_200_OK)
 async def get_runners_status(request: Request):
     """ Get the status of all runners. """
 
@@ -36,10 +37,10 @@ async def get_runners_status(request: Request):
                         content=cache)
 
 
-@router.get(    f"/api/{API_VERSION}/runners/status/{{name}}",
-    tags=["runners"],
-    response_model=Runner,
-    status_code=status.HTTP_200_OK)
+@router.get(f"/api/{API_VERSION}/runners/status/{{name}}",
+            tags=["runners"],
+            response_model=Runner,
+            status_code=status.HTTP_200_OK)
 async def get_runners_status_by_name(request: Request,
                                      name: str):
     """ Get the status of a runners. """
