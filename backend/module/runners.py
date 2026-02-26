@@ -27,7 +27,7 @@ def query_github_runners(repo: str):
     """ get github runners info """
 
     # Get all self-hosted runners for the repository
-    resp = requests.get(url=f"{GITHUB_API_URL}/{GITHUB_OWNER}/{repo}/actions/runners",
+    resp = requests.get(url=f"{GITHUB_API_URL}/repos/{GITHUB_OWNER}/{repo}/actions/runners",
                         headers={'Authorization': f'bearer {GITHUB_TOKEN}'},
                         params={"per_page": 100})
 
@@ -46,7 +46,7 @@ def query_github_jobs(repo: str):
     params = {"per_page": 100, "status": "in_progress"}
 
     # Get all in_progress workflow runs
-    resp = requests.get(url=f"{GITHUB_API_URL}/{GITHUB_OWNER}/{repo}/actions/runs",
+    resp = requests.get(url=f"{GITHUB_API_URL}/repos/{GITHUB_OWNER}/{repo}/actions/runs",
                         headers={'Authorization': f'bearer {GITHUB_TOKEN}'},
                         params=params)
 
