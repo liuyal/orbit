@@ -34,12 +34,23 @@ RUN sed -i 's/https/http/g' /etc/apk/repositories && \
     openssl && \
     sed -i 's/http:/https:/g' /etc/apk/repositories
 
-# Copy built Angular app from build stage (browser folder for SSR apps)
-# For static builds, files are directly in dist/orbit-app/browser
-COPY --from=build /app/dist/orbit-app/browser /usr/share/nginx/html
+# Copy built Angular app from build stage (support multiple output layouts)
+# Copy all project build outputs into nginx html directory
+COPY --from=build /app/dist/* /usr/share/nginx/html/
 
-# Rename index.csr.html to index.html for nginx
-RUN mv /usr/share/nginx/html/index.csr.html /usr/share/nginx/html/index.html
+# Rename index.csr.html to index.html for nginx if present
+RUN if [ -f /usr/share/nginx/html/index.csr.html ]; then \
+            mv /usr/share/nginx/html/index.csr.html /usr/share/nginx/html/index.html; \
+        fi
+
+# If build output was placed under a subdirectory (e.g. /usr/share/nginx/html/orbit),
+# move its contents up into the html root so nginx serves index.html at /
+RUN for d in /usr/share/nginx/html/*; do \
+            if [ -d "$d" ]; then \
+                cp -r "$d"/* /usr/share/nginx/html/ || true; \
+                rm -rf "$d" || true; \
+            fi; \
+        done
 
 # Remove default nginx HTML
 RUN rm -rf /usr/share/nginx/html/50x.html || true

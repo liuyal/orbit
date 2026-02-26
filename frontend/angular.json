@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "orbit": {
+    "orbit-app": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -62,10 +62,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "orbit:build:production"
+              "buildTarget": "orbit-app:build:production"
             },
             "development": {
-              "buildTarget": "orbit:build:development"
+              "buildTarget": "orbit-app:build:development"
             }
           },
           "defaultConfiguration": "development"
