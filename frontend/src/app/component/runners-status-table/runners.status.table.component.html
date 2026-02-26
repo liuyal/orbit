@@ -11,8 +11,9 @@
             </tr>
         </thead>
         <tbody>
-            <button (click)="loadRunners()">Refresh</button>
-            <!-- @for (runner of runners; track runner.id) {
+            <!-- <button (click)="loadRunners()">Refresh</button> -->
+
+            @for (runner of runnersDataSource.data; track runner.id) {
             <tr>
                 <td>{{ runner.name }}</td>
                 <td>{{ runner.designation || '-' }}</td>
@@ -42,7 +43,7 @@
                     </span>
                     }
                 </td>
-                <td>{{ runner.user || '-' }}</td>
+                <td>{{ runner.job_trigger_user || '-' }}</td>
                 <td>
                     @if (runner.job_url != "-") {
                     <a [href]="runner.job_url" target="_blank" class="job-link">LINK</a>
@@ -52,6 +53,6 @@
                 </td>
             </tr>
             }
-        </tbody> -->
+        </tbody>
     </table>
 </div>
