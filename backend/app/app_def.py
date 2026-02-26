@@ -7,7 +7,6 @@
 
 # app/app_def.py
 
-import json
 import os
 import pathlib
 
@@ -59,18 +58,18 @@ TM_DB_COLLECTIONS = [
 ]
 
 # MongoDB Connection Details
-MONGODB_HOST = os.getenv("MONGODB_HOST", "localhost")
-MONGODB_PORT = os.getenv("MONGODB_PORT", "27017")
-MONGODB_USER = os.getenv("MONGODB_USER", "admin")
-MONGODB_PASS = os.getenv("MONGODB_PASS", "password")
+MONGODB_HOST = os.getenv("MONGODB_HOST", "localhost").strip()
+MONGODB_PORT = os.getenv("MONGODB_PORT", "27017").strip()
+MONGODB_USER = os.getenv("MONGODB_USER", "admin").strip()
+MONGODB_PASS = os.getenv("MONGODB_PASS", "password").strip()
 
 MONGODB_URL = f"mongodb://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_HOST}:{MONGODB_PORT}"
 
 # GitHub Configuration Constants
-GITHUB_API_URL = os.getenv("GITHUB_API_URL")
-GITHUB_OWNER = os.getenv("GITHUB_OWNER")
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_REPOSITORY = os.getenv("GITHUB_REPOSITORY").split(",")
+GITHUB_API_URL = os.getenv("GITHUB_API_URL").strip()
+GITHUB_OWNER = os.getenv("GITHUB_OWNER").strip()
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN").strip()
+GITHUB_REPOSITORY = [m.strip() for m in os.getenv("GITHUB_REPOSITORY").split(",")]
 
 # Runner Constants
 QUERY_API_INTERVAL = 60
