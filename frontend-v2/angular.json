@@ -55,7 +55,6 @@
         },
         "serve": {
           "options": {
-            "proxyConfig": "src/proxy.conf.json",
             "ssl": true,
             "sslCert": "../certs/ssl/ca.crt",
             "sslKey": "../certs/ssl/ca.key"

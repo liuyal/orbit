@@ -59,7 +59,7 @@
                         </span>
                         }
                     </td>
-                    <td>{{ runner.user || '-' }}</td>
+                    <td>{{ runner.job_trigger_user || '-' }}</td>
                     <td>
                         @if (runner.job_url != "-") {
                         <a [href]="runner.job_url" target="_blank" class="job-link">LINK</a>
