@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -19,14 +19,21 @@ import { interval } from 'rxjs/internal/observable/interval';
   templateUrl: './runners.status.table.component.html'
 })
 
-export class RunnersStatusTableComponent implements OnInit, OnDestroy {
+export class RunnersStatusTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private static readonly AUTO_REFRESH_INTERVAL_MS = 60000;
   private refreshSubscription?: Subscription;
 
   runnersDataSource: MatTableDataSource<RunnerStatus>;
+  displayedColumns = ['NAME', 'DESIGNATION', 'STATUS', 'BUSY', 'USER', 'JOB LINK'];
+
   autoRefresh = false;
   isLoading = false;
+  showSpinner = false;
+
+  runners: any[] = [];
+  error = '';
+  cdr = inject(ChangeDetectorRef);
 
   constructor(
     private runnerStatusServices: RunnersStatusService,
@@ -35,27 +42,33 @@ export class RunnersStatusTableComponent implements OnInit, OnDestroy {
     this.runnersDataSource = new MatTableDataSource<RunnerStatus>([]);
   }
 
-  ngOnInit(): void {
-    // Initialize auto-refresh state from service
-    if (this.autoRefresh) {
-      this.startAutoRefresh();
-    }
-    this.loadRunners();
-  }
-
-  ngAfterViewInit(): void {
-    // Start auto-refresh if enabled
-  }
-
-  ngOnDestroy(): void {
-    // Clean up any subscriptions or timers
-    this.stopAutoRefresh();
+  loadRunners(): void {
+    this.isLoading = true;
+    this.showSpinner = false;
+    this.cdr.markForCheck();
+    this.runnerStatusServices.getRunners().subscribe({
+      next: (response) => {
+        this.runnersDataSource.data = Array.isArray(response) ? response : [];
+        console.log('Runners data received:', this.runnersDataSource.data);
+        this.isLoading = false;
+        this.showSpinner = false;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        console.error('Error fetching runners data:', error);
+        this.error = `Failed to load runners: ${error.error || 'API error'}`;
+        this.isLoading = false;
+        this.showSpinner = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   private startAutoRefresh(): void {
     if (!this.refreshSubscription) {
       this.refreshSubscription = interval(RunnersStatusTableComponent.AUTO_REFRESH_INTERVAL_MS).subscribe(() => {
         this.loadRunners();
+        this.cdr.markForCheck();
       });
     }
   }
@@ -67,19 +80,20 @@ export class RunnersStatusTableComponent implements OnInit, OnDestroy {
     }
   }
 
-  loadRunners(): void {
-    this.isLoading = true;
-    this.runnerStatusServices.getRunners().subscribe({
-      next: (response) => {
-        console.log('Runners data received:', response);
-        this.runnersDataSource.data = response.runners;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error fetching runners data:', error);
-        this.isLoading = false;
-      }
-    });
+  ngOnInit(): void {
+    this.autoRefresh = this.autoRefreshService.getAutoRefreshState('runnersStatus');
+    if (this.autoRefresh) {
+      this.startAutoRefresh();
+    }
+    this.loadRunners();
+
+  }
+
+  ngAfterViewInit(): void {
+  }
+
+  ngOnDestroy(): void {
+    this.stopAutoRefresh();
   }
 }
 

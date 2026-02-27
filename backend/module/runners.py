@@ -97,6 +97,11 @@ def fetch_runner_status():
             # Add info fields
             runner["queried_ts"] = int(ts)
 
+            # Set additional job fields
+            runner["job"] = "-"
+            runner["job_url"] = "-"
+            runner["job_trigger_user"] = "-"
+
             # Get runner designation from labels
             runner["designation"] = "-"
             runner_labels = runner.get("labels", [])
@@ -114,12 +119,6 @@ def fetch_runner_status():
                         runner["job_url"] = job["html_url"]
                         runner["job_trigger_user"] = job["triggering_actor"]["login"]
                         break
-
-            else:
-                # Runner is idle
-                runner["job"] = "-"
-                runner["job_url"] = "-"
-                runner["job_trigger_user"] = "-"
 
         return runners
 

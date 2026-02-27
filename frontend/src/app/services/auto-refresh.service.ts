@@ -2,9 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 export interface AutoRefreshSettings {
-  events: boolean;
-  devices: boolean;
-  systemTelemetry: boolean;
+  runnersStatus: boolean;
 }
 
 @Injectable({
@@ -16,9 +14,7 @@ export class AutoRefreshService {
   private static readonly VERSION_KEY = 'auto-refresh-settings-version';
   private static readonly CURRENT_VERSION = '1.0.0';
   private static readonly DEFAULT_SETTINGS: AutoRefreshSettings = {
-    events: false,
-    devices: false,
-    systemTelemetry: false
+    runnersStatus: false
   };
 
   private settingsSubject = new BehaviorSubject<AutoRefreshSettings>(this.loadSettings());
@@ -86,7 +82,7 @@ export class AutoRefreshService {
    */
   private isDataStructureValid(parsed: any): boolean {
     // Check if all required properties exist and are boolean values
-    const requiredProperties: (keyof AutoRefreshSettings)[] = ['events', 'devices', 'systemTelemetry'];
+    const requiredProperties: (keyof AutoRefreshSettings)[] = ['runnersStatus'];
 
     for (const prop of requiredProperties) {
       if (!(prop in parsed) || typeof parsed[prop] !== 'boolean') {
@@ -122,9 +118,7 @@ export class AutoRefreshService {
         // Validate the data structure
         if (this.isDataStructureValid(parsed)) {
           return {
-            events: parsed.events,
-            devices: parsed.devices,
-            systemTelemetry: parsed.systemTelemetry
+            runnersStatus: parsed.runnersStatus
           };
         } else {
           console.warn('Auto-refresh settings data structure is invalid, resetting to defaults');
