@@ -31,8 +31,6 @@ logger = logging.getLogger(__name__)
 async def get_runners_status(request: Request):
     """ Get the status of all runners. """
 
-    time.sleep(10)
-
     # Retrieve status from cache
     cache = getattr(request.app.state, RUNNER_STATUS_CACHE, [])
 
