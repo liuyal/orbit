@@ -21,19 +21,20 @@ import { interval } from 'rxjs/internal/observable/interval';
 
 export class RunnersStatusTableComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  private static readonly AUTO_REFRESH_INTERVAL_MS = 60000;
+  cdr = inject(ChangeDetectorRef);
+
+  private static readonly AUTO_REFRESH_INTERVAL_MS = 60 * 1000;
   private refreshSubscription?: Subscription;
+  private spinnerTimeout?: any;
 
   runnersDataSource: MatTableDataSource<RunnerStatus>;
   displayedColumns = ['NAME', 'DESIGNATION', 'STATUS', 'BUSY', 'USER', 'JOB LINK'];
+  runners: any[] = [];
 
   autoRefresh = false;
   isLoading = false;
   showSpinner = false;
-
-  runners: any[] = [];
   error = '';
-  cdr = inject(ChangeDetectorRef);
 
   constructor(
     private runnerStatusServices: RunnersStatusService,
@@ -45,7 +46,16 @@ export class RunnersStatusTableComponent implements OnInit, AfterViewInit, OnDes
   loadRunners(): void {
     this.isLoading = true;
     this.showSpinner = false;
-    this.cdr.markForCheck();
+
+    // Clear any existing timeout
+    if (this.spinnerTimeout) {
+      clearTimeout(this.spinnerTimeout);
+    }
+    this.spinnerTimeout = setTimeout(() => {
+      this.showSpinner = true;
+      this.cdr.markForCheck();
+    }, 3000);
+
     this.runnerStatusServices.getRunners().subscribe({
       next: (response) => {
         this.runnersDataSource.data = Array.isArray(response) ? response : [];
@@ -86,14 +96,17 @@ export class RunnersStatusTableComponent implements OnInit, AfterViewInit, OnDes
       this.startAutoRefresh();
     }
     this.loadRunners();
-
   }
 
   ngAfterViewInit(): void {
+    this.startAutoRefresh();
   }
 
   ngOnDestroy(): void {
     this.stopAutoRefresh();
+    if (this.spinnerTimeout) {
+      clearTimeout(this.spinnerTimeout);
+    }
   }
 }
 
