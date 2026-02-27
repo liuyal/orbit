@@ -148,6 +148,15 @@ async def create_cycle_for_project(request: Request,
     # Create the test cycle in the database
     await db.create(DB_COLLECTION_TCY, db_insert)
 
+    # Update project test cycle count
+    test_cycles = await db.find(DB_COLLECTION_TCY, {
+        "project_key": project_key
+    })
+    project["test_cycle_count"] = len(test_cycles)
+    await db.update(DB_COLLECTION_PRJ, project, {
+        "project_key": project_key
+    })
+
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content=request_data)
 

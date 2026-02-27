@@ -89,8 +89,8 @@ def fetch_runner_status():
             runners += query_github_runners(repo)
             jobs += query_github_jobs(repo)
 
-        logging.info(f"Runner status query completed in {round(time.time() - ts, 2)} seconds")
-        logging.info(f"Total: {len(runners)} runners, {len(jobs)} jobs")
+        logging.debug(f"Runner status query completed in {round(time.time() - ts, 2)} seconds. "
+                      f"Total: {len(runners)} runners, {len(jobs)} jobs")
 
         # Process runner data
         for runner in runners:

@@ -160,6 +160,16 @@ async def create_test_case_in_project(request: Request,
     # Create the test case in the database
     await db.create(DB_COLLECTION_TC, db_insert)
 
+    # Update project test case count & labels
+    test_cases = await db.find(DB_COLLECTION_TC, {
+        "project_key": project_key
+    })
+    project["labels"] = list(set(project.get("labels", []) + request_data["labels"]))
+    project["test_case_count"] = len(test_cases)
+    await db.update(DB_COLLECTION_PRJ, project, {
+        "project_key": project_key
+    })
+
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content=request_data)
 
@@ -296,6 +306,14 @@ async def update_test_case_by_key(request: Request,
         "test_case_key": test_case_key,
         "project_key": project_key
     })
+
+    # Update project labels
+    new_label_set = list(set(project.get("labels", []) + request_data["labels"]))
+    if project["labels"] != new_label_set:
+        project["labels"] = new_label_set
+        await db.update(DB_COLLECTION_PRJ, project, {
+            "project_key": project_key
+        })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=updated_test_case)
