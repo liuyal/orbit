@@ -8,6 +8,7 @@
 # routes/runner.py
 
 import logging
+import time
 
 from fastapi import APIRouter, Request, status
 from starlette.responses import JSONResponse
@@ -29,6 +30,8 @@ logger = logging.getLogger(__name__)
             status_code=status.HTTP_200_OK)
 async def get_runners_status(request: Request):
     """ Get the status of all runners. """
+
+    time.sleep(10)
 
     # Retrieve status from cache
     cache = getattr(request.app.state, RUNNER_STATUS_CACHE, [])

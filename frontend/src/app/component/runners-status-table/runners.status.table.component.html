@@ -1,21 +1,31 @@
 <div class="table-wrapper">
 
-    @if (runnersDataSource.data.length === 0 && !isLoading) {
-    <div class="empty-state">
-        <i class="fa-solid fa-server"></i>
-        <p>No Runners Found</p>
-    </div>
-    } @else if (isLoading && showSpinner) {
-    <div class="loading-container">
-        <div class="spinner"></div>
-    </div>
-    } @else if (!isLoading && error) {
-    <div class="error-state">
-        <i class="fa-solid fa-triangle-exclamation"></i>
-        <p>{{ error }}</p>
-    </div>
-    } @else if (!isLoading) {
-    <table mat-table [dataSource]="runnersDataSource" class="runners-table">
+    <ng-container *ngIf="isLoading; else notLoading">
+        <div class="loading-container" *ngIf="showSpinner">
+            <div class="loader"></div>
+        </div>
+    </ng-container>
+
+    <ng-template #notLoading>
+        <ng-container *ngIf="!isLoading && error; else checkEmpty">
+            <div class="error-state">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <p>{{ error }}</p>
+            </div>
+        </ng-container>
+    </ng-template>
+
+    <ng-template #checkEmpty>
+        <ng-container *ngIf="runnersDataSource.data.length === 0; else showTable">
+            <div class="empty-state">
+                <i class="fa-solid fa-server"></i>
+                <p>No Runners Found</p>
+            </div>
+        </ng-container>
+    </ng-template>
+
+    <ng-template #showTable>
+        <table mat-table [dataSource]="runnersDataSource" class="runners-table">
         <ng-container matColumnDef="NAME">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
             <td mat-cell *matCellDef="let runner">{{runner.name}}</td>
@@ -29,34 +39,32 @@
         <ng-container matColumnDef="STATUS">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
             <td mat-cell *matCellDef="let runner">
-                @if (runner.status === 'online') {
-                <span class="status-badge active">
+                <span *ngIf="runner.status === 'online'; else offline" class="status-badge active">
                     <i class="fa-solid fa-circle-check"></i>
                     ONLINE
                 </span>
-                } @else {
-                <span class="status-badge inactive">
-                    <i class="fa-solid fa-circle-xmark"></i>
-                    OFFLINE
-                </span>
-                }
+                <ng-template #offline>
+                    <span class="status-badge inactive">
+                        <i class="fa-solid fa-circle-xmark"></i>
+                        OFFLINE
+                    </span>
+                </ng-template>
             </td>
         </ng-container>
 
         <ng-container matColumnDef="BUSY">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Busy</th>
             <td mat-cell *matCellDef="let runner">
-                @if (runner.busy) {
-                <span class="status-badge busy">
+                <span *ngIf="runner.busy; else idle" class="status-badge busy">
                     <i class="fa-solid fa-hourglass-half"></i>
                     BUSY
                 </span>
-                } @else {
-                <span class="status-badge idle">
-                    <i class="fa-solid fa-circle"></i>
-                    IDLE
-                </span>
-                }
+                <ng-template #idle>
+                    <span class="status-badge idle">
+                        <i class="fa-solid fa-circle"></i>
+                        IDLE
+                    </span>
+                </ng-template>
             </td>
         </ng-container>
 
@@ -68,16 +76,14 @@
         <ng-container matColumnDef="JOB LINK">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Job Link</th>
             <td mat-cell *matCellDef="let runner">
-                @if (runner.job_url != "-") {
-                <a [href]="runner.job_url" target="_blank" class="job-link">LINK</a>
-                } @else {
-                {{ '-' }}
-                }
+                <a *ngIf="runner.job_url && runner.job_url !== '-'" [href]="runner.job_url" target="_blank" class="job-link">LINK</a>
+                <span *ngIf="!runner.job_url || runner.job_url === '-'">-</span>
             </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-    }
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </ng-template>
+
 </div>

@@ -14,10 +14,10 @@
 }
 
 /* ========================= */
-/*        Spinner            */
+/*        loader            */
 /* ========================= */
 
-.spinner {
+.loader {
   border: 5px solid rgba(255, 255, 255, 0.1);
   border-left-color: #faa560;
   border-radius: 50%;
