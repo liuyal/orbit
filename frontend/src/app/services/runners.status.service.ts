@@ -26,7 +26,7 @@ export interface RunnersResponseModel {
 })
 
 export class RunnersStatusService {
-    private apiUrl = environment.host + '/api/'+ environment.apiVersion;
+    private apiUrl = environment.host + '/api/' + environment.apiVersion;
 
     constructor(private http: HttpClient) { }
 
