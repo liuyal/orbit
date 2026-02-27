@@ -26,7 +26,7 @@ export interface RunnersResponseModel {
 })
 
 export class RunnersStatusService {
-    private apiUrl = environment.host + '/runners';
+    private apiUrl = environment.host + '/api/'+ environment.apiVersion;
 
     constructor(private http: HttpClient) { }
 
@@ -40,6 +40,6 @@ export class RunnersStatusService {
             'Accept': 'application/json'
         });
 
-        return this.http.get<RunnersResponseModel>(`${this.apiUrl}/status`, { headers });
+        return this.http.get<RunnersResponseModel>(`${this.apiUrl}/runners/status`, { headers });
     }
 }
