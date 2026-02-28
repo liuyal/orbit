@@ -57,7 +57,8 @@
           "options": {
             "ssl": true,
             "sslCert": "../certs/ssl/ca.crt",
-            "sslKey": "../certs/ssl/ca.key"
+            "sslKey": "../certs/ssl/ca.key",
+            "poll": 50
           },
           "builder": "@angular/build:dev-server",
           "configurations": {

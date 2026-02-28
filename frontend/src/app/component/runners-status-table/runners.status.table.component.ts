@@ -6,6 +6,9 @@ import { RunnersStatusService, RunnerStatus } from '../../services/runners.statu
 import { AutoRefreshService } from '../../services/auto-refresh.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { interval } from 'rxjs/internal/observable/interval';
+import { LoaderComponent } from '../loader/loader.component';
+import { ErrorStateComponent } from '../error-state/error.state.component';
+import { EmptyStateComponent } from '../empty-state/empty.state.component';
 
 @Component({
   selector: 'app-runners-status-table',
@@ -13,24 +16,23 @@ import { interval } from 'rxjs/internal/observable/interval';
   imports: [
     CommonModule,
     MatTableModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    LoaderComponent,
+    ErrorStateComponent,
+    EmptyStateComponent
   ],
   styleUrls: ['./runners.status.table.component.css'],
   templateUrl: './runners.status.table.component.html'
 })
 
 export class RunnersStatusTableComponent implements OnInit, AfterViewInit, OnDestroy {
-
-  cdr = inject(ChangeDetectorRef);
-
   private static readonly AUTO_REFRESH_INTERVAL_MS = 60 * 1000;
   private refreshSubscription?: Subscription;
   private spinnerTimeout?: any;
-
+  cdr = inject(ChangeDetectorRef);
   runnersDataSource: MatTableDataSource<RunnerStatus>;
   displayedColumns = ['NAME', 'DESIGNATION', 'STATUS', 'BUSY', 'USER', 'JOB LINK'];
   runners: any[] = [];
-
   autoRefresh = false;
   isLoading = false;
   showSpinner = false;

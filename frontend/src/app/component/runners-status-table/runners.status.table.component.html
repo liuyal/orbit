@@ -1,26 +1,18 @@
 <div class="table-wrapper">
 
     <ng-container *ngIf="isLoading; else notLoading">
-        <div class="loading-container" *ngIf="showSpinner">
-            <div class="loader"></div>
-        </div>
+        <app-loader [visible]="isLoading"></app-loader>
     </ng-container>
 
     <ng-template #notLoading>
         <ng-container *ngIf="!isLoading && error; else checkEmpty">
-            <div class="error-state">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <p>{{ error }}</p>
-            </div>
+            <app-error-state [error]="error"></app-error-state>
         </ng-container>
     </ng-template>
 
     <ng-template #checkEmpty>
         <ng-container *ngIf="runnersDataSource.data.length === 0; else showTable">
-            <div class="empty-state">
-                <i class="fa-solid fa-server"></i>
-                <p>No Runners Found</p>
-            </div>
+            <app-empty-state message="No runners found."></app-empty-state>
         </ng-container>
     </ng-template>
 
