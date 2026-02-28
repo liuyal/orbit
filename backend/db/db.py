@@ -21,20 +21,18 @@ class DBMode(Enum):
     """ Enumeration for supported database op mode. """
 
     DEBUG = 0
-    RELEASE = 1
+    PRODUCTION = 1
 
 
 class DatabaseClient(ABC):
     """ Abstract base class for database implementations supporting SQLite and MongoDB. """
 
     def __init__(self,
-                 db_name: str,
                  db_url: str,
                  db_type: DBType,
                  db_mode: DBMode):
         """ Initialize the database client."""
 
-        self._db_name = db_name
         self._db_url = db_url
         self._db_type = db_type
         self._db_mode = db_mode
@@ -44,11 +42,6 @@ class DatabaseClient(ABC):
     def db_type(self) -> DBType:
         """ Get the database type. """
         return self._db_type
-
-    @property
-    def db_name(self) -> str:
-        """ Get the database name. """
-        return self._db_name
 
     @property
     def db_url(self) -> str:
@@ -69,11 +62,6 @@ class DatabaseClient(ABC):
     def db_type(self, db_type: DBType):
         """ Set the database type. """
         self._db_type = db_type
-
-    @db_name.setter
-    def db_name(self, db_name: str):
-        """ Set the database name. """
-        self._db_name = db_name
 
     @db_url.setter
     def db_url(self, db_url: str):
@@ -98,31 +86,29 @@ class DatabaseClient(ABC):
         """ Disconnect from the database. """
 
     @abstractmethod
-    def create(self, table: str, data: dict):
+    def create(self, db_name: str, table: str, data: dict):
         """Insert a new record into the database."""
 
     @abstractmethod
-    def find(self, table: str, query: dict):
+    def find(self, db_name: str, table: str, query: dict):
         """Retrieve records from the database."""
 
     @abstractmethod
-    def find_one(self, table: str, query: dict):
+    def find_one(self, db_name: str, table: str, query: dict):
         """Retrieve records from the database."""
 
     @abstractmethod
-    def update(self, table: str, query: dict, data: dict):
+    def update(self, db_name: str, table: str, query: dict, data: dict):
         """Update records in the database."""
 
     @abstractmethod
-    def delete(self, table: str, query: dict):
+    def delete(self, db_name: str, table: str, query: dict):
         """Delete records from the database."""
 
     @abstractmethod
-    def delete_one(self, table: str, query: dict):
+    def delete_one(self, db_name: str, table: str, query: dict):
         """Delete records from the database."""
 
     @abstractmethod
     def execute_raw(self, command, *args, **kwargs):
-        """ Execute a raw query or command
-            (SQL for SQLite, command for MongoDB).
-        """
+        """ Execute a raw query or command """

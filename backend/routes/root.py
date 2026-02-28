@@ -12,7 +12,12 @@ import logging
 from fastapi import APIRouter, Request, status, Response
 from fastapi.responses import RedirectResponse
 
-from backend.app.app_def import API_VERSION, TM_DB_COLLECTIONS
+from backend.app.app_def import (
+    API_VERSION,
+    DB_ALL,
+    DB_NAME_TM,
+    DB_NAME_RUNNERS
+)
 
 router = APIRouter()
 
@@ -23,8 +28,8 @@ logger = logging.getLogger(__name__)
 async def root(request: Request):
     """ Root endpoint to check service status. """
 
-    logger.info(f"root endpoint")
-    logger.debug("root endpoint DEBUG")
+    logger.info(f"ROOT ENDPOINT")
+    logger.debug("ROOT ENDPOINT DEBUG")
 
     # TODO add service status info
     return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -41,27 +46,25 @@ async def root_api(request: Request):
     return RedirectResponse(url=f"{base_url}/api/{API_VERSION}/docs")
 
 
-@router.post(f"/api/{API_VERSION}/reset",
+@router.post(f"/api/{API_VERSION}/reset-database",
              tags=["root"],
              status_code=status.HTTP_204_NO_CONTENT)
-async def reset_server_db(request: Request):
-    """ Root endpoint to reset server db. """
+async def reset_database(request: Request,
+                         db_target: str = "ALL"):
+    """ Root endpoint to reset server database. """
+
+    db = request.app.state.mdb
 
     # Reset the database
-    db = request.app.state.mdb
-    await db.configure(clean_db="all")
+    if db_target.upper().endswith("TM"):
+        db_target = [DB_NAME_TM]
 
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    elif db_target.upper().endswith("RUNNERS"):
+        db_target = [DB_NAME_RUNNERS]
 
+    else:
+        db_target = DB_ALL
 
-@router.post(f"/api/{API_VERSION}/tm/reset",
-             tags=["root"],
-             status_code=status.HTTP_204_NO_CONTENT)
-async def reset_tm_server_db(request: Request):
-    """ Root endpoint to reset tm server. """
-
-    # Reset the database
-    db = request.app.state.mdb
-    await db.configure(clean_db="tm")
+    await db.configure(clean_db=db_target)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

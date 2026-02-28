@@ -17,7 +17,9 @@ from backend.app.app_def import (
     GITHUB_OWNER,
     GITHUB_TOKEN,
     GITHUB_REPOSITORY,
-    TABLE_RUNNER_STATS_HISTORIC,
+    DB_NAME_RUNNERS,
+    DB_COLLECTION_RUNNERS_STATS_HISTORIC,
+    API_QUERY_INTERVAL
 )
 from backend.db.mongodb import MongoClient
 from backend.models.runner import Runner
@@ -89,7 +91,8 @@ def fetch_runner_status():
             runners += query_github_runners(repo)
             jobs += query_github_jobs(repo)
 
-        logging.debug(f"Runner status query completed in {round(time.time() - ts, 2)} seconds. "
+        logging.debug(f"Runner status query completed in "
+                      f"{round(time.time() - ts, 2)} seconds. "
                       f"Total: {len(runners)} runners, {len(jobs)} jobs")
 
         # Process runner data
@@ -127,9 +130,9 @@ def fetch_runner_status():
         return []
 
 
-async def save_runner_status(app,
+async def save_runner_status(app: object,
                              mdb: MongoClient,
-                             interval: int = 60):
+                             interval: int = API_QUERY_INTERVAL):
     """ save runner status to mongodb - runs periodically in background """
 
     while True:
@@ -142,10 +145,10 @@ async def save_runner_status(app,
 
             # Save runner status to historic and current collections
             for item in status:
-                db_insert = Runner(**item).model_dump()
-                await mdb.create(TABLE_RUNNER_STATS_HISTORIC, db_insert)
-
-            logging.debug(f"Saved {len(status)} runner statuses to database")
+                data = Runner(**item).model_dump()
+                await mdb.create(DB_NAME_RUNNERS.name,
+                                 DB_COLLECTION_RUNNERS_STATS_HISTORIC.name,
+                                 data)
 
         except Exception as e:
             logging.error(f"Error saving runner status: {e}", exc_info=True)

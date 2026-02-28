@@ -21,7 +21,7 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Check no projects exist
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
@@ -29,7 +29,7 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         n = 10
         active_list = [False] + [True] * (n - 2) + [False]
         for i in range(0, n):
-            response = requests.post(f"{self.__class__.url}/projects", json={
+            response = requests.post(f"{self.__class__.url}/tm/projects", json={
                 "project_key": f"PRJ{i}",
                 "description": f"Project #{i}",
                 "is_active": active_list[i],
@@ -44,7 +44,7 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
             assert response.json()["test_cycle_count"] == 0
 
         # Check project list
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == n
 
@@ -64,12 +64,12 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Check no projects
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
         # Check duplicated labels
-        response = requests.post(f"{self.__class__.url}/projects", json={
+        response = requests.post(f"{self.__class__.url}/tm/projects", json={
             "project_key": f"PRJ-WDD",
             "description": f"Project #WDD",
             "is_active": True,
@@ -79,12 +79,12 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         assert response.json()["error"] == f"Duplicate labels are not allowed"
 
         # Check no projects
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
         # Add valid test case
-        response = requests.post(f"{self.__class__.url}/projects", json={
+        response = requests.post(f"{self.__class__.url}/tm/projects", json={
             "project_key": f"PRJ-WDD",
             "description": f"Project #WDD",
             "is_active": True,
@@ -99,7 +99,7 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         assert response.json()["test_cycle_count"] == 0
 
         # Get project details
-        response = requests.get(f"{self.__class__.url}/projects/PRJ-WDD")
+        response = requests.get(f"{self.__class__.url}/tm/projects/PRJ-WDD")
         assert response.status_code == 200
         assert response.json()["project_key"] == f"PRJ-WDD"
         assert response.json()["description"] == f"Project #WDD"
@@ -109,12 +109,12 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         assert response.json()["test_cycle_count"] == 0
 
         # Check projects is 1
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 1
 
         # Add duplicated test case
-        response = requests.post(f"{self.__class__.url}/projects", json={
+        response = requests.post(f"{self.__class__.url}/tm/projects", json={
             "project_key": f"PRJ-WDD",
             "description": f"Project #WDD",
             "is_active": True,
@@ -123,7 +123,7 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         assert response.status_code == 400
 
         # Check projects is 1
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 1
 
@@ -135,12 +135,12 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Check no projects
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
         # Add valid test case
-        response = requests.post(f"{self.__class__.url}/projects", json={
+        response = requests.post(f"{self.__class__.url}/tm/projects", json={
             "project_key": f"PRJ-SWW",
             "description": f"Project #SDD",
             "is_active": True,
@@ -155,7 +155,7 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         assert response.json()["test_cycle_count"] == 0
 
         # Get project details
-        response = requests.get(f"{self.__class__.url}/projects/PRJ-SWW")
+        response = requests.get(f"{self.__class__.url}/tm/projects/PRJ-SWW")
         assert response.status_code == 200
         assert response.json()["project_key"] == f"PRJ-SWW"
         assert response.json()["description"] == f"Project #SDD"
@@ -165,7 +165,7 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         assert response.json()["test_cycle_count"] == 0
 
         # Check projects is 1
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 1
 
@@ -177,12 +177,12 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Check no projects
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
         # Add valid test case
-        response = requests.post(f"{self.__class__.url}/projects", json={
+        response = requests.post(f"{self.__class__.url}/tm/projects", json={
             "project_key": f"PRJ-A",
             "description": f"Project #A",
             "is_active": True,
@@ -197,11 +197,11 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         assert response.json()["test_cycle_count"] == 0
 
         # Check projects is 1
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 1
 
-        response = requests.put(f"{self.__class__.url}/projects/PRJ-A", json={
+        response = requests.put(f"{self.__class__.url}/tm/projects/PRJ-A", json={
             "description": f"Project #B++++++++",
             "is_active": False,
             "labels": ["1", "2", "3"]
@@ -222,12 +222,12 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Check no projects
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
         # Add valid test case
-        response = requests.post(f"{self.__class__.url}/projects", json={
+        response = requests.post(f"{self.__class__.url}/tm/projects", json={
             "project_key": f"PRJ-A5",
             "description": f"Project #A5",
             "is_active": True,
@@ -242,20 +242,20 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
         assert response.json()["test_cycle_count"] == 0
 
         # Check projects is 1
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 1
 
         # Delete project
-        response = requests.delete(f"{self.__class__.url}/projects/PRJ-A5")
+        response = requests.delete(f"{self.__class__.url}/tm/projects/PRJ-A5")
         assert response.status_code == 204
 
         # Get deleted project
-        response = requests.get(f"{self.__class__.url}/projects/PRJ-A5")
+        response = requests.get(f"{self.__class__.url}/tm/projects/PRJ-A5")
         assert response.status_code == 404
 
         # Check no projects
-        response = requests.get(f"{self.__class__.url}/projects")
+        response = requests.get(f"{self.__class__.url}/tm/projects")
         assert response.status_code == 200
         assert len(response.json()) == 0
 

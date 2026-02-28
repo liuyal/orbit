@@ -22,10 +22,10 @@ class TestOrbitTMExecutions(OrbitTMBaseTest):
         # n = 2
         # for i in range(0, n):
         #     payload = {"project_key": f"PRJ{i}", "description": f"Project #{i}"}
-        #     response = requests.post(f"{self.__class__.url}/projects", json=payload)
+        #     response = requests.post(f"{self.__class__.url}/tm/projects", json=payload)
         #     assert response.status_code == 201
         #
-        # response = requests.get(f"{self.__class__.url}/projects")
+        # response = requests.get(f"{self.__class__.url}/tm/projects")
         # assert response.status_code == 200
         # assert len(response.json()) == 2
         #
@@ -33,20 +33,20 @@ class TestOrbitTMExecutions(OrbitTMBaseTest):
         # project_key = "PRJ0"
         # for i in range(0, n):
         #     payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
-        #     response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json=payload)
+        #     response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json=payload)
         #     assert response.status_code == 201
         #
-        # response = requests.get(f"{self.__class__.url}/test-cases")
+        # response = requests.get(f"{self.__class__.url}/tm/test-cases")
         # assert response.status_code == 200
         # assert len(response.json()) == n
         #
         # project_key = "PRJ1"
         # for i in range(0, n):
         #     payload = {"test_case_key": f"{project_key}-T{i}", "project_key": project_key}
-        #     response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-case", json=payload)
+        #     response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json=payload)
         #     assert response.status_code == 201
         #
-        # response = requests.get(f"{self.__class__.url}/test-cases")
+        # response = requests.get(f"{self.__class__.url}/tm/test-cases")
         # assert response.status_code == 200
         # assert len(response.json()) == n * 2
         #
@@ -55,10 +55,10 @@ class TestOrbitTMExecutions(OrbitTMBaseTest):
         # test_case_key = f"{project_key}-T0"
         # for i in range(0, n):
         #     payload = {"execution_key": f"{project_key}-E{i}"}
-        #     response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
+        #     response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
         #     assert response.status_code == 201
         #
-        # response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
+        # response = requests.get(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions")
         # assert response.status_code == 200
         # assert len(response.json()) == n
         #
@@ -67,10 +67,10 @@ class TestOrbitTMExecutions(OrbitTMBaseTest):
         # test_case_key = f"{project_key}-T1"
         # for i in range(n, n * 2):
         #     payload = {"execution_key": f"{project_key}-E{i}"}
-        #     response = requests.post(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
+        #     response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions", json=payload)
         #     assert response.status_code == 201
         #
-        # response = requests.get(f"{self.__class__.url}/projects/{project_key}/test-cases/{test_case_key}/executions")
+        # response = requests.get(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions")
         # assert response.status_code == 200
         # assert len(response.json()) == n
 

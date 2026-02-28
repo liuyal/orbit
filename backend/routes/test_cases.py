@@ -20,11 +20,12 @@ from fastapi import (
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
-    DB_COLLECTION_PRJ,
-    DB_COLLECTION_TC,
-    DB_COLLECTION_TE,
-    TC_KEY_PREFIX,
-    API_VERSION
+    API_VERSION,
+    DB_COLLECTION_TM_PRJ,
+    DB_COLLECTION_TM_TC,
+    DB_COLLECTION_TM_TE,
+    DB_NAME_TM,
+    TC_KEY_PREFIX
 )
 from backend.app.utility import get_current_utc_time
 from backend.models.test_cases import (
@@ -35,9 +36,14 @@ from backend.models.test_cases import (
 
 router = APIRouter()
 
+DB_NAME_TM = DB_NAME_TM.name
+DB_COLLECTION_TM_PRJ = DB_COLLECTION_TM_PRJ.name
+DB_COLLECTION_TM_TC = DB_COLLECTION_TM_TC.name
+DB_COLLECTION_TM_TE = DB_COLLECTION_TM_TE.name
+
 
 @router.get(f"/api/{API_VERSION}/tm/test-cases",
-            tags=[DB_COLLECTION_TC],
+            tags=[DB_COLLECTION_TM_TC],
             response_model=list[TestCase],
             status_code=status.HTTP_200_OK)
 async def get_all_test_cases(request: Request):
@@ -46,14 +52,14 @@ async def get_all_test_cases(request: Request):
     db = request.app.state.mdb
 
     # Retrieve all test cases from database
-    test_cases = await db.find(DB_COLLECTION_TC, {})
+    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {})
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cases)
 
 
 @router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
-            tags=[DB_COLLECTION_TC],
+            tags=[DB_COLLECTION_TM_TC],
             response_model=list[TestCase],
             status_code=status.HTTP_200_OK)
 async def get_all_test_cases_by_project(request: Request,
@@ -63,7 +69,7 @@ async def get_all_test_cases_by_project(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -73,7 +79,7 @@ async def get_all_test_cases_by_project(request: Request,
         )
 
     # Retrieve test cases from database matching project_key
-    test_cases = await db.find(DB_COLLECTION_TC, {
+    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "project_key": project_key
     })
 
@@ -82,7 +88,7 @@ async def get_all_test_cases_by_project(request: Request,
 
 
 @router.post(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-case",
-             tags=[DB_COLLECTION_TC],
+             tags=[DB_COLLECTION_TM_TC],
              status_code=status.HTTP_201_CREATED)
 async def create_test_case_in_project(request: Request,
                                       project_key: str,
@@ -92,7 +98,7 @@ async def create_test_case_in_project(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -158,15 +164,15 @@ async def create_test_case_in_project(request: Request,
     db_insert["_id"] = test_case_key
 
     # Create the test case in the database
-    await db.create(DB_COLLECTION_TC, db_insert)
+    await db.create(DB_NAME_TM, DB_COLLECTION_TM_TC, db_insert)
 
     # Update project test case count & labels
-    test_cases = await db.find(DB_COLLECTION_TC, {
+    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "project_key": project_key
     })
     project["labels"] = list(set(project.get("labels", []) + request_data["labels"]))
     project["test_case_count"] = len(test_cases)
-    await db.update(DB_COLLECTION_PRJ, project, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })
 
@@ -175,7 +181,7 @@ async def create_test_case_in_project(request: Request,
 
 
 @router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases",
-               tags=[DB_COLLECTION_TC],
+               tags=[DB_COLLECTION_TM_TC],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_test_case_from_project(request: Request,
                                             project_key: str):
@@ -184,7 +190,7 @@ async def delete_all_test_case_from_project(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -194,7 +200,7 @@ async def delete_all_test_case_from_project(request: Request,
         )
 
     # Check if test cases has any test executions
-    executions = await db.find(DB_COLLECTION_TE, {
+    executions = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "project_key": project_key,
     })
 
@@ -206,19 +212,19 @@ async def delete_all_test_case_from_project(request: Request,
         )
 
     # Delete all test cases under project
-    await db.delete(DB_COLLECTION_TC, {
+    await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "project_key": project_key
     })
 
     # Update project test counts to 0
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
 
     project["test_case_count"] = 0
     project["test_cycle_count"] = 0
 
-    await db.update(DB_COLLECTION_PRJ, project, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })
 
@@ -226,7 +232,7 @@ async def delete_all_test_case_from_project(request: Request,
 
 
 @router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",
-            tags=[DB_COLLECTION_TC],
+            tags=[DB_COLLECTION_TM_TC],
             response_model=TestCase)
 async def get_test_case_by_key(request: Request,
                                project_key: str,
@@ -236,7 +242,7 @@ async def get_test_case_by_key(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -246,7 +252,7 @@ async def get_test_case_by_key(request: Request,
         )
 
     # Retrieve test case from database
-    result = await db.find_one(DB_COLLECTION_TC, {
+    result = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "test_case_key": test_case_key,
         "project_key": project_key
     })
@@ -264,7 +270,7 @@ async def get_test_case_by_key(request: Request,
 
 
 @router.put(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",
-            tags=[DB_COLLECTION_TC],
+            tags=[DB_COLLECTION_TM_TC],
             response_model=TestCase)
 async def update_test_case_by_key(request: Request,
                                   project_key: str,
@@ -275,7 +281,7 @@ async def update_test_case_by_key(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -296,13 +302,13 @@ async def update_test_case_by_key(request: Request,
     request_data["updated_at"] = get_current_utc_time()
 
     # Update the project in the database
-    await db.update(DB_COLLECTION_TC, request_data, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, request_data, {
         "project_key": project_key,
         "test_case_key": test_case_key,
     })
 
     # Retrieve the updated test case
-    updated_test_case = await db.find_one(DB_COLLECTION_TC, {
+    updated_test_case = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "test_case_key": test_case_key,
         "project_key": project_key
     })
@@ -311,7 +317,7 @@ async def update_test_case_by_key(request: Request,
     new_label_set = list(set(project.get("labels", []) + request_data["labels"]))
     if project["labels"] != new_label_set:
         project["labels"] = new_label_set
-        await db.update(DB_COLLECTION_PRJ, project, {
+        await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
             "project_key": project_key
         })
 
@@ -320,7 +326,7 @@ async def update_test_case_by_key(request: Request,
 
 
 @router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",
-               tags=[DB_COLLECTION_TC],
+               tags=[DB_COLLECTION_TM_TC],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_test_case_by_key(request: Request,
                                   project_key: str,
@@ -331,7 +337,7 @@ async def delete_test_case_by_key(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -346,7 +352,7 @@ async def delete_test_case_by_key(request: Request,
         return response
 
     # Check if test case has any test executions
-    executions = await db.find(DB_COLLECTION_TE, {
+    executions = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "project_key": project_key,
         "test_case_key": test_case_key
     })
@@ -359,17 +365,17 @@ async def delete_test_case_by_key(request: Request,
         )
 
     # Delete the test case from project from the database
-    await db.delete_one(DB_COLLECTION_TC, {
+    await db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "test_case_key": test_case_key,
         "project_key": project_key
     })
 
     # Update project test case count
-    test_cases = await db.find(DB_COLLECTION_TC, {
+    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "project_key": project_key
     })
     project["test_case_count"] = len(test_cases)
-    await db.update(DB_COLLECTION_PRJ, project, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })
 

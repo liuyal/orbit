@@ -16,11 +16,12 @@ from fastapi import (
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
-    DB_COLLECTION_PRJ,
-    DB_COLLECTION_TC,
-    DB_COLLECTION_TE,
-    DB_COLLECTION_TCY,
-    API_VERSION
+    API_VERSION,
+    DB_COLLECTION_TM_PRJ,
+    DB_COLLECTION_TM_TC,
+    DB_COLLECTION_TM_TE,
+    DB_COLLECTION_TM_TCY,
+    DB_NAME_TM
 )
 from backend.app.utility import (
     get_current_utc_time
@@ -33,9 +34,15 @@ from backend.models.projects import (
 
 router = APIRouter()
 
+DB_NAME_TM = DB_NAME_TM.name
+DB_COLLECTION_TM_PRJ = DB_COLLECTION_TM_PRJ.name
+DB_COLLECTION_TM_TC = DB_COLLECTION_TM_TC.name
+DB_COLLECTION_TM_TE = DB_COLLECTION_TM_TE.name
+DB_COLLECTION_TM_TCY = DB_COLLECTION_TM_TCY.name
+
 
 @router.get(f"/api/{API_VERSION}/tm/projects",
-            tags=[DB_COLLECTION_PRJ],
+            tags=[DB_COLLECTION_TM_PRJ],
             response_model=list[Project],
             status_code=status.HTTP_200_OK)
 async def get_all_projects(request: Request):
@@ -44,14 +51,14 @@ async def get_all_projects(request: Request):
     db = request.app.state.mdb
 
     # Retrieve all projects from database
-    projects = await db.find(DB_COLLECTION_PRJ, {})
+    projects = await db.find(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {})
 
     for project in projects:
         # Get count for test cases and cycles
-        test_cases = await db.find(DB_COLLECTION_TC, {
+        test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
             "project_key": project["project_key"]
         })
-        test_cycles = await db.find(DB_COLLECTION_TCY, {
+        test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
             "project_key": project["project_key"]
         })
 
@@ -60,7 +67,7 @@ async def get_all_projects(request: Request):
         project["test_cycle_count"] = len(test_cycles)
 
         # Update count back into DB
-        await db.update(DB_COLLECTION_PRJ, project, {
+        await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
             "project_key": project["project_key"]
         })
 
@@ -69,7 +76,7 @@ async def get_all_projects(request: Request):
 
 
 @router.post(f"/api/{API_VERSION}/tm/projects",
-             tags=[DB_COLLECTION_PRJ],
+             tags=[DB_COLLECTION_TM_PRJ],
              response_model=Project,
              status_code=status.HTTP_201_CREATED)
 async def create_project_by_key(request: Request,
@@ -109,14 +116,14 @@ async def create_project_by_key(request: Request,
     db_insert["_id"] = project_key
 
     # Create the project in the database
-    await db.create(DB_COLLECTION_PRJ, db_insert)
+    await db.create(DB_NAME_TM, DB_COLLECTION_TM_PRJ, db_insert)
 
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content=request_data)
 
 
 @router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}",
-            tags=[DB_COLLECTION_PRJ],
+            tags=[DB_COLLECTION_TM_PRJ],
             response_model=Project,
             status_code=status.HTTP_200_OK)
 async def get_project_by_key(request: Request,
@@ -126,7 +133,7 @@ async def get_project_by_key(request: Request,
     db = request.app.state.mdb
 
     # Retrieve project from database
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -137,10 +144,10 @@ async def get_project_by_key(request: Request,
         )
 
     # Get count of test cases and cycles
-    test_cases = await db.find(DB_COLLECTION_TC, {
+    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "project_key": project_key
     })
-    test_cycles = await db.find(DB_COLLECTION_TCY, {
+    test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "project_key": project_key
     })
 
@@ -149,7 +156,7 @@ async def get_project_by_key(request: Request,
     project["test_cycle_count"] = len(test_cycles)
 
     # Update count back into DB
-    await db.update(DB_COLLECTION_PRJ, project, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })
 
@@ -159,7 +166,7 @@ async def get_project_by_key(request: Request,
 
 
 @router.put(f"/api/{API_VERSION}/tm/projects/{{project_key}}",
-            tags=[DB_COLLECTION_PRJ],
+            tags=[DB_COLLECTION_TM_PRJ],
             response_model=Project,
             status_code=status.HTTP_200_OK)
 async def update_project_by_key(request: Request,
@@ -187,10 +194,10 @@ async def update_project_by_key(request: Request,
         )
 
     # Get count of test cases and cycles
-    test_cases = await db.find(DB_COLLECTION_TC, {
+    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "project_key": project_key
     })
-    test_cycles = await db.find(DB_COLLECTION_TCY, {
+    test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "project_key": project_key
     })
 
@@ -199,12 +206,12 @@ async def update_project_by_key(request: Request,
     request_data["test_cycle_count"] = len(test_cycles)
 
     # Update count back into DB
-    await db.update(DB_COLLECTION_PRJ, request_data, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, request_data, {
         "project_key": project_key
     })
 
     # Retrieve the updated project
-    updated_project = await db.find_one(DB_COLLECTION_PRJ, {
+    updated_project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
 
@@ -213,7 +220,7 @@ async def update_project_by_key(request: Request,
 
 
 @router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}",
-               tags=[DB_COLLECTION_PRJ],
+               tags=[DB_COLLECTION_TM_PRJ],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_project_by_key(request: Request,
                                 project_key: str,
@@ -230,7 +237,7 @@ async def delete_project_by_key(request: Request,
     # Check force flag
     if force and force.get("force", None) is False:
         # Check for existing test cases, test-executions, test-cycles linked to the project
-        test_case_count = await db.count(DB_COLLECTION_TC, {
+        test_case_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TC, {
             "project_key": project_key
         })
         if test_case_count > 0:
@@ -240,7 +247,7 @@ async def delete_project_by_key(request: Request,
                                   f"contains linked test-cases"}
             )
 
-        test_executions_count = await db.count(DB_COLLECTION_TE, {
+        test_executions_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TE, {
             "project_key": project_key
         })
         if test_executions_count > 0:
@@ -250,7 +257,7 @@ async def delete_project_by_key(request: Request,
                                   f"contains linked test-executions"}
             )
 
-        test_cycles_count = await db.count(DB_COLLECTION_TCY, {
+        test_cycles_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
             "project_key": project_key
         })
         if test_cycles_count > 0:
@@ -262,18 +269,18 @@ async def delete_project_by_key(request: Request,
 
     else:
         # Force delete all linked test-cases, test-executions, test-cycles
-        await db.delete(DB_COLLECTION_TCY, {
+        await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
             "project_key": project_key
         })
-        await db.delete(DB_COLLECTION_TE, {
+        await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TE, {
             "project_key": project_key
         })
-        await db.delete(DB_COLLECTION_TC, {
+        await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TC, {
             "project_key": project_key
         })
 
     # Delete the project from the database
-    await db.delete(DB_COLLECTION_PRJ, {
+    await db.delete(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
 

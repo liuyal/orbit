@@ -20,12 +20,13 @@ from fastapi import (
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
-    DB_COLLECTION_PRJ,
-    DB_COLLECTION_TE,
-    DB_COLLECTION_TC,
-    DB_COLLECTION_TCY,
-    TE_KEY_PREFIX,
-    API_VERSION
+    API_VERSION,
+    DB_COLLECTION_TM_PRJ,
+    DB_COLLECTION_TM_TE,
+    DB_COLLECTION_TM_TC,
+    DB_COLLECTION_TM_TCY,
+    DB_NAME_TM,
+    TE_KEY_PREFIX
 )
 from backend.app.utility import get_current_utc_time
 from backend.models.test_executions import (
@@ -36,9 +37,15 @@ from backend.models.test_executions import (
 
 router = APIRouter()
 
+DB_NAME_TM = DB_NAME_TM.name
+DB_COLLECTION_TM_PRJ = DB_COLLECTION_TM_PRJ.name
+DB_COLLECTION_TM_TC = DB_COLLECTION_TM_TC.name
+DB_COLLECTION_TM_TE = DB_COLLECTION_TM_TE.name
+DB_COLLECTION_TM_TCY = DB_COLLECTION_TM_TCY.name
+
 
 @router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/executions",
-            tags=[DB_COLLECTION_TE],
+            tags=[DB_COLLECTION_TM_TE],
             response_model=list[TestExecution],
             status_code=status.HTTP_200_OK)
 async def get_all_executions_by_project(request: Request,
@@ -48,7 +55,7 @@ async def get_all_executions_by_project(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -58,7 +65,7 @@ async def get_all_executions_by_project(request: Request,
         )
 
     # Retrieve test execution matching project_key
-    test_executions = await db.find(DB_COLLECTION_TE, {
+    test_executions = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "project_key": project_key
     })
 
@@ -67,7 +74,7 @@ async def get_all_executions_by_project(request: Request,
 
 
 @router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/executions",
-               tags=[DB_COLLECTION_TE],
+               tags=[DB_COLLECTION_TM_TE],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_test_execution_by_project(request: Request,
                                                project_key: str):
@@ -76,7 +83,7 @@ async def delete_all_test_execution_by_project(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -86,30 +93,30 @@ async def delete_all_test_execution_by_project(request: Request,
         )
 
     # Set last_execution_key to None for all test cases in the project
-    test_cases = await db.find(DB_COLLECTION_TC, {
+    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "project_key": project_key
     })
     for tc_data in test_cases:
         tc_data["updated_at"] = get_current_utc_time()
         tc_data["last_execution_key"] = None
-        await db.update(DB_COLLECTION_TC, tc_data, {
+        await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, tc_data, {
             "project_key": project_key,
             "test_case_key": tc_data["test_case_key"]
         })
 
     # Set all execution_key to empty for all cycles in the project
-    cycles = await db.find(DB_COLLECTION_TCY, {
+    cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "project_key": project_key
     })
     for cycle in cycles:
         cycle["executions"] = {}
         cycle["updated_at"] = get_current_utc_time()
-        await db.update(DB_COLLECTION_TCY, cycle, {
+        await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle, {
             "test_cycle_key": cycle["test_cycle_key"]
         })
 
     # Delete test executions from database matching project_key
-    await db.delete(DB_COLLECTION_TE, {
+    await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "project_key": project_key
     })
 
@@ -117,7 +124,7 @@ async def delete_all_test_execution_by_project(request: Request,
 
 
 @router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",
-            tags=[DB_COLLECTION_TE],
+            tags=[DB_COLLECTION_TM_TE],
             response_model=list[TestExecution],
             status_code=status.HTTP_200_OK)
 async def get_all_executions_by_test_case_key(request: Request,
@@ -128,7 +135,7 @@ async def get_all_executions_by_test_case_key(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -138,7 +145,7 @@ async def get_all_executions_by_test_case_key(request: Request,
         )
 
     # Check if test_case_key exists
-    tc_data = await db.find_one(DB_COLLECTION_TC, {
+    tc_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "test_case_key": test_case_key,
         "project_key": project_key
     })
@@ -149,7 +156,7 @@ async def get_all_executions_by_test_case_key(request: Request,
         )
 
     # Retrieve test execution matching project_key and test_case_key
-    test_executions = await db.find(DB_COLLECTION_TE, {
+    test_executions = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "project_key": project_key,
         "test_case_key": test_case_key
     })
@@ -161,7 +168,7 @@ async def get_all_executions_by_test_case_key(request: Request,
 
 
 @router.post(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",
-             tags=[DB_COLLECTION_TE],
+             tags=[DB_COLLECTION_TM_TE],
              response_model=TestExecution,
              status_code=status.HTTP_201_CREATED)
 async def create_execution_by_test_case_key(request: Request,
@@ -173,7 +180,7 @@ async def create_execution_by_test_case_key(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -183,7 +190,7 @@ async def create_execution_by_test_case_key(request: Request,
         )
 
     # Check if test_case_key exists
-    tc_data = await db.find_one(DB_COLLECTION_TC, {
+    tc_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "test_case_key": test_case_key,
         "project_key": project_key
     })
@@ -250,13 +257,13 @@ async def create_execution_by_test_case_key(request: Request,
     db_insert["_id"] = execution_key
 
     # Create the test execution in the database
-    await db.create(DB_COLLECTION_TE, db_insert)
+    await db.create(DB_NAME_TM, DB_COLLECTION_TM_TE, db_insert)
 
     # Update last_execution_key and updated_at for test case
     tc_data["updated_at"] = current_time
     tc_data["last_execution_key"] = execution_key
     tc_data["last_result"] = request_data["result"]
-    await db.update(DB_COLLECTION_TC, tc_data, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, tc_data, {
         "project_key": project_key,
         "test_case_key": test_case_key
     })
@@ -266,7 +273,7 @@ async def create_execution_by_test_case_key(request: Request,
 
 
 @router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}/executions",
-               tags=[DB_COLLECTION_TE],
+               tags=[DB_COLLECTION_TM_TE],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_all_execution_by_test_case_key(request: Request,
                                                 project_key: str,
@@ -276,7 +283,7 @@ async def delete_all_execution_by_test_case_key(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -286,7 +293,7 @@ async def delete_all_execution_by_test_case_key(request: Request,
         )
 
     # Check if test_case_key exists
-    tc_data = await db.find_one(DB_COLLECTION_TC, {
+    tc_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "test_case_key": test_case_key,
         "project_key": project_key
     })
@@ -297,7 +304,7 @@ async def delete_all_execution_by_test_case_key(request: Request,
         )
 
     # Check project exists
-    test_cycles = await db.find(DB_COLLECTION_TCY, {
+    test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "project_key": project_key
     })
     for cycle in test_cycles:
@@ -305,7 +312,7 @@ async def delete_all_execution_by_test_case_key(request: Request,
             # remove execution key from cycle
             cycle["executions"].pop(test_case_key)
             cycle["updated_at"] = get_current_utc_time()
-            await db.update(DB_COLLECTION_TCY, cycle, {
+            await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle, {
                 "test_cycle_key": cycle["test_cycle_key"]
             })
 
@@ -313,13 +320,13 @@ async def delete_all_execution_by_test_case_key(request: Request,
     tc_data["updated_at"] = get_current_utc_time()
     tc_data["last_execution_key"] = None
     tc_data["last_result"] = "NOT_EXECUTED"
-    await db.update(DB_COLLECTION_TC, tc_data, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, tc_data, {
         "project_key": project_key,
         "test_case_key": test_case_key
     })
 
     # Delete all test executions for the specified test case
-    result, deleted_count = await db.delete(DB_COLLECTION_TE, {
+    result, deleted_count = await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "project_key": project_key,
         "test_case_key": test_case_key
     })
@@ -336,7 +343,7 @@ async def delete_all_execution_by_test_case_key(request: Request,
 
 
 @router.get(f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
-            tags=[DB_COLLECTION_TE],
+            tags=[DB_COLLECTION_TM_TE],
             response_model=TestExecution,
             status_code=status.HTTP_200_OK)
 async def get_execution_by_key(request: Request,
@@ -346,7 +353,7 @@ async def get_execution_by_key(request: Request,
     db = request.app.state.mdb
 
     # Retrieve test execution from database
-    test_execution = await db.find_one(DB_COLLECTION_TE, {
+    test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "execution_key": execution_key
     })
     if test_execution is None:
@@ -361,7 +368,7 @@ async def get_execution_by_key(request: Request,
 
 
 @router.put(f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
-            tags=[DB_COLLECTION_TE],
+            tags=[DB_COLLECTION_TM_TE],
             response_model=TestExecutionUpdate)
 async def update_execution_by_key(request: Request,
                                   execution_key: str,
@@ -380,7 +387,7 @@ async def update_execution_by_key(request: Request,
     request_data = {k: v for k, v in request_data.items() if v is not None}
 
     # Update the execution in the database
-    result, matched_count = await db.update(DB_COLLECTION_TE, request_data, {
+    result, matched_count = await db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, request_data, {
         "execution_key": execution_key
     })
     if matched_count == 0:
@@ -389,7 +396,7 @@ async def update_execution_by_key(request: Request,
             content={"error": f"{execution_key} not found"})
 
     # Retrieve the updated test execution from the database
-    updated_test_execution = await db.find_one(DB_COLLECTION_TE, {
+    updated_test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "execution_key": execution_key
     })
 
@@ -397,7 +404,7 @@ async def update_execution_by_key(request: Request,
     test_case_key = updated_test_execution["test_case_key"]
 
     # Get the test case
-    tc_data = await db.find_one(DB_COLLECTION_TC, {
+    tc_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "test_case_key": test_case_key
     })
     if tc_data is None:
@@ -408,7 +415,7 @@ async def update_execution_by_key(request: Request,
     # Update test case info
     tc_data["updated_at"] = get_current_utc_time()
     tc_data["last_result"] = request_data["result"]
-    await db.update(DB_COLLECTION_TC, tc_data, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, tc_data, {
         "test_case_key": test_case_key
     })
 
@@ -417,7 +424,7 @@ async def update_execution_by_key(request: Request,
 
 
 @router.delete(f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
-               tags=[DB_COLLECTION_TE],
+               tags=[DB_COLLECTION_TM_TE],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_execution_by_key(request: Request,
                                   execution_key: str):
@@ -428,7 +435,7 @@ async def delete_execution_by_key(request: Request,
     # TODO: Update test case info and use last - 1 as last_execution_key
 
     # Delete the project from the database
-    result, deleted_count = await db.delete_one(DB_COLLECTION_TE, {
+    result, deleted_count = await db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "execution_key": execution_key
     })
     if deleted_count == 0:

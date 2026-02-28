@@ -20,12 +20,13 @@ from fastapi import (
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
-    DB_COLLECTION_PRJ,
-    DB_COLLECTION_TE,
-    DB_COLLECTION_TC,
-    DB_COLLECTION_TCY,
-    TCY_KEY_PREFIX,
-    API_VERSION
+    API_VERSION,
+    DB_COLLECTION_TM_PRJ,
+    DB_COLLECTION_TM_TE,
+    DB_COLLECTION_TM_TC,
+    DB_COLLECTION_TM_TCY,
+    DB_NAME_TM,
+    TCY_KEY_PREFIX
 )
 from backend.app.utility import get_current_utc_time
 from backend.models.test_cycles import (
@@ -37,9 +38,15 @@ from backend.models.test_cycles import (
 
 router = APIRouter()
 
+DB_NAME_TM = DB_NAME_TM.name
+DB_COLLECTION_TM_PRJ = DB_COLLECTION_TM_PRJ.name
+DB_COLLECTION_TM_TC = DB_COLLECTION_TM_TC.name
+DB_COLLECTION_TM_TE = DB_COLLECTION_TM_TE.name
+DB_COLLECTION_TM_TCY = DB_COLLECTION_TM_TCY.name
+
 
 @router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/cycles",
-            tags=[DB_COLLECTION_TCY],
+            tags=[DB_COLLECTION_TM_TCY],
             response_model=list[TestCycle],
             status_code=status.HTTP_200_OK)
 async def get_all_cycles_for_project(request: Request,
@@ -49,7 +56,7 @@ async def get_all_cycles_for_project(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -59,7 +66,7 @@ async def get_all_cycles_for_project(request: Request,
         )
 
     # Retrieve all test cycles from the database matching project_key
-    test_cycles = await db.find(DB_COLLECTION_TCY, {
+    test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "project_key": project_key
     })
 
@@ -70,7 +77,7 @@ async def get_all_cycles_for_project(request: Request,
 
 
 @router.post(f"/api/{API_VERSION}/tm/projects/{{project_key}}/cycles",
-             tags=[DB_COLLECTION_TCY],
+             tags=[DB_COLLECTION_TM_TCY],
              response_model=TestCycle,
              status_code=status.HTTP_201_CREATED)
 async def create_cycle_for_project(request: Request,
@@ -81,7 +88,7 @@ async def create_cycle_for_project(request: Request,
     db = request.app.state.mdb
 
     # Check project exists
-    project = await db.find_one(DB_COLLECTION_PRJ, {
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
     if project is None:
@@ -146,14 +153,14 @@ async def create_cycle_for_project(request: Request,
     db_insert["_id"] = test_cycle_key
 
     # Create the test cycle in the database
-    await db.create(DB_COLLECTION_TCY, db_insert)
+    await db.create(DB_NAME_TM, DB_COLLECTION_TM_TCY, db_insert)
 
     # Update project test cycle count
-    test_cycles = await db.find(DB_COLLECTION_TCY, {
+    test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "project_key": project_key
     })
     project["test_cycle_count"] = len(test_cycles)
-    await db.update(DB_COLLECTION_PRJ, project, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })
 
@@ -162,7 +169,7 @@ async def create_cycle_for_project(request: Request,
 
 
 @router.get(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}",
-            tags=[DB_COLLECTION_TCY],
+            tags=[DB_COLLECTION_TM_TCY],
             response_model=TestCycle,
             status_code=status.HTTP_200_OK)
 async def get_cycle_by_key(request: Request,
@@ -172,7 +179,7 @@ async def get_cycle_by_key(request: Request,
     db = request.app.state.mdb
 
     # Retrieve the test cycle from the database
-    result = await db.find_one(DB_COLLECTION_TCY, {
+    result = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "test_cycle_key": test_cycle_key
     })
 
@@ -190,7 +197,7 @@ async def get_cycle_by_key(request: Request,
 
 
 @router.put(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}",
-            tags=[DB_COLLECTION_TCY],
+            tags=[DB_COLLECTION_TM_TCY],
             response_model=TestCycle,
             status_code=status.HTTP_200_OK)
 async def update_cycle_by_key(request: Request,
@@ -206,7 +213,7 @@ async def update_cycle_by_key(request: Request,
     request_data["updated_at"] = get_current_utc_time()
 
     # Update the cycle in the database
-    result, matched_count = await db.update(DB_COLLECTION_TCY, request_data, {
+    result, matched_count = await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, request_data, {
         "test_cycle_key": test_cycle_key
     })
 
@@ -217,7 +224,7 @@ async def update_cycle_by_key(request: Request,
         )
 
     # Retrieve the updated test case
-    updated_test_cycle = await db.find_one(DB_COLLECTION_TCY, {
+    updated_test_cycle = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "test_cycle_key": test_cycle_key
     })
 
@@ -226,7 +233,7 @@ async def update_cycle_by_key(request: Request,
 
 
 @router.delete(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}",
-               tags=[DB_COLLECTION_TCY],
+               tags=[DB_COLLECTION_TM_TCY],
                status_code=status.HTTP_204_NO_CONTENT)
 async def delete_cycle_by_key(request: Request,
                               test_cycle_key: str):
@@ -235,7 +242,7 @@ async def delete_cycle_by_key(request: Request,
     db = request.app.state.mdb
 
     # Delete the test_cycle from the database
-    result, deleted_count = await db.delete_one(DB_COLLECTION_TCY, {
+    result, deleted_count = await db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "test_cycle_key": test_cycle_key
     })
 
@@ -250,7 +257,7 @@ async def delete_cycle_by_key(request: Request,
 
 
 @router.get(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}/executions",
-            tags=[DB_COLLECTION_TCY],
+            tags=[DB_COLLECTION_TM_TCY],
             response_model=list[dict],
             status_code=status.HTTP_200_OK)
 async def get_cycle_executions(request: Request,
@@ -269,10 +276,10 @@ async def get_cycle_executions(request: Request,
     result_data = {}
     for tc_key, exec_key in cycle_executions.items():
         # Retrieve test execution data
-        exec_data = await db.find_one(DB_COLLECTION_TE, {
+        exec_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
             "execution_key": exec_key["execution_key"]
         })
-        tc_data = await db.find_one(DB_COLLECTION_TC, {
+        tc_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
             "test_case_key": tc_key
         })
         exec_data.update(tc_data)
@@ -284,7 +291,7 @@ async def get_cycle_executions(request: Request,
 
 
 @router.post(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}/executions",
-             tags=[DB_COLLECTION_TCY],
+             tags=[DB_COLLECTION_TM_TCY],
              status_code=status.HTTP_200_OK)
 async def add_execution_to_cycle(request: Request,
                                  test_cycle_key: str,
@@ -300,7 +307,7 @@ async def add_execution_to_cycle(request: Request,
         return response
 
     # Check execution exists
-    test_execution = await db.find_one(DB_COLLECTION_TE, {
+    test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "execution_key": execution_key
     })
     if test_execution is None:
@@ -341,13 +348,13 @@ async def add_execution_to_cycle(request: Request,
         "execution_key": execution_key
     }}
     cycle_data["executions"].update(exec_data)
-    await db.update(DB_COLLECTION_TCY, cycle_data, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {
         "test_cycle_key": test_cycle_key
     })
 
     # Update execution cycle id
     test_execution["test_cycle_key"] = test_cycle_key
-    await db.update(DB_COLLECTION_TE, test_execution, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {
         "execution_key": execution_key
     })
 
@@ -360,7 +367,7 @@ async def add_execution_to_cycle(request: Request,
 
 
 @router.delete(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}/executions/{{execution_key}}",
-               tags=[DB_COLLECTION_TCY],
+               tags=[DB_COLLECTION_TM_TCY],
                status_code=status.HTTP_200_OK)
 async def remove_executions_from_cycle(request: Request,
                                        test_cycle_key: str,
@@ -376,7 +383,7 @@ async def remove_executions_from_cycle(request: Request,
         return response
 
     # Check execution exists
-    test_execution = await db.find_one(DB_COLLECTION_TE, {
+    test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "execution_key": execution_key
     })
 
@@ -397,13 +404,13 @@ async def remove_executions_from_cycle(request: Request,
 
     # Remove execution from cycle
     cycle_data["executions"].pop(test_execution["test_case_key"])
-    await db.update(DB_COLLECTION_TCY, cycle_data, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {
         "test_cycle_key": test_cycle_key
     })
 
     # Update execution cycle key
     test_execution["test_cycle_key"] = None
-    await db.update(DB_COLLECTION_TE, test_execution, {
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {
         "execution_key": execution_key
     })
 

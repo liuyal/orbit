@@ -24,7 +24,7 @@ class OrbitTMBaseTest:
         cls.port = pytest.options['port']
 
         cls.protocol = "http"
-        cls.url = f"{cls.protocol}://{cls.host}:{cls.port}/api/v1/tm"
+        cls.url = f"{cls.protocol}://{cls.host}:{cls.port}/api/v1"
 
         response = requests.get(f"{cls.protocol}://{cls.host}:{cls.port}/")
         assert response.status_code == 204
@@ -39,5 +39,5 @@ class OrbitTMBaseTest:
     def reset_db(cls):
         """Reset the database"""
 
-        response = requests.post(f"{cls.url}/reset")
+        response = requests.post(f"{cls.url}/reset-database")
         assert response.status_code == 204

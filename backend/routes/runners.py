@@ -8,9 +8,12 @@
 # routes/runner.py
 
 import logging
-import time
 
-from fastapi import APIRouter, Request, status
+from fastapi import (
+    APIRouter,
+    Request,
+    status
+)
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
