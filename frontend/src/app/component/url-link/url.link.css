@@ -1,0 +1,13 @@
+/* ========================= */
+/*          Link             */
+/* ========================= */
+
+.url-link {
+  color: #60a5fa;
+  text-decoration: none;
+}
+
+.url-link:hover {
+  color: #4296fd;
+  text-decoration: underline;
+}
