@@ -10,6 +10,7 @@ import { LoaderComponent } from '../loader/loader.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { UrlLinkComponent } from '../url-link/url.link';
+import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 
 @Component({
   selector: 'app-runners-status-table',
@@ -21,7 +22,8 @@ import { UrlLinkComponent } from '../url-link/url.link';
     LoaderComponent,
     ErrorStateComponent,
     EmptyStateComponent,
-    UrlLinkComponent
+    UrlLinkComponent,
+    StatusBadgeComponent
   ],
   styleUrls: ['./runners.status.table.component.css'],
   templateUrl: './runners.status.table.component.html'

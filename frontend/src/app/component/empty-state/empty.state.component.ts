@@ -10,6 +10,6 @@ import { CommonModule } from '@angular/common';
 })
 
 export class EmptyStateComponent {
-    @Input() visible = true;
-    @Input() message = '';
+    @Input() visible: boolean = true;
+    @Input() message: string = '';
 }
