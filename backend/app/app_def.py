@@ -91,9 +91,9 @@ DB_COLLECTION_RUNNERS_ONLINE_STATS = DBCollection(name="runners-stats-online")
 DB_COLLECTION_USER_LEADERBOARD_STATS = DBCollection(name="user-leaderboard-stats")
 
 # DB Constants
-DB_NAME = "ORBIT"
+DB_NAME = "orbit"
 DB_NAME_TM = DB(
-    name=f"{DB_NAME}-TM",
+    name=f"{DB_NAME}-tm",
     collections=[
         DB_COLLECTION_TM_PRJ,
         DB_COLLECTION_TM_TC,
@@ -103,7 +103,7 @@ DB_NAME_TM = DB(
 )
 
 DB_NAME_RUNNERS = DB(
-    name=f"{DB_NAME}-RUNNERS",
+    name=f"{DB_NAME}-runners",
     collections=[
         DB_COLLECTION_RUNNERS_TIMESTAMP_STATS,
         DB_COLLECTION_RUNNERS_STATS_HISTORIC,
