@@ -73,8 +73,8 @@ class MongoClient(DatabaseClient):
         for db in DB_ALL:
             # Initialize the database
             if db.name not in await self._db_client.list_database_names():
-                await self._db_client[db.name].drop_collection("INIT")
-                await self._db_client[db.name].create_collection("INIT")
+                await self._db_client[db.name].drop_collection("init")
+                await self._db_client[db.name].create_collection("init")
 
             # Initialize required collections
             collections = await self._db_client[db.name].list_collection_names()
