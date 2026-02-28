@@ -9,6 +9,7 @@ import { interval } from 'rxjs/internal/observable/interval';
 import { LoaderComponent } from '../loader/loader.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
+import { UrlLinkComponent } from '../url-link/url.link';
 
 @Component({
   selector: 'app-runners-status-table',
@@ -19,7 +20,8 @@ import { EmptyStateComponent } from '../empty-state/empty.state.component';
     MatProgressSpinnerModule,
     LoaderComponent,
     ErrorStateComponent,
-    EmptyStateComponent
+    EmptyStateComponent,
+    UrlLinkComponent
   ],
   styleUrls: ['./runners.status.table.component.css'],
   templateUrl: './runners.status.table.component.html'

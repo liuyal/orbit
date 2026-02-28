@@ -68,8 +68,7 @@
         <ng-container matColumnDef="JOB LINK">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Job Link</th>
             <td mat-cell *matCellDef="let runner">
-                <a *ngIf="runner.job_url && runner.job_url !== '-'" [href]="runner.job_url" target="_blank" class="job-link">LINK</a>
-                <span *ngIf="!runner.job_url || runner.job_url === '-'">-</span>
+                <app-url-link [name]="'LINK'" [href]="runner.job_url"></app-url-link>
             </td>
         </ng-container>
 
