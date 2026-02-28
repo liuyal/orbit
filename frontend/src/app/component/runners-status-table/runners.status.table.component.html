@@ -1,7 +1,7 @@
 <div class="table-wrapper">
 
     <ng-container *ngIf="isLoading; else notLoading">
-        <app-loader [visible]="isLoading"></app-loader>
+        <app-loader [active]="isLoading" [delay]="3000"></app-loader>
     </ng-container>
 
     <ng-template #notLoading>

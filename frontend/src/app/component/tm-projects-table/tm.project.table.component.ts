@@ -14,10 +14,8 @@ import { LoaderComponent } from '../loader/loader.component';
 })
 
 export class TmProjectsTableComponent implements OnInit, AfterViewInit, OnDestroy {
-  private spinnerTimeout?: any;
   cdr = inject(ChangeDetectorRef);
   isLoading = false;
-  showSpinner = false;
   error = '';
 
   constructor() {
@@ -33,9 +31,6 @@ export class TmProjectsTableComponent implements OnInit, AfterViewInit, OnDestro
   }
 
   ngOnDestroy(): void {
-    if (this.spinnerTimeout) {
-      clearTimeout(this.spinnerTimeout);
-    }
   }
 }
 

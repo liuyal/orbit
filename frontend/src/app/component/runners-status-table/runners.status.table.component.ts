@@ -30,16 +30,14 @@ import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 })
 
 export class RunnersStatusTableComponent implements OnInit, AfterViewInit, OnDestroy {
+  cdr = inject(ChangeDetectorRef);
   private static readonly AUTO_REFRESH_INTERVAL_MS = 60 * 1000;
   private refreshSubscription?: Subscription;
-  private spinnerTimeout?: any;
-  cdr = inject(ChangeDetectorRef);
   runnersDataSource: MatTableDataSource<RunnerStatus>;
   displayedColumns = ['NAME', 'DESIGNATION', 'STATUS', 'BUSY', 'USER', 'JOB LINK'];
   runners: any[] = [];
   autoRefresh = false;
   isLoading = false;
-  showSpinner = false;
   error = '';
 
   constructor(
@@ -51,30 +49,17 @@ export class RunnersStatusTableComponent implements OnInit, AfterViewInit, OnDes
 
   loadRunners(): void {
     this.isLoading = true;
-    this.showSpinner = false;
-
-    // Clear any existing timeout
-    if (this.spinnerTimeout) {
-      clearTimeout(this.spinnerTimeout);
-    }
-    this.spinnerTimeout = setTimeout(() => {
-      this.showSpinner = true;
-      this.cdr.markForCheck();
-    }, 3000);
-
     this.runnerStatusServices.getRunners().subscribe({
       next: (response) => {
         this.runnersDataSource.data = Array.isArray(response) ? response : [];
         console.log('Runners data received:', this.runnersDataSource.data);
         this.isLoading = false;
-        this.showSpinner = false;
         this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error fetching runners data:', error);
         this.error = `Failed to load runners: ${error.error || 'API error'}`;
         this.isLoading = false;
-        this.showSpinner = false;
         this.cdr.markForCheck();
       }
     });
@@ -110,9 +95,7 @@ export class RunnersStatusTableComponent implements OnInit, AfterViewInit, OnDes
 
   ngOnDestroy(): void {
     this.stopAutoRefresh();
-    if (this.spinnerTimeout) {
-      clearTimeout(this.spinnerTimeout);
-    }
+    
   }
 }
 
