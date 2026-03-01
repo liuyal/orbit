@@ -432,17 +432,32 @@ async def delete_execution_by_key(request: Request,
 
     db = request.app.state.mdb
 
-    # TODO: Update test case info and use last - 1 as last_execution_key
-
-    # Delete the project from the database
-    result, deleted_count = await db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+    # Update test case info if last_execution_key matches the deleted execution
+    test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "execution_key": execution_key
     })
-    if deleted_count == 0:
-        # Test execution not found
+    if test_execution is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{execution_key} not found"}
         )
+
+    # Check linked test case
+    test_case = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
+        "test_case_key": test_execution["test_case_key"]
+    })
+    if test_case is not None and test_case["last_execution_key"] == execution_key:
+        # Update test case info
+        test_case["updated_at"] = get_current_utc_time()
+        test_case["last_execution_key"] = None
+        test_case["last_result"] = "NOT_EXECUTED"
+        await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, test_case, {
+            "test_case_key": test_execution["test_case_key"]
+        })
+
+    # Delete the execution from the database
+    await db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+        "execution_key": execution_key
+    })
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -8,9 +8,11 @@
 # routes/root.py
 
 import logging
+from enum import Enum
 
 from fastapi import APIRouter, Request, status, Response
 from fastapi.responses import RedirectResponse
+from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
     API_VERSION,
@@ -22,6 +24,12 @@ from backend.app.app_def import (
 router = APIRouter()
 
 logger = logging.getLogger(__name__)
+
+
+class DbTarget(str, Enum):
+    ALL = "ALL"
+    TM = "TM"
+    RUNNERS = "RUNNERS"
 
 
 @router.get(f"/", tags=["root"])
@@ -50,21 +58,25 @@ async def root_api(request: Request):
              tags=["root"],
              status_code=status.HTTP_204_NO_CONTENT)
 async def reset_database(request: Request,
-                         db_target: str = "ALL"):
+                         db_name: DbTarget):
     """ Root endpoint to reset server database. """
 
     db = request.app.state.mdb
 
     # Reset the database
-    if db_target.upper().endswith("TM"):
-        db_target = [DB_NAME_TM]
+    if db_name == DbTarget.TM:
+        db_target_list = [DB_NAME_TM]
 
-    elif db_target.upper().endswith("RUNNERS"):
-        db_target = [DB_NAME_RUNNERS]
+    elif db_name == DbTarget.RUNNERS:
+        db_target_list = [DB_NAME_RUNNERS]
+
+    elif db_name == DbTarget.ALL:
+        db_target_list = DB_ALL
 
     else:
-        db_target = DB_ALL
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
+                            content={"error": f"Invalid db_target value: {db_name}"})
 
-    await db.configure(clean_db=db_target)
+    await db.configure(clean_db=db_target_list)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

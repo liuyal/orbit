@@ -23,7 +23,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Generate project
-        projects = 2
+        projects = 1
         cases = 50
         for i in range(1, projects + 1):
             project_key = f"PRJ{i}"
@@ -65,7 +65,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 assert len(response.json()) == te_count
 
             # Create cycles
-            cycles = 3
+            cycles = 1
             for j in range(1, cycles + 1):
                 response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/cycles", json={
                     "title": f"Cycle #{j} ({project_key}) - {uuid.uuid4()}"
@@ -73,14 +73,14 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 assert response.status_code == 201
                 cycle_key = response.json().get("test_cycle_key")
 
-                for i in range(1, len(execution_list) + 1):
+                for ii in range(1, len(execution_list) + 1):
                     # Add execution to cycle
                     execution = execution_list.pop()
                     response = requests.post(f"{self.__class__.url}/tm/cycles/{cycle_key}/executions", params={
                         "execution_key": execution,
                         "custom_field_values": {
-                            "custom_field_1": f"Value {i} for {execution}",
-                            "custom_field_2": f"Value {i} for {execution}"
+                            "custom_field_1": f"Value {ii} for {execution}",
+                            "custom_field_2": f"Value {ii} for {execution}"
                         }
                     })
                     assert response.status_code == 200

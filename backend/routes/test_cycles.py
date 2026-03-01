@@ -245,7 +245,6 @@ async def delete_cycle_by_key(request: Request,
     result, deleted_count = await db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "test_cycle_key": test_cycle_key
     })
-
     if deleted_count == 0:
         # Test case not found
         return JSONResponse(
@@ -386,7 +385,6 @@ async def remove_executions_from_cycle(request: Request,
     test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "execution_key": execution_key
     })
-
     if test_execution is None:
         # test execution not found
         return JSONResponse(

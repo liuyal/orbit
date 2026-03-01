@@ -47,20 +47,13 @@ async def get_runners_status(request: Request):
             status_code=status.HTTP_200_OK)
 async def get_runners_status_by_name(request: Request,
                                      name: str):
-    """ Get the status of a runners. """
+    """ Get the status of a runner. """
 
-    # Retrieve runner from database
-    cache = getattr(request.app.state, RUNNER_STATUS_CACHE, [])
-
-    result = None
-    for item in cache:
+    # Retrieve runner from cache
+    for item in getattr(request.app.state, RUNNER_STATUS_CACHE, []):
         if item["name"] == name:
-            result = item
-            break
+            return JSONResponse(status_code=status.HTTP_200_OK,
+                                content=item)
 
-    if result is None:
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
-                            content={"error": f"{name} not found"})
-
-    return JSONResponse(status_code=status.HTTP_200_OK,
-                        content=result)
+    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
+                        content={"error": f"{name} not found"})

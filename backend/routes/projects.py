@@ -93,7 +93,7 @@ async def create_project_by_key(request: Request,
     if len(request_data["labels"]) != len(set(request_data["labels"])):
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": f"Duplicate labels are not allowed"}
+            content={"error": f"Duplicated labels in request"}
         )
 
     # Check project exists
@@ -236,7 +236,7 @@ async def delete_project_by_key(request: Request,
 
     # Check force flag
     if force and force.get("force", None) is False:
-        # Check for existing test cases, test-executions, test-cycles linked to the project
+        # Check for existing test cases linked to the project
         test_case_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TC, {
             "project_key": project_key
         })
@@ -246,7 +246,7 @@ async def delete_project_by_key(request: Request,
                 content={"error": f"Project {project_key} "
                                   f"contains linked test-cases"}
             )
-
+        # Check for existing test-executions linked to the project
         test_executions_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TE, {
             "project_key": project_key
         })
@@ -256,7 +256,7 @@ async def delete_project_by_key(request: Request,
                 content={"error": f"Project {project_key} "
                                   f"contains linked test-executions"}
             )
-
+        # Check for existing test-cycles linked to the project
         test_cycles_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
             "project_key": project_key
         })
@@ -268,13 +268,15 @@ async def delete_project_by_key(request: Request,
             )
 
     else:
-        # Force delete all linked test-cases, test-executions, test-cycles
+        # Force delete all linked test-cases
         await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
             "project_key": project_key
         })
+        # Force delete all linked test-executions
         await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TE, {
             "project_key": project_key
         })
+        # Force delete all linked test-cycles
         await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TC, {
             "project_key": project_key
         })
