@@ -18,10 +18,8 @@ import { RunnersStatusTableComponent } from '../../component/runners-status-tabl
 export class RunnersStatus implements OnInit, OnDestroy {
 
   ngOnInit(): void {
-    console.log('ngOnInit called');
   }
 
   ngOnDestroy(): void {
-    console.log('ngOnDestroy called');
   }
 }
