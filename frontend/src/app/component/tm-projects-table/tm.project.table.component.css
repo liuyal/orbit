@@ -7,3 +7,93 @@
   width: 100%;
   max-height: calc(80vh - 10px);
 }
+
+/* ========================= */
+/*        Table Styles       */
+/* ========================= */
+
+.projects-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+/* ========================= */
+/*      Table Header         */
+/* ========================= */
+
+.projects-table .mat-mdc-header-row th {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+/* ========================= */
+/*      Table Header Cell    */
+/* ========================= */
+
+.projects-table th {
+  padding: 5px;
+  text-align: center;
+  font-size: 15px;
+  color: #deedff;
+  text-transform: uppercase;
+  width: auto;
+  background: #1e1e1e;
+}
+
+/* ========================= */
+/*      Table Body Rows      */
+/* ========================= */
+
+.projects-table .mat-mdc-row {
+  border: 1px solid #1e1e1e;
+}
+
+.projects-table .mat-mdc-row:hover td {
+  background-color: #181818;
+}
+
+/* ========================= */
+/*      Table Body Cells     */
+/* ========================= */
+
+.projects-table td {
+  padding: 12px;
+  font-size: 16px;
+  color: #ffffff;
+  text-align: center;
+  width: auto;
+  background-color: #13171f;
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* ========================= */
+/*   Light Theme (System)    */
+/* ========================= */
+
+@media (prefers-color-scheme: light) {
+  .table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+  }
+
+  .projects-table th {
+    background-color: #f7f7f7;
+    color: #000;
+  }
+
+  .projects-table .mat-mdc-row {
+    border: 1px solid #e5e7eb;
+  }
+
+  .projects-table .mat-mdc-row:hover td {
+    background-color: #f9fafb;
+  }
+
+  .projects-table td {
+    background-color: #ffffff;
+    color: #000;
+  }
+}

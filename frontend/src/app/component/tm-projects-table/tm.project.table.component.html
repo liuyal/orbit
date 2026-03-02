@@ -16,7 +16,45 @@
         </ng-container>
     </ng-template>
 
-     <ng-template #showTable>
-     </ng-template>
+    <ng-template #showTable>
+        <table mat-table [dataSource]="projectsDataSource" class="projects-table">
+
+            <ng-container matColumnDef="KEY">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>KEY</th>
+                <td mat-cell *matCellDef="let project">{{project.project_key}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="DESCRIPTION">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>DESCRIPTION</th>
+                <td mat-cell *matCellDef="let project">{{project.description}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="# TESTS">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header># TESTS</th>
+                <td mat-cell *matCellDef="let project">{{project.test_case_count}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="# CYCLES">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header># CYCLES</th>
+                <td mat-cell *matCellDef="let project">{{project.test_cycle_count}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="STATUS">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
+                <td mat-cell *matCellDef="let project">
+                    <app-status-badge *ngIf="project.is_active; else offline" [text]="'ACTIVE'" [className]="'active'"
+                        [icon]="'fa-circle-check'">
+                    </app-status-badge>
+                    <ng-template #offline>
+                        <app-status-badge [text]="'INACTIVE'" [className]="'inactive'" [icon]="'fa-circle-xmark'">
+                        </app-status-badge>
+                    </ng-template>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </ng-template>
 
 </div>

@@ -2,18 +2,21 @@ import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { ProjectsService, Projects } from '../../services/tm.project.service';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
+import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 
 @Component({
   selector: 'app-tm-projects-table',
   standalone: true,
   imports: [
     CommonModule,
+    MatTableModule,
     LoaderComponent,
     EmptyStateComponent,
-    ErrorStateComponent
+    ErrorStateComponent,
+    StatusBadgeComponent
   ],
   styleUrls: ['./tm.project.table.component.css'],
   templateUrl: './tm.project.table.component.html'
@@ -21,6 +24,7 @@ import { ErrorStateComponent } from '../error-state/error.state.component';
 
 export class TmProjectsTableComponent implements OnInit {
   cdr = inject(ChangeDetectorRef);
+  displayedColumns = ['KEY', 'DESCRIPTION', '# TESTS', '# CYCLES', 'STATUS'];
   projectsDataSource: MatTableDataSource<Projects>;
   isLoading = false;
   error = '';

@@ -1,7 +1,6 @@
 import { Component, inject, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RunnersStatusService, RunnerStatus } from '../../services/runners.status.service';
 import { AutoRefreshService } from '../../services/auto-refresh.service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -18,7 +17,6 @@ import { StatusBadgeComponent } from '../status-badge/status.badge.component';
   imports: [
     CommonModule,
     MatTableModule,
-    MatProgressSpinnerModule,
     LoaderComponent,
     ErrorStateComponent,
     EmptyStateComponent,
