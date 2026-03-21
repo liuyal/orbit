@@ -33,7 +33,6 @@
 /* ========================= */
 
 .projects-table th {
-  padding: 5px;
   text-align: center;
   font-size: 15px;
   color: #deedff;
@@ -52,6 +51,11 @@
 
 .projects-table .mat-mdc-row:hover td {
   background-color: #181818;
+}
+
+/* Make rows appear clickable */
+.projects-table .mat-mdc-row:hover {
+  cursor: pointer;
 }
 
 /* ========================= */
@@ -90,6 +94,11 @@
 
   .projects-table .mat-mdc-row:hover td {
     background-color: #f9fafb;
+  }
+
+  /* Make rows appear clickable in light theme */
+  .projects-table .mat-mdc-row:hover {
+    cursor: pointer;
   }
 
   .projects-table td {

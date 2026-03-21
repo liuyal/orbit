@@ -53,7 +53,10 @@
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                (click)="onProjectClick($event, row.project_key)"
+                (auxclick)="onProjectClick($event, row.project_key)">
+            </tr>
         </table>
     </ng-template>
 

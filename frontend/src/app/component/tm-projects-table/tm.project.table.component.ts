@@ -6,6 +6,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { StatusBadgeComponent } from '../status-badge/status.badge.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tm-projects-table',
@@ -24,6 +25,7 @@ import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 
 export class TmProjectsTableComponent implements OnInit {
   cdr = inject(ChangeDetectorRef);
+  router = inject(Router);
   displayedColumns = ['KEY', 'DESCRIPTION', '# TESTS', '# CYCLES', 'STATUS'];
   projectsDataSource: MatTableDataSource<Projects>;
   isLoading = false;
@@ -53,6 +55,18 @@ export class TmProjectsTableComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  onProjectClick(event: MouseEvent, projectKey: string) {
+    if (event.button === 1) {
+      // Middle mouse button
+      event.preventDefault();
+      const url = this.router.serializeUrl(this.router.createUrlTree(['/projects', projectKey, 'test-cases']));
+      window.open(url, '_blank');
+    } else if (event.button === 0) {
+      // Left mouse button
+      this.router.navigate(['/projects', projectKey, 'test-cases']);
+    }
   }
 
   ngOnInit(): void {
