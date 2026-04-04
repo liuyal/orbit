@@ -61,11 +61,11 @@ export class TmProjectsTableComponent implements OnInit {
     if (event.button === 1) {
       // Middle mouse button
       event.preventDefault();
-      const url = this.router.serializeUrl(this.router.createUrlTree(['/projects', projectKey, 'test-cases']));
+      const url = this.router.serializeUrl(this.router.createUrlTree(['/projects', projectKey]));
       window.open(url, '_blank');
     } else if (event.button === 0) {
       // Left mouse button
-      this.router.navigate(['/projects', projectKey, 'test-cases']);
+      this.router.navigate(['/projects', projectKey]);
     }
   }
 

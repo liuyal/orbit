@@ -40,4 +40,18 @@ export class ProjectsService {
 
         return this.http.get<ProjectsResponseModel>(`${this.apiUrl}/tm/projects`, { headers });
     }
-}
+
+    /**
+     * Get a specific project by its key
+     * @param projectKey The key of the project to retrieve
+     * @returns An observable that emits the project details
+     */
+    getProjectByKey(projectKey: string): Observable<Projects> {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        });
+
+        return this.http.get<Projects>(`${this.apiUrl}/tm/projects/${projectKey}`, { headers });
+    }
+}   
