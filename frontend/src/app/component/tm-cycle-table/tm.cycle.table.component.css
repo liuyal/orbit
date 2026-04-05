@@ -1,0 +1,20 @@
+/* ========================= */
+/*        Table Wrapper      */
+/* ========================= */
+
+.table-wrapper {
+  overflow: auto;
+  width: 100%;
+  max-height: calc(80vh - 10px);
+}
+
+/* ========================= */
+/*   Light Theme (System)    */
+/* ========================= */
+
+@media (prefers-color-scheme: light) {
+  .table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+  }
+}

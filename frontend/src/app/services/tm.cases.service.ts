@@ -39,7 +39,7 @@ export class TestCasesService {
     * Get a list of test cases
     * @returns An observable that emits the test cases response model containing an array of test cases.
     */
-    getTestCasesbyProject(projectKey: string): Observable<TestCasesResponseModel> {
+    getTestCasesbyProjectKey(projectKey: string): Observable<TestCasesResponseModel> {
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
             'Accept': 'application/json'

@@ -32,7 +32,7 @@ export class TestCyclesService {
     * Get a list of test cycles
     * @returns An observable that emits the test cycles response model containing an array of test cycles.
     */
-    getTestCyclesbyProject(projectKey: string): Observable<TestCyclesResponseModel> {
+    getTestCyclesbyProjectKey(projectKey: string): Observable<TestCyclesResponseModel> {
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
             'Accept': 'application/json'
