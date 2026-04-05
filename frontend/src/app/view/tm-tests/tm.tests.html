@@ -1,0 +1,21 @@
+<app-navbar [showBackButton]="true" [backButtonText]="'Back to Projects'"
+    [backButtonAction]="goBack.bind(this)"></app-navbar>
+
+<div class="tabs-container">
+    <div class="tabs">
+        <button class="tab" [class.active]="selectedTab === 'tests'" (click)="selectTab('tests')">
+            <i class="fa-solid fa-flask"></i>
+            Test Cases
+        </button>
+        <button class="tab" [class.active]="selectedTab === 'cycles'" (click)="selectTab('cycles')">
+            <i class="fa-regular fa-rectangle-list"></i>
+            Test Cycles
+        </button>
+    </div>
+</div>
+
+<div class="test-cases-container" *ngIf="selectedTab === 'tests'">
+</div>
+
+<div class="test-cycles-container" *ngIf="selectedTab === 'cycles'">
+</div>
