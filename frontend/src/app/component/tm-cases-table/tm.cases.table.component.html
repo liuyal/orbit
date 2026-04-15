@@ -1,63 +1,92 @@
 <div class="table-wrapper">
+    <div class="split-view">
+        <div class="folder-sidebar">
+            <div class="folder-header">
+                <h3>Folders</h3>
+            </div>
+            <!-- <div class="folder-list">
+                <div class="folder-item" [class.selected]="selectedFolder === null" (click)="selectFolder(null)">
+                    <i class="fa-solid fa-folder"></i>
+                    <span>Test Cases</span>
+                    <span class="folder-count">{{ testCases.length }}</span>
+                </div>
+                @for (folder of folders; track folder.name) {
+                <div class="folder-item" [class.selected]="selectedFolder === folder.name"
+                    (click)="selectFolder(folder.name)">
+                    <i class="fa-solid fa-folder"></i>
+                    <span>{{ folder.name }}</span>
+                    <span class="folder-count">{{ folder.count }}</span>
+                    <button class="folder-delete-btn" (click)="$event.stopPropagation(); deleteFolder(folder.name)"
+                        title="Delete Folder">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+                }
+            </div>-->
+        </div>
 
-    <ng-container *ngIf="isLoading; else notLoading">
-        <app-loader [active]="isLoading" [delay]="3000"></app-loader>
-    </ng-container>
-
-    <ng-template #notLoading>
-        <ng-container *ngIf="!isLoading && error; else checkEmpty">
-            <app-error-state [error]="error"></app-error-state>
+        <ng-container *ngIf="isLoading; else notLoading">
+            <app-loader [active]="isLoading" [delay]="3000"></app-loader>
         </ng-container>
-    </ng-template>
 
-    <ng-template #checkEmpty>
-        <ng-container *ngIf="testCasesDataSource.data.length === 0; else showTable">
-            <app-empty-state message="No test cases found."></app-empty-state>
-        </ng-container>
-    </ng-template>
-
-    <ng-template #showTable>
-        <app-status-badge> </app-status-badge>
-        <!-- <table mat-table [dataSource]="testCasesDataSource" class="projects-table">
-
-            <ng-container matColumnDef="KEY">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>KEY</th>
-                <td mat-cell *matCellDef="let project">{{project.project_key}}</td>
+        <ng-template #notLoading>
+            <ng-container *ngIf="!isLoading && error; else checkEmpty">
+                <app-error-state [error]="error"></app-error-state>
             </ng-container>
+        </ng-template>
 
-            <ng-container matColumnDef="DESCRIPTION">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>DESCRIPTION</th>
-                <td mat-cell *matCellDef="let project">{{project.description}}</td>
+        <ng-template #checkEmpty>
+            <ng-container *ngIf="testCasesDataSource.data.length === 0; else showTable">
+                <app-empty-state message="No test cases found."></app-empty-state>
             </ng-container>
+        </ng-template>
 
-            <ng-container matColumnDef="# TESTS">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header># TESTS</th>
-                <td mat-cell *matCellDef="let project">{{project.test_case_count}}</td>
-            </ng-container>
+        <ng-template #showTable>
+            <div class="test-case-table">
+                <table mat-table [dataSource]="testCasesDataSource">
+                    <ng-container matColumnDef="KEY">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>KEY</th>
+                        <td mat-cell *matCellDef="let testCase">{{testCase.test_case_key}}</td>
+                    </ng-container>
 
-            <ng-container matColumnDef="# CYCLES">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header># CYCLES</th>
-                <td mat-cell *matCellDef="let project">{{project.test_cycle_count}}</td>
-            </ng-container>
+                    <ng-container matColumnDef="TITLE">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>TITLE</th>
+                        <td mat-cell *matCellDef="let testCase">{{testCase.title}}</td>
+                    </ng-container>
 
-            <ng-container matColumnDef="STATUS">
-                <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
-                <td mat-cell *matCellDef="let project">
-                    <app-status-badge *ngIf="project.is_active; else offline" [text]="'ACTIVE'" [className]="'active'"
-                        [icon]="'fa-circle-check'">
-                    </app-status-badge>
-                    <ng-template #offline>
-                        <app-status-badge [text]="'INACTIVE'" [className]="'inactive'" [icon]="'fa-circle-xmark'">
-                        </app-status-badge>
-                    </ng-template>
-                </td>
-            </ng-container>
+                    <ng-container matColumnDef="STATUS">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
+                        <td mat-cell *matCellDef="let testCase">
+                            <app-status-badge [text]="testCase.status.toUpperCase()"
+                                [className]="'test_status ' + testCase.status.toLowerCase()">
+                            </app-status-badge>
+                        </td>
+                    </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                (click)="onProjectClick($event, row.project_key)"
-                (auxclick)="onProjectClick($event, row.project_key)">
-            </tr>
-        </table> -->
-    </ng-template>
+                    <ng-container matColumnDef="FREQUENCY">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>FREQUENCY</th>
+                        <td mat-cell *matCellDef="let testCase">{{testCase.test_frequency}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="LABELS">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>LABELS</th>
+                        <td mat-cell *matCellDef="let testCase">{{testCase.labels}}</td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="RESULT">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>RESULT</th>
+                        <td mat-cell *matCellDef="let testCase">
+                            <app-status-badge [text]="testCase.last_result.toUpperCase()"
+                                [className]="'result ' + testCase.last_result.toLowerCase()">
+                            </app-status-badge>
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                    </tr>
+                </table>
+            </div>
+        </ng-template>
+    </div>
 </div>

@@ -35,6 +35,89 @@
   border: 1px solid #475569;
 }
 
+/* Status Badge Variants */
+.status-badge.test_status.approved {
+  background-color: #4caf50;
+  color: #fff;
+  font-weight: bold;
+}
+
+.status-badge.test_status.draft {
+  background-color: #ffd700;
+  color: #222222;
+  font-weight: bold;
+}
+
+.status-badge.test_status.deprecated {
+  background-color: #9c27b0;
+  color: #fff;
+  font-weight: bold;
+}
+
+.status-badge.test_status.expected-fail {
+  background-color: #5209a5;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Priority Badge Variants */
+.status-badge.priority.high {
+  background-color: #ff1100;
+  color: #fff;
+  font-weight: bold;
+}
+
+.status-badge.priority.medium {
+  background-color: #ffd700;
+  color: #222222;
+  font-weight: bold;
+}
+
+.status-badge.priority.low {
+  background-color: #2196f3;
+  color: #fff;
+  font-weight: bold;
+}
+
+/* Result Badge Variants - Circular Design */
+.status-badge.result {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0;
+  line-height: 0;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.status-badge.result:hover {
+  transform: scale(1.15);
+}
+
+.status-badge.result.pass {
+  background-color: #4caf50;
+  color: #fff;
+}
+
+.status-badge.result.fail {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.status-badge.result.blocked {
+  background-color: #2196f3;
+  color: #fff;
+}
+
+.status-badge.result.not_executed {
+  background-color: #757575;
+  color: #fff;
+}
+
 @media (prefers-color-scheme: light) {
   .status-badge.active {
     background-color: #d1fae5;

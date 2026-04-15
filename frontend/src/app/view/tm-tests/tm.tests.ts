@@ -2,6 +2,7 @@ import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
+import { TmCasesTableComponent } from '../../component/tm-cases-table/tm.cases.table.component';
 
 @Component({
     selector: 'app-tm-tests',
@@ -9,6 +10,7 @@ import { NavbarComponent } from '../../component/navbar/navbar';
     imports: [
         CommonModule,
         NavbarComponent,
+        TmCasesTableComponent
     ],
     styleUrls: ['./tm.tests.css'],
     templateUrl: './tm.tests.html'
