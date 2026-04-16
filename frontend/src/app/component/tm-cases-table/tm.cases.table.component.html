@@ -58,7 +58,7 @@
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
                         <td mat-cell *matCellDef="let testCase">
                             <app-status-badge [text]="testCase.status.toUpperCase()"
-                                [className]="'test_status ' + testCase.status.toLowerCase()">
+                                [className]="'test_status ' + testCase.status.toLowerCase().replace(/ /g, '_')">
                             </app-status-badge>
                         </td>
                     </ng-container>
