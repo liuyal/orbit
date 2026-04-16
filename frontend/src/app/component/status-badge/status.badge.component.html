@@ -1,4 +1,7 @@
 <span class="status-badge {{className}}">
-    <i class="fa-solid {{icon}}"></i>
-    {{text}}
+    @if (icon) {
+        <i class="fa-solid {{icon}}"></i>{{text}}
+    } @else {
+        <span>{{text}}</span>
+    }
 </span>

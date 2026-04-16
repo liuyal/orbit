@@ -15,9 +15,36 @@
             <app-empty-state message="No test cycles found."></app-empty-state>
         </ng-container>
     </ng-template>
-    
-    <ng-template #showTable>
-         <app-status-badge> </app-status-badge>
-    </ng-template>
 
+    <ng-template #showTable>
+        <table mat-table [dataSource]="cyclesDataSource" class="test-cycle-table">
+            <ng-container matColumnDef="KEY">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>KEY</th>
+                <td mat-cell *matCellDef="let cycle">{{cycle.test_cycle_key}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="TITLE">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>TITLE</th>
+                <td mat-cell *matCellDef="let cycle">{{cycle.title}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="PROGRESS">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>PROGRESS</th>
+                <td mat-cell *matCellDef="let cycle">{{cycle.progress || 'N/A'}}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="STATUS">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
+                <td mat-cell *matCellDef="let cycle">
+                    <app-status-badge [text]="cycle.status.toUpperCase()"
+                        [className]="'test_status ' + cycle.status.toLowerCase()">
+                    </app-status-badge>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+            </tr>
+        </table>
+    </ng-template>
 </div>

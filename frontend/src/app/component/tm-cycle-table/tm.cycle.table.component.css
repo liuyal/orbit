@@ -3,9 +3,8 @@
 /* ========================= */
 
 .table-wrapper {
-  overflow: auto;
   width: 100%;
-  max-height: calc(80vh - 10px);
+  max-height: calc(85vh - 10px);
 }
 
 /* ========================= */
@@ -17,4 +16,112 @@
     background: #ffffff;
     border: 1px solid #e5e7eb;
   }
+}
+
+/* ========================================
+   TEST CYCLES TABLE
+   ======================================== */
+
+.test-cycle-table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  width: 100%;
+  background-color: rgb(19, 22.5, 30.5);
+}
+
+.test-cycle-table th:nth-child(1) {
+  width: 15%;
+}
+
+.test-cycle-table th:nth-child(2) {
+  width: 40%;
+}
+
+.test-cycle-table th:nth-child(3) {
+  width: 20%;
+}
+
+.test-cycle-table th:nth-child(4) {
+  width: 15%;
+}
+
+.test-cycle-table {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.test-cycle-table table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #252525;
+}
+
+.test-cycle-table thead {
+  background-color: #0057ad;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.test-cycle-table th {
+  padding: 8px 20px;
+  text-align: left;
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #004090;
+  width: 20%;
+  background-color: #0057ad;
+}
+
+.test-cycle-table th:first-child {
+  padding-left: 24px;
+}
+
+.test-cycle-table th:last-child {
+  padding-right: 24px;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.test-cycle-table td {
+  padding: 6px 20px;
+  border-bottom: 1px solid #333;
+  color: #e0e0e0;
+  font-size: 14px;
+  vertical-align: middle;
+  background-color: #171c25;
+}
+
+.test-cycle-table td:first-child {
+  padding-left: 24px;
+  font-weight: 500;
+  color: #4da6ff;
+}
+
+.test-cycle-table td:last-child {
+  padding-right: 24px;
+  width: 1%;
+  white-space: nowrap;
+}
+
+.test-cycle-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.test-cycle-table tbody tr:hover {
+  cursor: pointer;
+}
+
+.test-cycle-table tbody tr:hover td {
+  background-color: rgb(46, 46, 46);
+}
+
+.test-cycle-table tbody tr:last-child td {
+  border-bottom: none;
 }

@@ -61,7 +61,7 @@ export class TmCasesTableComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.projectKey = params['projectKey'];
-      console.log('Test Cases page for project:', this.projectKey);
+      console.log('Test cases tab for project:', this.projectKey);
       this.loadTestCases();
     });
   }

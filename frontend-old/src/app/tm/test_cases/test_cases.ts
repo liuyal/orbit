@@ -54,7 +54,6 @@ export class TestCases implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.projectKey = params['projectKey'];
-      console.log('Test Cases page for project:', this.projectKey);
       this.loadTestCases();
     });
   }

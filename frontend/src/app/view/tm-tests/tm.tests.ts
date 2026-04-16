@@ -28,14 +28,19 @@ export class TmTests implements OnInit {
 
     selectTab(tab: string) {
         this.selectedTab = tab;
-        console.log(`Selected tab: ${tab}`);
+        localStorage.setItem('tm-tests-selectedTab', tab);
     }
 
     goBack() {
         this.router.navigate(['/projects']);
     }
 
-    ngOnInit(): void { }
+    ngOnInit(): void {
+        const saved = localStorage.getItem('tm-tests-selectedTab');
+        if (saved) {
+            this.selectedTab = saved;
+        }
+    }
 
     ngAfterViewInit(): void { }
 

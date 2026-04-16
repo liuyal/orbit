@@ -18,7 +18,6 @@
 
     <ng-template #showTable>
         <table mat-table [dataSource]="projectsDataSource" class="projects-table">
-
             <ng-container matColumnDef="KEY">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header>KEY</th>
                 <td mat-cell *matCellDef="let project">{{project.project_key}}</td>

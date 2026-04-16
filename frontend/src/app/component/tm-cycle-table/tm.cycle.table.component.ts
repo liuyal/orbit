@@ -31,7 +31,7 @@ export class TmCyclesTableComponent implements OnInit {
   isLoading = false;
   error = '';
   projectKey = '';
-  displayedColumns = ['KEY', 'DESCRIPTION', '# TESTS', '# CYCLES', 'STATUS'];
+  displayedColumns = ['KEY', 'TITLE', 'PROGRESS', 'STATUS'];
 
   constructor(
     private testCyclesService: TestCyclesService
@@ -62,7 +62,7 @@ export class TmCyclesTableComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.projectKey = params['projectKey'];
-      console.log('Test Cases page for project:', this.projectKey);
+      console.log('Test cycle tab for project:', this.projectKey);
       this.loadTestCycles();
     });
   }
