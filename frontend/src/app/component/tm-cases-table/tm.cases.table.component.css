@@ -4,7 +4,7 @@
 
 .table-wrapper {
   width: 100%;
-  max-height: calc(80vh - 10px);
+  max-height: calc(85vh - 10px);
 }
 
 /* ========================= */
@@ -28,7 +28,7 @@
   flex: 1;
   overflow: hidden;
   gap: 0;
-  height: calc(80vh - 10px);
+  height: 120vh;
 }
 
 .folder-sidebar {
