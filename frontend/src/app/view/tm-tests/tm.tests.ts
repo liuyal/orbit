@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
 import { TmCasesTableComponent } from '../../component/tm-cases-table/tm.cases.table.component';
+import { TmCyclesTableComponent } from '../../component/tm-cycle-table/tm.cycle.table.component';
 
 @Component({
     selector: 'app-tm-tests',
@@ -10,7 +11,8 @@ import { TmCasesTableComponent } from '../../component/tm-cases-table/tm.cases.t
     imports: [
         CommonModule,
         NavbarComponent,
-        TmCasesTableComponent
+        TmCasesTableComponent,
+        TmCyclesTableComponent
     ],
     styleUrls: ['./tm.tests.css'],
     templateUrl: './tm.tests.html'

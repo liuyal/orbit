@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { MatList } from '@angular/material/list';
 
 export interface TestCycles {
     id: string;
@@ -30,6 +31,7 @@ export class TestCyclesService {
 
     /**
     * Get a list of test cycles
+    * @param projectKey The key of the project to retrieve test cycles for.
     * @returns An observable that emits the test cycles response model containing an array of test cycles.
     */
     getTestCyclesbyProjectKey(projectKey: string): Observable<TestCyclesResponseModel> {
@@ -38,6 +40,20 @@ export class TestCyclesService {
             'Accept': 'application/json'
         });
 
-        return this.http.get<TestCyclesResponseModel>(`${this.apiUrl}/tm/projects/${projectKey}/test-cycles`, { headers });
+        return this.http.get<TestCyclesResponseModel>(`${this.apiUrl}/tm/projects/${projectKey}/cycles`, { headers });
+    }
+
+    /**
+    * Get a specific test cycle execution info
+    * @param testCycleKey The key of the test cycle to retrieve.
+    * @return An observable that emits the test cycle details.
+    */
+    getCycleExecutionInfo(testCycleKey: string): Observable<object> {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        });
+
+        return this.http.get<object>(`${this.apiUrl}/tm/cycles/${testCycleKey}/executions`, { headers });
     }
 }

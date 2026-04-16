@@ -5,7 +5,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { StatusBadgeComponent } from '../status-badge/status.badge.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TestCyclesService, TestCycles } from '../../services/tm.cycles.service';
 
 @Component({
@@ -26,10 +26,12 @@ import { TestCyclesService, TestCycles } from '../../services/tm.cycles.service'
 export class TmCyclesTableComponent implements OnInit {
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
-  displayedColumns = ['KEY', 'DESCRIPTION', '# TESTS', '# CYCLES', 'STATUS'];
+  route = inject(ActivatedRoute);
   cyclesDataSource: MatTableDataSource<TestCycles>;
   isLoading = false;
   error = '';
+  projectKey = '';
+  displayedColumns = ['KEY', 'DESCRIPTION', '# TESTS', '# CYCLES', 'STATUS'];
 
   constructor(
     private testCyclesService: TestCyclesService
@@ -41,7 +43,7 @@ export class TmCyclesTableComponent implements OnInit {
     this.isLoading = true;
     this.error = '';
 
-    this.testCyclesService.getTestCyclesbyProjectKey('Key').subscribe({
+    this.testCyclesService.getTestCyclesbyProjectKey(this.projectKey).subscribe({
       next: (response) => {
         this.cyclesDataSource.data = Array.isArray(response) ? response : [];
         console.log('Test cycles data loaded:', this.cyclesDataSource.data);
@@ -58,7 +60,11 @@ export class TmCyclesTableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadTestCycles();
+    this.route.params.subscribe(params => {
+      this.projectKey = params['projectKey'];
+      console.log('Test Cases page for project:', this.projectKey);
+      this.loadTestCycles();
+    });
   }
 }
 
