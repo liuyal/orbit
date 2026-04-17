@@ -22,9 +22,16 @@ from backend.models.test_executions import TestExecution
 
 
 @dataclass
+class DBIndex:
+    keys: list[tuple[str, int]]
+    index_name: str
+
+
+@dataclass
 class DBCollection:
     name: str
     schema: Optional[dict] = field(default_factory=dict)
+    index: Optional[DBIndex] = None
 
 
 @dataclass
@@ -75,11 +82,40 @@ TEST_CASE_SCHEMA = pydantic_to_mongo_jsonschema(TestCase.model_json_schema())
 TEST_EXECUTION_SCHEMA = pydantic_to_mongo_jsonschema(TestExecution.model_json_schema())
 TEST_CYCLE_SCHEMA = pydantic_to_mongo_jsonschema(TestCycle.model_json_schema())
 
+# DB Indexes
+TEST_CASE_INDEX = DBIndex(
+    keys=[("project_key", 1), ("test_case_key", 1)],
+    index_name="idx_tc_project_key_test_case_key"
+)
+TEST_EXECUTION_INDEX = DBIndex(
+    keys=[("project_key", 1), ("execution_key", 1)],
+    index_name="idx_te_project_key_test_case_key"
+)
+TEST_CYCLE_INDEX = DBIndex(
+    keys=[("project_key", 1), ("test_cycle_key", 1)],
+    index_name="idx_tcy_project_key_test_case_key"
+)
+
 # DB COLLECTIONS - TM
-DB_COLLECTION_TM_PRJ = DBCollection(name="projects", schema=PROJECT_SCHEMA)
-DB_COLLECTION_TM_TC = DBCollection(name="test-cases", schema=TEST_CASE_SCHEMA)
-DB_COLLECTION_TM_TE = DBCollection(name="test-executions", schema=TEST_EXECUTION_SCHEMA)
-DB_COLLECTION_TM_TCY = DBCollection(name="test-cycles", schema=TEST_CYCLE_SCHEMA)
+DB_COLLECTION_TM_PRJ = DBCollection(
+    name="projects",
+    schema=PROJECT_SCHEMA
+)
+DB_COLLECTION_TM_TC = DBCollection(
+    name="test-cases",
+    schema=TEST_CASE_SCHEMA,
+    index=TEST_CASE_INDEX
+)
+DB_COLLECTION_TM_TE = DBCollection(
+    name="test-executions",
+    schema=TEST_EXECUTION_SCHEMA,
+    index=TEST_EXECUTION_INDEX
+)
+DB_COLLECTION_TM_TCY = DBCollection(
+    name="test-cycles",
+    schema=TEST_CYCLE_SCHEMA,
+    index=TEST_CYCLE_INDEX
+)
 
 # DB COLLECTIONS - RUNNER
 DB_COLLECTION_RUNNERS_TIMESTAMP_STATS = DBCollection(name="timestamp-stats")

@@ -87,6 +87,13 @@ class MongoClient(DatabaseClient):
                         validator={"$jsonSchema": collection.schema}
                     )
 
+                if collection.index:
+                    await self._db_client[db.name][collection.name].create_index(
+                        keys=collection.index.keys,
+                        name=collection.index.index_name,
+                        unique=True
+                    )
+
     async def create(self,
                      db_name: str,
                      table: str,
