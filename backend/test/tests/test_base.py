@@ -26,7 +26,9 @@ class OrbitTMBaseTest:
         cls.protocol = "http"
         cls.url = f"{cls.protocol}://{cls.host}:{cls.port}/api/v1"
 
-        response = requests.get(f"{cls.protocol}://{cls.host}:{cls.port}/")
+        cls.session = requests.Session()
+
+        response = cls.session.get(f"{cls.protocol}://{cls.host}:{cls.port}/")
         assert response.status_code == 204
 
     @classmethod
@@ -34,10 +36,11 @@ class OrbitTMBaseTest:
         """Teardown test class"""
 
         logging.debug(f"Teardown tests...")
+        cls.session.close()
 
     @classmethod
     def reset_db(cls):
         """Reset the database"""
 
-        response = requests.post(f"{cls.url}/reset-database", params={"db_name": "ALL"})
+        response = cls.session.post(f"{cls.url}/reset-database", params={"db_name": "ALL"})
         assert response.status_code == 204

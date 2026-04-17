@@ -8,7 +8,6 @@
 import logging
 
 import pytest
-import requests
 
 from .test_base import OrbitTMBaseTest
 
@@ -20,8 +19,10 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
+        session = self.__class__.session
+
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
@@ -33,7 +34,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         for i in range(1, projects + 1):
             # Create project
             project_key = f"PRJ{i}"
-            response = requests.post(f"{self.__class__.url}/tm/projects", json={
+            response = session.post(f"{self.__class__.url}/tm/projects", json={
                 "project_key": project_key,
                 "description": f"Project #{i}"
             })
@@ -41,14 +42,14 @@ class TestOrbitTMCases(OrbitTMBaseTest):
 
             # Create test cases for the project
             for j in range(1, cases + 1):
-                response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
+                response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
                     "test_case_key": f"{project_key}-T{j}",
                     "project_key": project_key,
                 })
                 assert response.status_code == 201
 
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == projects * cases
 
@@ -59,8 +60,10 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
+        session = self.__class__.session
+
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
@@ -72,7 +75,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         for i in range(1, projects + 1):
             # Create project
             project_key = f"PRJ{i}"
-            response = requests.post(f"{self.__class__.url}/tm/projects", json={
+            response = session.post(f"{self.__class__.url}/tm/projects", json={
                 "project_key": project_key,
                 "description": f"Project #{i}"
             })
@@ -80,7 +83,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
 
             # Create test cases for the project
             for j in range(1, cases + 1):
-                response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
+                response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
                     "test_case_key": f"{project_key}-T{j}",
                     "project_key": project_key
                 })
@@ -88,7 +91,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
 
         for i in range(1, projects + 1):
             # Get test cases for each project and verify count
-            response = requests.get(f"{self.__class__.url}/tm/projects/PRJ{i}/test-cases")
+            response = session.get(f"{self.__class__.url}/tm/projects/PRJ{i}/test-cases")
             assert response.status_code == 200
             assert len(response.json()) == cases
 
@@ -99,8 +102,10 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
+        session = self.__class__.session
+
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
@@ -113,11 +118,11 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         for i in range(1, projects + 1):
             # Create Test cases for non-existent project (should fail)
             project_key = f"PRJ{i}"
-            response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case")
+            response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case")
             assert response.status_code == 404
 
             # Create project
-            response = requests.post(f"{self.__class__.url}/tm/projects", json={
+            response = session.post(f"{self.__class__.url}/tm/projects", json={
                 "project_key": project_key,
                 "description": f"Project #{i}"
             })
@@ -126,7 +131,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
             # Create test cases for the project
             for j in range(1, cases + 1):
                 count += 1
-                response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
+                response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
                     "test_case_key": f"{project_key}-T{j}",
                     "project_key": project_key,
                     "title": f"Test Case {j} for {project_key}",
@@ -153,12 +158,12 @@ class TestOrbitTMCases(OrbitTMBaseTest):
                 assert response.json()["links"] == [f"http://example.com/test-case/{project_key}-T{j}"]
 
                 # Check test cases count after each addition
-                response = requests.get(f"{self.__class__.url}/tm/test-cases")
+                response = session.get(f"{self.__class__.url}/tm/test-cases")
                 assert response.status_code == 200
                 assert len(response.json()) == count
 
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert count == projects * cases
         assert len(response.json()) == projects * cases
@@ -170,8 +175,10 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
+        session = self.__class__.session
+
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
@@ -184,7 +191,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         for i in range(1, projects + 1):
             # Create project
             project_key = f"PRJ{i}"
-            response = requests.post(f"{self.__class__.url}/tm/projects", json={
+            response = session.post(f"{self.__class__.url}/tm/projects", json={
                 "project_key": project_key,
                 "description": f"Project #{i}"
             })
@@ -193,25 +200,25 @@ class TestOrbitTMCases(OrbitTMBaseTest):
             # Create test cases for the project
             for j in range(1, cases + 1):
                 count += 1
-                response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
+                response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
                     "test_case_key": f"{project_key}-T{j}",
                     "project_key": project_key,
                 })
                 assert response.status_code == 201
 
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert count == projects * cases
         assert len(response.json()) == projects * cases
 
         # Delete test cases for PROJECT 1
         project_key = f"PRJ{1}"
-        response = requests.delete(f"{self.__class__.url}/tm/projects/{project_key}/test-cases")
+        response = session.delete(f"{self.__class__.url}/tm/projects/{project_key}/test-cases")
         assert response.status_code == 204
 
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert count == projects * cases
         assert len(response.json()) == projects * cases - cases
@@ -223,14 +230,16 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
+        session = self.__class__.session
+
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
         # Create project
         project_key = f"PRJ{1}"
-        response = requests.post(f"{self.__class__.url}/tm/projects", json={
+        response = session.post(f"{self.__class__.url}/tm/projects", json={
             "project_key": project_key,
             "description": f"Project #{1}"
         })
@@ -239,7 +248,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         # Create test cases for the project
         cases = 20
         for j in range(1, cases + 1):
-            response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
+            response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
                 "test_case_key": f"{project_key}-T{j}",
                 "project_key": project_key,
                 "title": f"Test Case {j} for {project_key}",
@@ -266,7 +275,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
             assert response.json()["links"] == [f"http://example.com/test-case/{project_key}-T{j}"]
 
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == cases
 
@@ -277,14 +286,16 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
+        session = self.__class__.session
+
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
         # Create project
         project_key = f"PRJ{1}"
-        response = requests.post(f"{self.__class__.url}/tm/projects", json={
+        response = session.post(f"{self.__class__.url}/tm/projects", json={
             "project_key": project_key,
             "description": f"Project #{1}"
         })
@@ -292,7 +303,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
 
         # Create test cases for the project
         j = 1
-        response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
+        response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
             "test_case_key": f"{project_key}-T{j}",
             "project_key": project_key,
             "title": f"Test Case {j} for {project_key}",
@@ -319,12 +330,12 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         assert response.json()["links"] == [f"http://example.com/test-case/{project_key}-T{j}"]
 
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == 1
 
         # Update test case
-        response = requests.put(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{project_key}-T{j}", json={
+        response = session.put(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{project_key}-T{j}", json={
             "title": f"Update Test Case {j} for {project_key}",
             "description": f"Update description for Test Case {j} in {project_key}",
             "folder": f"/A",
@@ -349,7 +360,7 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         assert response.json()["links"] == [f"http://AAAAA.com/test-case/{project_key}-T{j}"]
 
         # Get updated test case and verify
-        response = requests.get(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{project_key}-T{j}")
+        response = session.get(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{project_key}-T{j}")
         assert response.status_code == 200
         assert response.json()["test_case_key"] == f"{project_key}-T{j}"
         assert response.json()["project_key"] == project_key
@@ -370,14 +381,16 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         logging.info(f"--- Starting test: {request.node.name} ---")
         self.__class__.reset_db()
 
+        session = self.__class__.session
+
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == 0
 
         # Create project
         project_key = f"PRJ{1}"
-        response = requests.post(f"{self.__class__.url}/tm/projects", json={
+        response = session.post(f"{self.__class__.url}/tm/projects", json={
             "project_key": project_key,
             "description": f"Project #{1}"
         })
@@ -387,23 +400,23 @@ class TestOrbitTMCases(OrbitTMBaseTest):
         cases = 10
         project_key = f"PRJ{1}"
         for j in range(1, cases + 1):
-            response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
+            response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
                 "test_case_key": f"{project_key}-T{j}",
                 "project_key": project_key,
             })
             assert response.status_code == 201
 
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == cases
 
         # Delete test case by key
-        response = requests.delete(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{project_key}-T{1}")
+        response = session.delete(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{project_key}-T{1}")
         assert response.status_code == 204
 
         # Check total test cases
-        response = requests.get(f"{self.__class__.url}/tm/test-cases")
+        response = session.get(f"{self.__class__.url}/tm/test-cases")
         assert response.status_code == 200
         assert len(response.json()) == cases - 1
 

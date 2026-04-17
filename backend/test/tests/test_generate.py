@@ -10,7 +10,6 @@ import random
 import uuid
 
 import pytest
-import requests
 
 from .test_base import OrbitTMBaseTest
 
@@ -23,11 +22,12 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Generate project
-        projects = 2
-        cases = 100
+        projects = 10
+        cases = 200
+        session = self.__class__.session
         for i in range(1, projects + 1):
             project_key = f"PRJ{i}"
-            response = requests.post(f"{self.__class__.url}/tm/projects", json={
+            response = session.post(f"{self.__class__.url}/tm/projects", json={
                 "project_key": project_key,
                 "description": f"Project #{i}",
                 "labels": ["A", "B", "C"]
@@ -38,7 +38,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
             test_cases = []
             for j in range(1, cases + 1):
                 test_case_key = f"{project_key}-T{j}"
-                response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
+                response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
                     "test_case_key": test_case_key,
                     "project_key": project_key,
                     "title": f"Test Case #{j} ({project_key}) - {uuid.uuid4()}",
@@ -51,9 +51,9 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 test_cases.append(test_case_key)
 
             # Create cycles
-            cycles = 5
+            cycles = 10
             for j in range(1, cycles + 1):
-                response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/cycles", json={
+                response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/cycles", json={
                     "title": f"Cycle #{j} ({project_key}) - {uuid.uuid4()}"
                 })
                 assert response.status_code == 201
@@ -62,7 +62,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 # Generate test executions for test cases
                 for l in range(1, len(test_cases) + 1):
                     test_case_key = test_cases[l - 1]
-                    response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions", json={
+                    response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions", json={
                         "result": random.choice(["PASS", "FAIL", "BLOCKED", "NOT_EXECUTED"]),
                         "comments": f"Execution {l} for {test_case_key} - {uuid.uuid4()}"
                     })
@@ -70,7 +70,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
 
                     # Add to cycle
                     execution = response.json().get("execution_key")
-                    response = requests.post(f"{self.__class__.url}/tm/cycles/{cycle_key}/executions", params={
+                    response = session.post(f"{self.__class__.url}/tm/cycles/{cycle_key}/executions", params={
                         "execution_key": execution,
                         "custom_field_values": {
                             "custom_field_1": f"Value {l} for {execution}",
