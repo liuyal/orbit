@@ -24,7 +24,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
 
         # Generate project
         projects = 1
-        cases = 50
+        cases = 500
         for i in range(1, projects + 1):
             project_key = f"PRJ{i}"
             response = requests.post(f"{self.__class__.url}/tm/projects", json={
@@ -35,7 +35,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
             assert response.status_code == 201
 
             # Generate test cases for project
-            execution_list = []
+            test_cases = []
             for j in range(1, cases + 1):
                 test_case_key = f"{project_key}-T{j}"
                 response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-case", json={
@@ -43,29 +43,15 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                     "project_key": project_key,
                     "title": f"Test Case #{j} ({project_key}) - {uuid.uuid4()}",
                     "description": f"Description for Test Case #{j} in {project_key} - {uuid.uuid4()}",
-                    "status": random.choice(["APPROVED", "DRAFT"]),
+                    "status": random.choice(["APPROVED", "DRAFT", "EXPECTED FAIL"]),
                     "test_frequency": [random.choice(["NIGHTLY", "WEEKLY"])],
                     "labels": random.sample(["A", "B", "C"], k=random.randint(1, 3))
                 })
                 assert response.status_code == 201
-
-                # Generate test executions for test cases
-                te_count = 1
-                for l in range(1, te_count + 1):
-                    response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions", json={
-                        "result": random.choice(["PASS", "FAIL", "BLOCKED", "NOT_EXECUTED"]),
-                        "comments": f"Execution {l} for {test_case_key} - {uuid.uuid4()}"
-                    })
-                    assert response.status_code == 201
-                    execution_list.append(response.json().get("execution_key"))
-
-                # Check test executions created for test case
-                response = requests.get(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions")
-                assert response.status_code == 200
-                assert len(response.json()) == te_count
+                test_cases.append(test_case_key)
 
             # Create cycles
-            cycles = 1
+            cycles = 10
             for j in range(1, cycles + 1):
                 response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/cycles", json={
                     "title": f"Cycle #{j} ({project_key}) - {uuid.uuid4()}"
@@ -73,14 +59,22 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 assert response.status_code == 201
                 cycle_key = response.json().get("test_cycle_key")
 
-                for ii in range(1, len(execution_list) + 1):
-                    # Add execution to cycle
-                    execution = execution_list.pop()
+                # Generate test executions for test cases
+                for l in range(1, len(test_cases) + 1):
+                    test_case_key = test_cases[l - 1]
+                    response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions", json={
+                        "result": random.choice(["PASS", "FAIL", "BLOCKED", "NOT_EXECUTED"]),
+                        "comments": f"Execution {l} for {test_case_key} - {uuid.uuid4()}"
+                    })
+                    assert response.status_code == 201
+
+                    # Add to cycle
+                    execution = response.json().get("execution_key")
                     response = requests.post(f"{self.__class__.url}/tm/cycles/{cycle_key}/executions", params={
                         "execution_key": execution,
                         "custom_field_values": {
-                            "custom_field_1": f"Value {ii} for {execution}",
-                            "custom_field_2": f"Value {ii} for {execution}"
+                            "custom_field_1": f"Value {l} for {execution}",
+                            "custom_field_2": f"Value {l * 2} for {execution}"
                         }
                     })
                     assert response.status_code == 200

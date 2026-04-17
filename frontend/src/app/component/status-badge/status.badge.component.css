@@ -11,20 +11,21 @@
   font-size: 12px;
 }
 
-/* Status Badge runner Variants */
-.status-badge.runner.active {
+/* Status Badge Variants */
+.status-badge.active {
   background-color: #064e3b;
   color: #6ee7b7;
   border: 1px solid #10b981;
 }
 
-.status-badge.runner.inactive {
+.status-badge.inactive {
   background-color: #550000;
   color: #fca5a5;
   border: 1px solid #f11f1f;
 }
 
-.status-badge.runner.busy {
+/* Status Badge runner Variants */
+.status-badge.busy {
   background-color: #914f16;
   color: #fcd34d;
   border: 1px solid #f59e0b;
