@@ -161,9 +161,9 @@ Last updated: 2026-04-16 (all optimizations complete)
 | test_cases.py | `get_all_test_cases_by_project` | ✅ Optimized | Concurrent project + cases fetch |
 | test_cases.py | `delete_all_test_case_from_project` | ✅ Optimized | Concurrent check, `db.count()`, reuse project var |
 | test_cases.py | `get_test_case_by_key` | ✅ Optimized | Concurrent project + test case fetch |
-| test_cases.py | `create_test_case_in_project` | 🟡 Minor | `find`+`len` for post-create count |
-| test_cases.py | `update_test_case_by_key` | 🟡 Minor | One redundant project lookup via `get_test_case_by_key` |
-| test_cases.py | `delete_test_case_by_key` | 🟡 Minor | Redundant project lookup + `find`+`len` for count |
+| test_cases.py | `create_test_case_in_project` | ✅ Optimized | `_id` projection for key gen, `db.count()`, direct lookups |
+| test_cases.py | `update_test_case_by_key` | ✅ Optimized | Concurrent project + test case fetch, no redundant lookup |
+| test_cases.py | `delete_test_case_by_key` | ✅ Optimized | 3 concurrent pre-checks, `db.count()` throughout |
 | test_cycles.py | `get_all_cycles_for_project` | ✅ Optimized | Concurrent project + cycles fetch |
 | test_cycles.py | `create_cycle_for_project` | ✅ Optimized | Direct queries, `db.count()`, no redundant checks |
 | test_cycles.py | `get_cycle_by_key` | ✅ Good | — |
