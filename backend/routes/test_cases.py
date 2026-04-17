@@ -17,6 +17,7 @@ from fastapi import (
     status,
     Response
 )
+from natsort import natsorted
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
@@ -54,6 +55,9 @@ async def get_all_test_cases(request: Request):
     # Retrieve all test cases from database
     test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {})
 
+    # Sort test cases by test_case_key using natsort
+    test_cases = natsorted(test_cases, key=lambda x: x.get("test_case_key"))
+
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cases)
 
@@ -82,6 +86,9 @@ async def get_all_test_cases_by_project(request: Request,
     test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "project_key": project_key
     })
+
+    # Sort test cases by test_case_key using natsort
+    test_cases = natsorted(test_cases, key=lambda x: x.get("test_case_key"))
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cases)
@@ -120,7 +127,7 @@ async def create_test_case_in_project(request: Request,
     if test_case_key is None:
         # Auto-generate test_case_key
         response = await get_all_test_cases_by_project(request, project_key)
-        cases = json.loads(response.body.decode())
+        cases = json.loads(response.body)
         if len(cases) < 1:
             # no test cases exist yet, start with 1
             last_tc = 1

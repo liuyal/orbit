@@ -7,6 +7,7 @@
 
 # routes/cycles.py
 
+import asyncio
 import json
 import re
 from typing import Optional
@@ -43,34 +44,6 @@ DB_COLLECTION_TM_PRJ = DB_COLLECTION_TM_PRJ.name
 DB_COLLECTION_TM_TC = DB_COLLECTION_TM_TC.name
 DB_COLLECTION_TM_TE = DB_COLLECTION_TM_TE.name
 DB_COLLECTION_TM_TCY = DB_COLLECTION_TM_TCY.name
-
-
-async def fetch_cycle_execution_info(cycle: dict, db):
-    """ Fetch cycle execution info """
-
-    # status_count = {}
-    # for tc in cycle["executions"]:
-    #     # Fetch execution status for each execution in cycle
-    #     te = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-    #         "execution_key": cycle["executions"][tc]["execution_key"]
-    #     })
-    #     cycle["executions"][tc]["status"] = te["result"]
-    #
-    #     # Increment status count
-    #     status_count[te["result"]] = status_count.get(te["result"], 0) + 1
-    #
-    # # assign status of cycle base on execution status
-    # if status_count.get("NOT_EXECUTED", 0) > 0:
-    #     if status_count.get("NOT_EXECUTED", 0) == len(cycle["executions"]):
-    #         cycle["status"] = "NOT_STARTED"
-    #
-    #     else:
-    #         cycle["status"] = "IN_PROGRESS"
-    #
-    # else:
-    #     cycle["status"] = "COMPLETE"
-
-    return cycle
 
 
 @router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/cycles",
@@ -139,7 +112,7 @@ async def create_cycle_for_project(request: Request,
         # Auto-generate test_cycle_key
         # get list of test cycle in project to determine next key
         response = await get_all_cycles_for_project(request, project_key)
-        cycle = json.loads(response.body.decode())
+        cycle = json.loads(response.body)
         if len(cycle) < 1:
             # no test cycle exist yet, start with 1
             last_tcy = 1
@@ -296,20 +269,32 @@ async def get_cycle_executions(request: Request,
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
-    cycle_data = json.loads(response.body.decode())
+    cycle_data = json.loads(response.body)
     cycle_executions = cycle_data.get("executions")
 
-    result_data = {}
-    for tc_key, exec_key in cycle_executions.items():
-        # Retrieve test execution data
-        exec_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-            "execution_key": exec_key["execution_key"]
-        })
-        tc_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-            "test_case_key": tc_key
-        })
-        exec_data.update(tc_data)
+    if not cycle_executions:
+        return JSONResponse(status_code=status.HTTP_200_OK, content={})
 
+    # Collect all keys upfront for batch queries
+    tc_keys = list(cycle_executions.keys())
+    exec_keys = [v["execution_key"] for v in cycle_executions.values()]
+
+    # Fetch all executions and test cases in 2 concurrent batch queries
+    executions_list, test_cases_list = await asyncio.gather(
+        db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {"execution_key": {"$in": exec_keys}}),
+        db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": {"$in": tc_keys}})
+    )
+
+    # Index results by their keys for O(1) lookup
+    executions_map = {e["execution_key"]: e for e in executions_list}
+    test_cases_map = {t["test_case_key"]: t for t in test_cases_list}
+
+    # Merge execution and test case data per tc_key
+    result_data = {}
+    for tc_key, exec_ref in cycle_executions.items():
+        exec_data = executions_map.get(exec_ref["execution_key"], {}).copy()
+        tc_data = test_cases_map.get(tc_key, {})
+        exec_data.update(tc_data)
         result_data[tc_key] = exec_data
 
     return JSONResponse(status_code=status.HTTP_200_OK,
@@ -328,7 +313,7 @@ async def add_execution_to_cycle(request: Request,
 
     # Check cycle exists
     response = await get_cycle_by_key(request, test_cycle_key)
-    cycle_data = json.loads(response.body.decode())
+    cycle_data = json.loads(response.body)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
@@ -386,7 +371,7 @@ async def add_execution_to_cycle(request: Request,
 
     # return updated cycle_data
     response = await get_cycle_by_key(request, test_cycle_key)
-    cycle_data = json.loads(response.body.decode())
+    cycle_data = json.loads(response.body)
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=cycle_data)
@@ -404,7 +389,7 @@ async def remove_executions_from_cycle(request: Request,
 
     # Check cycle exists
     response = await get_cycle_by_key(request, test_cycle_key)
-    cycle_data = json.loads(response.body.decode())
+    cycle_data = json.loads(response.body)
     if response.status_code == status.HTTP_404_NOT_FOUND:
         return response
 
@@ -441,7 +426,7 @@ async def remove_executions_from_cycle(request: Request,
 
     # return updated cycle_data
     response = await get_cycle_by_key(request, test_cycle_key)
-    cycle_data = json.loads(response.body.decode())
+    cycle_data = json.loads(response.body)
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=cycle_data)

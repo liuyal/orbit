@@ -214,7 +214,7 @@ async def create_execution_by_test_case_key(request: Request,
         # Auto-generate execution_key
         # get list of test execution to determine next key
         response = await get_all_executions_by_project(request, project_key)
-        execution = json.loads(response.body.decode())
+        execution = json.loads(response.body)
         if len(execution) < 1:
             # no test execution exist yet, start with 1
             last_te = 1

@@ -9,6 +9,7 @@
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
+  font-weight: bold;
 }
 
 /* Status Badge Variants */
@@ -41,44 +42,56 @@
 .status-badge.test_status.approved {
   background-color: #4caf50;
   color: #fff;
-  font-weight: bold;
 }
 
 .status-badge.test_status.draft {
   background-color: #ffd700;
   color: #222222;
-  font-weight: bold;
 }
 
 .status-badge.test_status.deprecated {
   background-color: #9c27b0;
   color: #fff;
-  font-weight: bold;
 }
 
 .status-badge.test_status.expected_fail {
   background-color: #5209a5;
   color: #fff;
-  font-weight: bold;
+}
+
+/* Status Badge cycle status Variants */
+.status-badge.cycle_status.completed {
+  background-color: #4caf50;
+  color: #fff;
+  border: 1px solid #00744d;
+}
+
+.status-badge.cycle_status.in_progress {
+  background-color: #ffd700;
+  color: #222222;
+  border: 1px solid #7a6400;
+}
+
+.status-badge.cycle_status.not_started {
+  background-color: #757575;
+  color: #fff;
+  border: 1px solid #292929;
 }
 
 /* Status Badge Priority Variants */
 .status-badge.priority.high {
   background-color: #ff1100;
   color: #fff;
-  font-weight: bold;
 }
 
 .status-badge.priority.medium {
   background-color: #ffd700;
   color: #222222;
-  font-weight: bold;
 }
 
 .status-badge.priority.low {
   background-color: #2196f3;
   color: #fff;
-  font-weight: bold;
 }
 
 /* Status Badge Result Variants - Circular Design */
@@ -89,7 +102,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
   font-size: 0;
   line-height: 0;
   padding: 0;
@@ -118,30 +130,4 @@
 .status-badge.result.not_executed {
   background-color: #757575;
   color: #fff;
-}
-
-@media (prefers-color-scheme: light) {
-  .status-badge.active {
-    background-color: #d1fae5;
-    color: #065f46;
-    border: 1px solid #10b981;
-  }
-
-  .status-badge.inactive {
-    background-color: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #dc2626;
-  }
-
-  .status-badge.busy {
-    background-color: #fef3c7;
-    color: #92400e;
-    border: 1px solid #f59e0b;
-  }
-
-  .status-badge.idle {
-    background-color: #f1f5f9;
-    color: #334155;
-    border: 1px solid #94a3b8;
-  }
 }

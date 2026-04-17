@@ -36,8 +36,8 @@
                 <ng-container matColumnDef="STATUS">
                     <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
                     <td mat-cell *matCellDef="let cycle">
-                        <app-status-badge [text]="(cycle.status || 'N/A').toUpperCase()"
-                            [className]="'test_status ' + (cycle.status || 'N/A').toLowerCase()">
+                        <app-status-badge [text]="(cycle.status || 'NOT_STARTED').toUpperCase()"
+                            [className]="'cycle_status ' + (cycle.status || 'NOT_STARTED').toLowerCase()">
                         </app-status-badge>
                     </td>
                 </ng-container>

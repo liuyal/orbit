@@ -65,5 +65,10 @@ export class TmCasesTableComponent implements OnInit {
       this.loadTestCases();
     });
   }
+
+  sortLabels(labels: any[]): any[] {
+    if (!labels) return [];
+    return [...labels].sort((a, b) => String(a).localeCompare(String(b)));
+  }
 }
 
