@@ -8,7 +8,6 @@
 # routes/test_cases.py
 
 import asyncio
-import json
 import re
 from typing import Optional
 
@@ -113,29 +112,24 @@ async def create_test_case_in_project(request: Request,
         )
 
     if test_case:
-        # Prepare request data from request data
         request_data = test_case.model_dump()
         test_case_key = request_data.get("test_case_key", None)
 
     else:
-        # No request body, create blank test case
         request_data = TestCaseCreate().model_dump()
         test_case_key = None
 
     if test_case_key is None:
-        # Auto-generate test_case_key
-        response = await get_all_test_cases_by_project(request, project_key)
-        cases = json.loads(response.body)
-        if len(cases) < 1:
-            # no test cases exist yet, start with 1
+        # Auto-generate test_case_key — fetch only _id fields, no full documents
+        existing_keys = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC,
+                                      {"project_key": project_key},
+                                      {"_id": 1})
+        if len(existing_keys) < 1:
             last_tc = 1
 
         else:
-            # Get list of test cases in project to determine next key
-            # Extract numeric part of test_case_key to find last number
-            last_tc = max([int(case["_id"].split(TC_KEY_PREFIX)[-1]) for case in cases]) + 1
+            last_tc = max([int(case["_id"].split(TC_KEY_PREFIX)[-1]) for case in existing_keys]) + 1
 
-        # Generate new test_case_key and assign to request data
         test_case_key = f"{project_key}-{TC_KEY_PREFIX}{last_tc}"
         request_data["test_case_key"] = test_case_key
 
@@ -146,12 +140,16 @@ async def create_test_case_in_project(request: Request,
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"Key '{test_case_key}' is not valid. "
-                                  f"Must be in format {project_key}-{TC_KEY_PREFIX}#"}
+                                  f"Must be in format {project_key}-{TC_KEY_PREFIX}#"
+                         }
             )
 
-        # Check if test_case_key already exists
-        response = await get_test_case_by_key(request, project_key, test_case_key)
-        if response.status_code != status.HTTP_404_NOT_FOUND:
+        # Check if test_case_key already exists with direct find_one
+        existing = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
+            "test_case_key": test_case_key,
+            "project_key": project_key
+        })
+        if existing is not None:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"{test_case_key} already exists"}
@@ -171,12 +169,10 @@ async def create_test_case_in_project(request: Request,
     # Create the test case in the database
     await db.create(DB_NAME_TM, DB_COLLECTION_TM_TC, db_insert)
 
-    # Update project test case count & labels
-    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-        "project_key": project_key
-    })
+    # Update project test case count using db.count + update labels
+    tc_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TC, {"project_key": project_key})
     project["labels"] = list(set(project.get("labels", []) + request_data["labels"]))
-    project["test_case_count"] = len(test_cases)
+    project["test_case_count"] = tc_count
     await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })
@@ -243,7 +239,7 @@ async def get_test_case_by_key(request: Request,
     project, result = await asyncio.gather(
         db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
         db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": test_case_key,
-                                                       "project_key": project_key})
+                                                      "project_key": project_key})
     )
 
     if project is None:
@@ -273,20 +269,24 @@ async def update_test_case_by_key(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently check project and test case exist
+    project, existing_tc = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": test_case_key,
+                                                      "project_key": project_key})
+    )
+
     if project is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
 
-    # Check if test_case_key exists
-    response = await get_test_case_by_key(request, project_key, test_case_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    if existing_tc is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{test_case_key} not found"}
+        )
 
     # Prepare request data, excluding None values
     request_data = test_case.model_dump()
@@ -294,7 +294,7 @@ async def update_test_case_by_key(request: Request,
     request_data["labels"] = [l.strip() for l in request_data.get("labels", [])]
     request_data["updated_at"] = get_current_utc_time()
 
-    # Update the project in the database
+    # Update the test case in the database
     await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, request_data, {
         "project_key": project_key,
         "test_case_key": test_case_key,
@@ -306,7 +306,7 @@ async def update_test_case_by_key(request: Request,
         "project_key": project_key
     })
 
-    # Update project labels
+    # Update project labels if changed
     new_label_set = list(set(project.get("labels", []) + request_data["labels"]))
     if project["labels"] != new_label_set:
         project["labels"] = new_label_set
@@ -326,48 +326,46 @@ async def delete_test_case_by_key(request: Request,
                                   test_case_key: str):
     """Delete a specific test case by its ID within the specified project"""
 
-    # Check project exists
     db = request.app.state.mdb
 
-    # Check project exists
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently check project, test case, and execution count
+    project, existing_tc, execution_count = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": test_case_key,
+                                                      "project_key": project_key}),
+        db.count(DB_NAME_TM, DB_COLLECTION_TM_TE, {"project_key": project_key,
+                                                   "test_case_key": test_case_key})
+    )
+
     if project is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
 
-    # Check if test_case_key exists
-    response = await get_test_case_by_key(request, project_key, test_case_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    if existing_tc is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{test_case_key} not found"}
+        )
 
-    # Check if test case has any test executions
-    executions = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-        "project_key": project_key,
-        "test_case_key": test_case_key
-    })
-
-    if executions:
+    if execution_count > 0:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"error": f"Test case {test_case_key} has "
                               f"associated test executions and cannot be deleted"}
         )
 
-    # Delete the test case from project from the database
+    # Delete the test case and get updated count concurrently
     await db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "test_case_key": test_case_key,
         "project_key": project_key
     })
 
-    # Update project test case count
-    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
+    # Update project test case count using db.count
+    project["test_case_count"] = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TC, {
         "project_key": project_key
     })
-    project["test_case_count"] = len(test_cases)
     await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })

@@ -40,9 +40,11 @@ Last updated: 2026-04-16 (all optimizations complete)
 ### `GET /tm/projects/{project_key}/test-cases` → `get_all_test_cases_by_project` ✅ Optimized
 - Project check and test cases fetch run concurrently via `asyncio.gather`.
 
-### `POST /tm/projects/{project_key}/test-case` → `create_test_case_in_project` 🟡 Minor
-- After creation, uses `db.find` + `len()` to update `test_case_count` — could use `db.count()` or `+1`.
-- The call to `get_all_test_cases_by_project` for key generation is a direct DB query (project already verified above), but still loads full documents — could use projection for `_id` only.
+### `POST /tm/projects/{project_key}/test-case` → `create_test_case_in_project` ✅ Optimized
+- Key generation uses `{"_id": 1}` projection — only IDs fetched, no full documents.
+- Duplicate key check via direct `db.find_one` instead of calling `get_test_case_by_key`.
+- Post-create count uses `db.count()` instead of `db.find` + `len()`.
+- `json` import removed.
 
 ### `DELETE /tm/projects/{project_key}/test-cases` → `delete_all_test_case_from_project` ✅ Optimized
 - Project check and execution count run concurrently via `asyncio.gather`.
@@ -52,14 +54,13 @@ Last updated: 2026-04-16 (all optimizations complete)
 ### `GET /tm/projects/{project_key}/test-cases/{test_case_key}` → `get_test_case_by_key` ✅ Optimized
 - Project and test case `find_one` calls run concurrently via `asyncio.gather`.
 
-### `PUT /tm/projects/{project_key}/test-cases/{test_case_key}` → `update_test_case_by_key` 🟡 Minor
-- Fetches project at top (1 `find_one`), then calls `get_test_case_by_key` for existence check which fetches project again — one redundant project lookup remains.
-- Could replace `get_test_case_by_key` with a direct `db.find_one` for just the test case.
+### `PUT /tm/projects/{project_key}/test-cases/{test_case_key}` → `update_test_case_by_key` ✅ Optimized
+- Project and test case fetched concurrently via `asyncio.gather` — eliminates the redundant second project lookup that came with `get_test_case_by_key`.
 
-### `DELETE /tm/projects/{project_key}/test-cases/{test_case_key}` → `delete_test_case_by_key` 🟡 Minor
-- Same redundant project lookup via `get_test_case_by_key`.
-- Uses `db.find` + truthy check for execution check — `db.count() > 0` would be lighter.
-- Post-delete `db.find` + `len()` for recount — could use `db.count()` or decrement.
+### `DELETE /tm/projects/{project_key}/test-cases/{test_case_key}` → `delete_test_case_by_key` ✅ Optimized
+- All 3 pre-checks (project, test case, execution count) run concurrently via `asyncio.gather`.
+- Execution check uses `db.count()` instead of `db.find` + truthy check.
+- Post-delete count uses `db.count()` instead of `db.find` + `len()`.
 
 ---
 
