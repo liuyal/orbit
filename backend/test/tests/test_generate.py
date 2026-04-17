@@ -23,8 +23,8 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Generate project
-        projects = 1
-        cases = 500
+        projects = 2
+        cases = 100
         for i in range(1, projects + 1):
             project_key = f"PRJ{i}"
             response = requests.post(f"{self.__class__.url}/tm/projects", json={
@@ -51,7 +51,7 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 test_cases.append(test_case_key)
 
             # Create cycles
-            cycles = 10
+            cycles = 5
             for j in range(1, cycles + 1):
                 response = requests.post(f"{self.__class__.url}/tm/projects/{project_key}/cycles", json={
                     "title": f"Cycle #{j} ({project_key}) - {uuid.uuid4()}"

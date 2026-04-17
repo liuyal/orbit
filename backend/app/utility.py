@@ -5,9 +5,9 @@
 # License: MIT
 # ================================================================
 
-# app/utility.py
-
 import pathlib
+# app/utility.py
+from collections import Counter
 from datetime import datetime, timezone
 
 import yaml
@@ -44,3 +44,26 @@ def get_current_utc_time():
 
     return current_utc_iso
 
+
+def calculate_cycle_status(cycle_data: dict):
+    """Calculate cycle status from cycle data."""
+
+    # Count cycle status
+    counts = Counter(cycle_data["executions"].values())
+
+    # assign status of cycle base on execution status
+    if counts.get("NOT_EXECUTED", 0) > 0:
+        if counts.get("NOT_EXECUTED", 0) == len(cycle_data["executions"]):
+            cycle_data["status"] = "NOT_STARTED"
+
+        else:
+            cycle_data["status"] = "IN_PROGRESS"
+
+    else:
+        if len(cycle_data["executions"]) == 0:
+            cycle_data["status"] = "NOT_STARTED"
+
+        else:
+            cycle_data["status"] = "COMPLETE"
+
+    return cycle_data

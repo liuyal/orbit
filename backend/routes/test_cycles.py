@@ -29,12 +29,14 @@ from backend.app.app_def import (
     DB_NAME_TM,
     TCY_KEY_PREFIX
 )
-from backend.app.utility import get_current_utc_time
+from backend.app.utility import (
+    get_current_utc_time,
+    calculate_cycle_status
+)
 from backend.models.test_cycles import (
     TestCycle,
     TestCycleCreate,
     TestCycleUpdate
-
 )
 
 router = APIRouter()
@@ -355,10 +357,10 @@ async def add_execution_to_cycle(request: Request,
         )
 
     # Add execution to cycle
-    exec_data = {test_execution["test_case_key"]: {
-        "execution_key": execution_key
-    }}
+    exec_data = {execution_key: test_execution["result"]}
     cycle_data["executions"].update(exec_data)
+    cycle_data = calculate_cycle_status(cycle_data)
+
     await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {
         "test_cycle_key": test_cycle_key
     })

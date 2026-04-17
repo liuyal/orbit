@@ -28,7 +28,10 @@ from backend.app.app_def import (
     DB_NAME_TM,
     TE_KEY_PREFIX
 )
-from backend.app.utility import get_current_utc_time
+from backend.app.utility import (
+    get_current_utc_time,
+    calculate_cycle_status
+)
 from backend.models.test_executions import (
     TestExecution,
     TestExecutionCreate,
@@ -369,7 +372,7 @@ async def get_execution_by_key(request: Request,
 
 @router.put(f"/api/{API_VERSION}/tm/executions/{{execution_key}}",
             tags=[DB_COLLECTION_TM_TE],
-            response_model=TestExecutionUpdate)
+            response_model=TestExecution)
 async def update_execution_by_key(request: Request,
                                   execution_key: str,
                                   execution: TestExecutionUpdate):
@@ -385,6 +388,7 @@ async def update_execution_by_key(request: Request,
     # Prepare request data, excluding None values
     request_data = execution.model_dump()
     request_data = {k: v for k, v in request_data.items() if v is not None}
+    request_data["result"] = request_data["result"].upper()
 
     # Update the execution in the database
     result, matched_count = await db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, request_data, {
@@ -417,6 +421,25 @@ async def update_execution_by_key(request: Request,
     tc_data["last_result"] = request_data["result"]
     await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, tc_data, {
         "test_case_key": test_case_key
+    })
+
+    # Get the cycle from db
+    cycle_key = updated_test_execution["test_cycle_key"]
+    cycle_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
+        "test_cycle_key": cycle_key
+    })
+    if cycle_data is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{cycle_key} not found"}
+        )
+
+    # Update cycle execution info
+    cycle_data["executions"][execution_key] = request_data["result"].upper()
+    cycle_data = calculate_cycle_status(cycle_data)
+    cycle_data["updated_at"] = get_current_utc_time()
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {
+        "test_cycle_key": cycle_key
     })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
