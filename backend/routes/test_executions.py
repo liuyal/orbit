@@ -8,7 +8,6 @@
 # routes/execution.py
 
 import asyncio
-import json
 import re
 from typing import Optional
 
@@ -172,21 +171,19 @@ async def create_execution_by_test_case_key(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently check project and test case exist
+    project, tc_data = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": test_case_key,
+                                                       "project_key": project_key})
+    )
+
     if project is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
 
-    # Check if test_case_key exists
-    tc_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-        "test_case_key": test_case_key,
-        "project_key": project_key
-    })
     if tc_data is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -194,30 +191,25 @@ async def create_execution_by_test_case_key(request: Request,
         )
 
     if execution:
-        # Prepare request data from request data
         request_data = execution.model_dump()
         execution_key = request_data.get("execution_key", None)
 
     else:
-        # Prepare request data with default values
         request_data = TestExecutionCreate().model_dump()
         execution_key = None
 
     if execution_key is None:
-        # Auto-generate execution_key
-        # get list of test execution to determine next key
-        response = await get_all_executions_by_project(request, project_key)
-        execution = json.loads(response.body)
-        if len(execution) < 1:
-            # no test execution exist yet, start with 1
+        # Auto-generate execution_key — fetch only _id fields (projection), no full documents
+        existing_keys = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE,
+                                      {"project_key": project_key},
+                                      {"_id": 1})
+        if len(existing_keys) < 1:
             last_te = 1
 
         else:
-            # extract numeric part of test_case_key to find last number
-            key_n = [int(e["_id"].split(TE_KEY_PREFIX)[-1]) for e in execution]
+            key_n = [int(e["_id"].split(TE_KEY_PREFIX)[-1]) for e in existing_keys]
             last_te = max(key_n) + 1
 
-        # generate execution_key
         execution_key = f"{project_key}-{TE_KEY_PREFIX}{last_te}"
         request_data["execution_key"] = execution_key
 
@@ -231,9 +223,11 @@ async def create_execution_by_test_case_key(request: Request,
                                   f"Must be in format {project_key}-{TE_KEY_PREFIX}#"}
             )
 
-        # Check if execution_key already exists
-        response = await get_execution_by_key(request, execution_key)
-        if response.status_code != status.HTTP_404_NOT_FOUND:
+        # Check if execution_key already exists with direct find_one
+        existing = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+            "execution_key": execution_key
+        })
+        if existing is not None:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"{execution_key} already exists"}
@@ -370,10 +364,15 @@ async def update_execution_by_key(request: Request,
 
     db = request.app.state.mdb
 
-    # Check execution exists
-    response = await get_execution_by_key(request, execution_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    # Fetch execution directly to get doc and check existence in one call
+    existing_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+        "execution_key": execution_key
+    })
+    if existing_execution is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{execution_key} not found"}
+        )
 
     # Prepare request data, excluding None values
     request_data = execution.model_dump()
@@ -389,51 +388,44 @@ async def update_execution_by_key(request: Request,
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{execution_key} not found"})
 
-    # Retrieve the updated test execution from the database
-    updated_test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-        "execution_key": execution_key
-    })
+    # Reuse already-fetched execution doc to extract keys — no re-fetch needed
+    test_case_key = existing_execution["test_case_key"]
+    cycle_key = existing_execution["test_cycle_key"]
 
-    # get the test case key from the updated test execution
-    test_case_key = updated_test_execution["test_case_key"]
+    # Concurrently fetch linked test case and cycle
+    tc_data, cycle_data = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": test_case_key}),
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"test_cycle_key": cycle_key})
+    )
 
-    # Get the test case
-    tc_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-        "test_case_key": test_case_key
-    })
     if tc_data is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{test_case_key} not found"}
         )
-    # Update test case info
-    tc_data["updated_at"] = get_current_utc_time()
-    tc_data["last_result"] = request_data["result"]
-    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, tc_data, {
-        "test_case_key": test_case_key
-    })
-
-    # Get the cycle from db
-    cycle_key = updated_test_execution["test_cycle_key"]
-    cycle_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
-        "test_cycle_key": cycle_key
-    })
     if cycle_data is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{cycle_key} not found"}
         )
 
-    # Update cycle execution info
+    # Prepare test case and cycle updates
+    current_time = get_current_utc_time()
+    tc_data["last_result"] = request_data["result"]
     cycle_data["executions"][execution_key] = request_data["result"].upper()
     cycle_data = calculate_cycle_status(cycle_data)
-    cycle_data["updated_at"] = get_current_utc_time()
-    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {
-        "test_cycle_key": cycle_key
-    })
+    cycle_data["updated_at"] = current_time
 
+    # Apply both updates concurrently
+    await asyncio.gather(
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, tc_data, {"test_case_key": test_case_key}),
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {"test_cycle_key": cycle_key})
+    )
+
+    # Return the updated execution (merge request_data into existing doc)
+    existing_execution.update(request_data)
     return JSONResponse(status_code=status.HTTP_200_OK,
-                        content=updated_test_execution)
+                        content=existing_execution)
 
 
 @router.delete(f"/api/{API_VERSION}/tm/executions/{{execution_key}}",

@@ -108,10 +108,11 @@ class MongoClient(DatabaseClient):
     async def find(self,
                    db_name: str,
                    table: str,
-                   query: dict) -> list:
+                   query: dict,
+                   projection: dict = None) -> list:
         """Retrieve records from the database."""
 
-        cursor = self._db_client[db_name][table].find(query)
+        cursor = self._db_client[db_name][table].find(query, projection)
         results = await cursor.to_list()
         results = [self._convert_object_id(p) for p in results]
 

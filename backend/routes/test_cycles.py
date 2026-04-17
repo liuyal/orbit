@@ -108,17 +108,16 @@ async def create_cycle_for_project(request: Request,
         test_cycle_key = None
 
     if test_cycle_key is None:
-        # Auto-generate test_cycle_key
-        # get list of test cycle in project to determine next key
-        response = await get_all_cycles_for_project(request, project_key)
-        cycle = json.loads(response.body)
-        if len(cycle) < 1:
-            # no test cycle exist yet, start with 1
+        # Auto-generate test_cycle_key — query cycles directly (project already verified)
+        existing_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
+            "project_key": project_key
+        })
+
+        if len(existing_cycles) < 1:
             last_tcy = 1
 
         else:
-            # extract numeric part of test_cycle_key to find last number
-            key_n = [int(c["_id"].split(TCY_KEY_PREFIX)[-1]) for c in cycle]
+            key_n = [int(c["_id"].split(TCY_KEY_PREFIX)[-1]) for c in existing_cycles]
             last_tcy = max(key_n) + 1
 
         test_cycle_key = f"{project_key}-{TCY_KEY_PREFIX}{last_tcy}"
@@ -134,9 +133,11 @@ async def create_cycle_for_project(request: Request,
                                   f"Must be in format {project_key}-{TCY_KEY_PREFIX}#"}
             )
 
-        # Check if test_cycle already exists
-        response = await get_cycle_by_key(request, test_cycle_key)
-        if response.status_code != status.HTTP_404_NOT_FOUND:
+        # Check if test_cycle already exists with direct find_one
+        existing = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
+            "test_cycle_key": test_cycle_key
+        })
+        if existing is not None:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"{test_cycle_key} already exists"}
@@ -155,11 +156,10 @@ async def create_cycle_for_project(request: Request,
     # Create the test cycle in the database
     await db.create(DB_NAME_TM, DB_COLLECTION_TM_TCY, db_insert)
 
-    # Update project test cycle count
-    test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
+    # Update project test cycle count using db.count (no full document fetch)
+    project["test_cycle_count"] = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "project_key": project_key
     })
-    project["test_cycle_count"] = len(test_cycles)
     await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })

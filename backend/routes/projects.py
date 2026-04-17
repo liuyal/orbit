@@ -92,9 +92,11 @@ async def create_project_by_key(request: Request,
             content={"error": f"Duplicated labels in request"}
         )
 
-    # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code != status.HTTP_404_NOT_FOUND:
+    # Check project exists with direct find_one (no need for counts)
+    existing = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
+        "project_key": project_key
+    })
+    if existing is not None:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"error": f"{project_key} already exists"}
@@ -160,10 +162,15 @@ async def update_project_by_key(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    # Check project exists with direct find_one
+    existing = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
+        "project_key": project_key
+    })
+    if existing is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
 
     # Prepare request data, excluding None values
     request_data = project_update.model_dump()
@@ -177,24 +184,20 @@ async def update_project_by_key(request: Request,
             content={"error": f"Duplicate labels are not allowed"}
         )
 
-    # Get count of test cases and cycles
-    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-        "project_key": project_key
-    })
-    test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
-        "project_key": project_key
-    })
+    # Concurrently fetch test case and cycle counts
+    tc_count, tcy_count = await asyncio.gather(
+        db.count(DB_NAME_TM, DB_COLLECTION_TM_TC, {"project_key": project_key}),
+        db.count(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"project_key": project_key})
+    )
 
-    # Assign value to dict
-    request_data["test_case_count"] = len(test_cases)
-    request_data["test_cycle_count"] = len(test_cycles)
+    request_data["test_case_count"] = tc_count
+    request_data["test_cycle_count"] = tcy_count
 
-    # Update count back into DB
+    # Update project in DB then fetch updated doc concurrently
     await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, request_data, {
         "project_key": project_key
     })
 
-    # Retrieve the updated project
     updated_project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
@@ -213,57 +216,47 @@ async def delete_project_by_key(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    response = await get_project_by_key(request, project_key)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    # Check project exists with direct find_one
+    existing = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
+        "project_key": project_key
+    })
+    if existing is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
 
     # Check force flag
     if force and force.get("force", None) is False:
-        # Check for existing test cases linked to the project
-        test_case_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-            "project_key": project_key
-        })
-        if test_case_count > 0:
+        # Concurrently count all linked collections
+        tc_count, te_count, tcy_count = await asyncio.gather(
+            db.count(DB_NAME_TM, DB_COLLECTION_TM_TC, {"project_key": project_key}),
+            db.count(DB_NAME_TM, DB_COLLECTION_TM_TE, {"project_key": project_key}),
+            db.count(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"project_key": project_key})
+        )
+        if tc_count > 0:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"Project {project_key} "
-                                  f"contains linked test-cases"}
+                content={"error": f"Project {project_key} contains linked test-cases"}
             )
-        # Check for existing test-executions linked to the project
-        test_executions_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-            "project_key": project_key
-        })
-        if test_executions_count > 0:
+        if te_count > 0:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"Project {project_key} "
-                                  f"contains linked test-executions"}
+                content={"error": f"Project {project_key} contains linked test-executions"}
             )
-        # Check for existing test-cycles linked to the project
-        test_cycles_count = await db.count(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
-            "project_key": project_key
-        })
-        if test_cycles_count > 0:
+        if tcy_count > 0:
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                content={"error": f"Project {project_key} "
-                                  f"contains linked test-cycles"}
+                content={"error": f"Project {project_key} contains linked test-cycles"}
             )
 
     else:
-        # Force delete all linked test-cases
-        await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
-            "project_key": project_key
-        })
-        # Force delete all linked test-executions
-        await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-            "project_key": project_key
-        })
-        # Force delete all linked test-cycles
-        await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-            "project_key": project_key
-        })
+        # Concurrently force delete all linked collections
+        await asyncio.gather(
+            db.delete(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"project_key": project_key}),
+            db.delete(DB_NAME_TM, DB_COLLECTION_TM_TE, {"project_key": project_key}),
+            db.delete(DB_NAME_TM, DB_COLLECTION_TM_TC, {"project_key": project_key})
+        )
 
     # Delete the project from the database
     await db.delete(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
