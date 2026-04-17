@@ -140,8 +140,8 @@ async def save_runner_status(app: object,
             # Fetch runner status from GitHub
             status = fetch_runner_status()
 
-            # Save status to app state cache
-            app.state.runner_status_cache = copy.deepcopy(status)
+            # Save status to app state cache as dict keyed by runner name
+            app.state.runner_status_cache = {r["name"]: copy.deepcopy(r) for r in status}
 
             # Save runner status to historic and current collections
             for item in status:

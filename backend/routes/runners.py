@@ -34,11 +34,11 @@ logger = logging.getLogger(__name__)
 async def get_runners_status(request: Request):
     """ Get the status of all runners. """
 
-    # Retrieve status from cache
-    cache = getattr(request.app.state, RUNNER_STATUS_CACHE, [])
+    # Retrieve status from cache (dict keyed by name), return as list
+    cache = getattr(request.app.state, RUNNER_STATUS_CACHE, {})
 
     return JSONResponse(status_code=status.HTTP_200_OK,
-                        content=cache)
+                        content=list(cache.values()))
 
 
 @router.get(f"/api/{API_VERSION}/runners/status/{{name}}",
@@ -49,11 +49,14 @@ async def get_runners_status_by_name(request: Request,
                                      name: str):
     """ Get the status of a runner. """
 
-    # Retrieve runner from cache
-    for item in getattr(request.app.state, RUNNER_STATUS_CACHE, []):
-        if item["name"] == name:
-            return JSONResponse(status_code=status.HTTP_200_OK,
-                                content=item)
+    # Retrieve runner from cache via dict lookup
+    cache = getattr(request.app.state, RUNNER_STATUS_CACHE, {})
+    runner = cache.get(name)
 
-    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
-                        content={"error": f"{name} not found"})
+    if runner is None:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND,
+                            content={"error": f"{name} not found"})
+
+    return JSONResponse(status_code=status.HTTP_200_OK,
+                        content=runner)
+
