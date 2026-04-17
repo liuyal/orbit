@@ -58,22 +58,19 @@ async def get_all_cycles_for_project(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently check project exists and fetch cycles
+    project, test_cycles = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"project_key": project_key})
+    )
+
     if project is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
 
-    # Retrieve all test cycles from the database matching project_key
-    test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
-        "project_key": project_key
-    })
-
-    test_cycles = list(reversed(test_cycles))
+    test_cycles = test_cycles[::-1]
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cycles)
@@ -323,18 +320,19 @@ async def add_execution_to_cycle(request: Request,
 
     db = request.app.state.mdb
 
-    # Check cycle exists
-    response = await get_cycle_by_key(request, test_cycle_key)
-    cycle_data = json.loads(response.body)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    # Concurrently fetch cycle and execution
+    cycle_data, test_execution = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"test_cycle_key": test_cycle_key}),
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {"execution_key": execution_key})
+    )
 
-    # Check execution exists
-    test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-        "execution_key": execution_key
-    })
+    if cycle_data is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{test_cycle_key} not found"}
+        )
+
     if test_execution is None:
-        # test execution not found
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{execution_key} not found"}
@@ -371,19 +369,12 @@ async def add_execution_to_cycle(request: Request,
     cycle_data["executions"].update(exec_data)
     cycle_data = calculate_cycle_status(cycle_data)
 
-    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {
-        "test_cycle_key": test_cycle_key
-    })
-
-    # Update execution cycle id
+    # Update execution cycle id and cycle data concurrently
     test_execution["test_cycle_key"] = test_cycle_key
-    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {
-        "execution_key": execution_key
-    })
-
-    # return updated cycle_data
-    response = await get_cycle_by_key(request, test_cycle_key)
-    cycle_data = json.loads(response.body)
+    await asyncio.gather(
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {"test_cycle_key": test_cycle_key}),
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {"execution_key": execution_key})
+    )
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=cycle_data)
@@ -399,18 +390,19 @@ async def remove_executions_from_cycle(request: Request,
 
     db = request.app.state.mdb
 
-    # Check cycle exists
-    response = await get_cycle_by_key(request, test_cycle_key)
-    cycle_data = json.loads(response.body)
-    if response.status_code == status.HTTP_404_NOT_FOUND:
-        return response
+    # Concurrently fetch cycle and execution
+    cycle_data, test_execution = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"test_cycle_key": test_cycle_key}),
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {"execution_key": execution_key})
+    )
 
-    # Check execution exists
-    test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-        "execution_key": execution_key
-    })
+    if cycle_data is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{test_cycle_key} not found"}
+        )
+
     if test_execution is None:
-        # test execution not found
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{execution_key} not found"}
@@ -426,19 +418,13 @@ async def remove_executions_from_cycle(request: Request,
 
     # Remove execution from cycle
     cycle_data["executions"].pop(test_execution["test_case_key"])
-    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {
-        "test_cycle_key": test_cycle_key
-    })
 
-    # Update execution cycle key
+    # Update cycle and clear execution's cycle key concurrently
     test_execution["test_cycle_key"] = None
-    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {
-        "execution_key": execution_key
-    })
-
-    # return updated cycle_data
-    response = await get_cycle_by_key(request, test_cycle_key)
-    cycle_data = json.loads(response.body)
+    await asyncio.gather(
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {"test_cycle_key": test_cycle_key}),
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {"execution_key": execution_key})
+    )
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=cycle_data)

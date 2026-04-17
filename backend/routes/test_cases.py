@@ -7,6 +7,7 @@
 
 # routes/test_cases.py
 
+import asyncio
 import json
 import re
 from typing import Optional
@@ -72,20 +73,17 @@ async def get_all_test_cases_by_project(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently check project exists and fetch test cases
+    project, test_cases = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {"project_key": project_key})
+    )
+
     if project is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
-
-    # Retrieve test cases from database matching project_key
-    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-        "project_key": project_key
-    })
 
     # Sort test cases by test_case_key using natsort
     test_cases = natsorted(test_cases, key=lambda x: x.get("test_case_key"))
@@ -196,22 +194,19 @@ async def delete_all_test_case_from_project(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently check project exists and check for linked executions
+    project, execution_count = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.count(DB_NAME_TM, DB_COLLECTION_TM_TE, {"project_key": project_key})
+    )
+
     if project is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
 
-    # Check if test cases has any test executions
-    executions = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-        "project_key": project_key,
-    })
-
-    if executions:
+    if execution_count > 0:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"error": f"Test cases in project {project_key} have "
@@ -223,11 +218,7 @@ async def delete_all_test_case_from_project(request: Request,
         "project_key": project_key
     })
 
-    # Update project test counts to 0
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
-
+    # Update project test counts to 0 using already-fetched project doc
     project["test_case_count"] = 0
     project["test_cycle_count"] = 0
 
@@ -248,32 +239,27 @@ async def get_test_case_by_key(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently check project exists and fetch test case
+    project, result = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": test_case_key,
+                                                       "project_key": project_key})
+    )
+
     if project is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
 
-    # Retrieve test case from database
-    result = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-        "test_case_key": test_case_key,
-        "project_key": project_key
-    })
     if result is None:
-        # test case not found
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{test_case_key} not found"}
         )
 
-    else:
-        # Found and return test case
-        return JSONResponse(status_code=status.HTTP_200_OK,
-                            content=result)
+    return JSONResponse(status_code=status.HTTP_200_OK,
+                        content=result)
 
 
 @router.put(f"/api/{API_VERSION}/tm/projects/{{project_key}}/test-cases/{{test_case_key}}",

@@ -58,20 +58,18 @@ async def get_all_executions_by_project(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently check project exists and fetch executions
+    project, test_executions = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {"project_key": project_key})
+    )
+
     if project is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
 
-    # Retrieve test execution matching project_key
-    test_executions = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-        "project_key": project_key
-    })
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_executions)
@@ -131,28 +129,26 @@ async def get_all_executions_by_test_case_key(request: Request,
 
     db = request.app.state.mdb
 
-    # Check project exists
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently check project and test case exist
+    project, tc_data = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": test_case_key,
+                                                       "project_key": project_key})
+    )
+
     if project is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
 
-    # Check if test_case_key exists
-    tc_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-        "test_case_key": test_case_key,
-        "project_key": project_key
-    })
     if tc_data is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{test_case_key} not found"}
         )
 
-    # Retrieve test execution matching project_key and test_case_key
+    # Retrieve test executions matching project_key and test_case_key
     test_executions = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "project_key": project_key,
         "test_case_key": test_case_key
