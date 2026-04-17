@@ -97,6 +97,14 @@ class MongoClient(DatabaseClient):
 
         return True
 
+    async def count(self,
+                    db_name: str,
+                    table: str,
+                    query: dict) -> int:
+        """Count records in the database matching the query."""
+
+        return await self._db_client[db_name][table].count_documents(query)
+
     async def find(self,
                    db_name: str,
                    table: str,

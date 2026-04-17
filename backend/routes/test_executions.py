@@ -7,6 +7,7 @@
 
 # routes/execution.py
 
+import asyncio
 import json
 import re
 from typing import Optional
@@ -95,33 +96,26 @@ async def delete_all_test_execution_by_project(request: Request,
             content={"error": f"{project_key} not found"}
         )
 
-    # Set last_execution_key to None for all test cases in the project
-    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-        "project_key": project_key
-    })
-    for tc_data in test_cases:
-        tc_data["updated_at"] = get_current_utc_time()
-        tc_data["last_execution_key"] = None
-        await db.update(DB_NAME_TM, DB_COLLECTION_TM_TC, tc_data, {
-            "project_key": project_key,
-            "test_case_key": tc_data["test_case_key"]
-        })
+    current_time = get_current_utc_time()
 
-    # Set all execution_key to empty for all cycles in the project
-    cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
-        "project_key": project_key
-    })
-    for cycle in cycles:
-        cycle["executions"] = {}
-        cycle["updated_at"] = get_current_utc_time()
-        await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle, {
-            "test_cycle_key": cycle["test_cycle_key"]
-        })
+    # Concurrently: reset all test cases, reset all cycles, delete all executions
+    await asyncio.gather(
+        # Bulk reset last_execution_key and last_result on all test cases in project
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TC,
+                  {"last_execution_key": None,
+                   "last_result": "NOT_EXECUTED",
+                   "updated_at": current_time},
+                  {"project_key": project_key}),
 
-    # Delete test executions from database matching project_key
-    await db.delete(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-        "project_key": project_key
-    })
+        # Bulk reset executions map on all cycles in project
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY,
+                  {"executions": {}, "updated_at": current_time},
+                  {"project_key": project_key}),
+
+        # Delete all executions for the project
+        db.delete(DB_NAME_TM, DB_COLLECTION_TM_TE,
+                  {"project_key": project_key})
+    )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

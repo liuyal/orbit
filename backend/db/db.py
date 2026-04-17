@@ -90,6 +90,10 @@ class DatabaseClient(ABC):
         """Insert a new record into the database."""
 
     @abstractmethod
+    def count(self, db_name: str, table: str, query: dict):
+        """count record from the database."""
+
+    @abstractmethod
     def find(self, db_name: str, table: str, query: dict):
         """Retrieve records from the database."""
 

@@ -7,6 +7,7 @@
 
 # routes/cycles.py
 
+import asyncio
 import json
 import re
 from typing import Optional
@@ -242,16 +243,24 @@ async def delete_cycle_by_key(request: Request,
 
     db = request.app.state.mdb
 
-    # Delete the test_cycle from the database
-    result, deleted_count = await db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
+    # Check cycle exists
+    result = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
         "test_cycle_key": test_cycle_key
     })
-    if deleted_count == 0:
-        # Test case not found
+    if result is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{test_cycle_key} not found"}
         )
+
+    # Concurrently: delete the cycle and clear test_cycle_key on all linked executions
+    await asyncio.gather(
+        db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TCY,
+                      {"test_cycle_key": test_cycle_key}),
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TE,
+                  {"test_cycle_key": None},
+                  {"test_cycle_key": test_cycle_key})
+    )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

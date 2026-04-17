@@ -7,6 +7,8 @@
 
 # routes/projects.py
 
+import asyncio
+
 from fastapi import (
     APIRouter,
     Request,
@@ -53,23 +55,17 @@ async def get_all_projects(request: Request):
     # Retrieve all projects from database
     projects = await db.find(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {})
 
-    for project in projects:
-        # Get count for test cases and cycles
-        test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-            "project_key": project["project_key"]
-        })
-        test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
-            "project_key": project["project_key"]
-        })
+    # Concurrently fetch test case and cycle counts for all projects
+    async def fetch_counts(project):
+        tc_count, tcy_count = await asyncio.gather(
+            db.count(DB_NAME_TM, DB_COLLECTION_TM_TC, {"project_key": project["project_key"]}),
+            db.count(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"project_key": project["project_key"]})
+        )
+        project["test_case_count"] = tc_count
+        project["test_cycle_count"] = tcy_count
+        return project
 
-        # Assign value to dict
-        project["test_case_count"] = len(test_cases)
-        project["test_cycle_count"] = len(test_cycles)
-
-        # Update count back into DB
-        await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
-            "project_key": project["project_key"]
-        })
+    projects = list(await asyncio.gather(*[fetch_counts(p) for p in projects]))
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=projects)
@@ -132,35 +128,23 @@ async def get_project_by_key(request: Request,
 
     db = request.app.state.mdb
 
-    # Retrieve project from database
-    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
-        "project_key": project_key
-    })
+    # Concurrently fetch project, test case count, and cycle count
+    project, tc_count, tcy_count = await asyncio.gather(
+        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
+        db.count(DB_NAME_TM, DB_COLLECTION_TM_TC, {"project_key": project_key}),
+        db.count(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"project_key": project_key})
+    )
+
     if project is None:
-        # Project not found
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
 
-    # Get count of test cases and cycles
-    test_cases = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
-        "project_key": project_key
-    })
-    test_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
-        "project_key": project_key
-    })
+    # Assign counts to project
+    project["test_case_count"] = tc_count
+    project["test_cycle_count"] = tcy_count
 
-    # Assign to project
-    project["test_case_count"] = len(test_cases)
-    project["test_cycle_count"] = len(test_cycles)
-
-    # Update count back into DB
-    await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
-        "project_key": project_key
-    })
-
-    # Convert ObjectId to string
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=project)
 
