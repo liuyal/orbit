@@ -7,7 +7,6 @@
 
 # routes/cycles.py
 
-import asyncio
 import json
 import re
 from typing import Optional
@@ -259,7 +258,7 @@ async def delete_cycle_by_key(request: Request,
 
 @router.get(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}/executions",
             tags=[DB_COLLECTION_TM_TCY],
-            response_model=list[dict],
+            response_model=dict,
             status_code=status.HTTP_200_OK)
 async def get_cycle_executions(request: Request,
                                test_cycle_key: str):
@@ -274,30 +273,32 @@ async def get_cycle_executions(request: Request,
     cycle_data = json.loads(response.body)
     cycle_executions = cycle_data.get("executions")
 
-    if not cycle_executions:
+    if not cycle_executions or len(cycle_executions) == 0:
         return JSONResponse(status_code=status.HTTP_200_OK, content={})
 
-    # Collect all keys upfront for batch queries
-    tc_keys = list(cycle_executions.keys())
-    exec_keys = [v["execution_key"] for v in cycle_executions.values()]
+    # Query 1: batch fetch all executions by execution_key
+    exec_keys = list(cycle_executions.keys())
+    executions_list = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+        "execution_key": {"$in": exec_keys}
+    })
 
-    # Fetch all executions and test cases in 2 concurrent batch queries
-    executions_list, test_cases_list = await asyncio.gather(
-        db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {"execution_key": {"$in": exec_keys}}),
-        db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": {"$in": tc_keys}})
-    )
+    # Extract test_case_keys from execution docs for second batch query
+    tc_keys = [e["test_case_key"] for e in executions_list if "test_case_key" in e]
 
-    # Index results by their keys for O(1) lookup
-    executions_map = {e["execution_key"]: e for e in executions_list}
+    # Query 2: batch fetch all linked test cases by test_case_key
+    test_cases_list = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {
+        "test_case_key": {"$in": tc_keys}
+    })
+
+    # Build O(1) lookup maps
     test_cases_map = {t["test_case_key"]: t for t in test_cases_list}
 
-    # Merge execution and test case data per tc_key
+    # Merge execution and test case data, keyed by execution_key
     result_data = {}
-    for tc_key, exec_ref in cycle_executions.items():
-        exec_data = executions_map.get(exec_ref["execution_key"], {}).copy()
-        tc_data = test_cases_map.get(tc_key, {})
-        exec_data.update(tc_data)
-        result_data[tc_key] = exec_data
+    for exec_doc in executions_list:
+        tc_key = exec_doc.get("test_case_key")
+        merged = {**exec_doc, **test_cases_map.get(tc_key, {})}
+        result_data[exec_doc["execution_key"]] = merged
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=result_data)
