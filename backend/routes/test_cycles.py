@@ -45,6 +45,34 @@ DB_COLLECTION_TM_TE = DB_COLLECTION_TM_TE.name
 DB_COLLECTION_TM_TCY = DB_COLLECTION_TM_TCY.name
 
 
+async def fetch_cycle_execution_info(cycle: dict, db):
+    """ Fetch cycle execution info """
+
+    # status_count = {}
+    # for tc in cycle["executions"]:
+    #     # Fetch execution status for each execution in cycle
+    #     te = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+    #         "execution_key": cycle["executions"][tc]["execution_key"]
+    #     })
+    #     cycle["executions"][tc]["status"] = te["result"]
+    #
+    #     # Increment status count
+    #     status_count[te["result"]] = status_count.get(te["result"], 0) + 1
+    #
+    # # assign status of cycle base on execution status
+    # if status_count.get("NOT_EXECUTED", 0) > 0:
+    #     if status_count.get("NOT_EXECUTED", 0) == len(cycle["executions"]):
+    #         cycle["status"] = "NOT_STARTED"
+    #
+    #     else:
+    #         cycle["status"] = "IN_PROGRESS"
+    #
+    # else:
+    #     cycle["status"] = "COMPLETE"
+
+    return cycle
+
+
 @router.get(f"/api/{API_VERSION}/tm/projects/{{project_key}}/cycles",
             tags=[DB_COLLECTION_TM_TCY],
             response_model=list[TestCycle],

@@ -10,8 +10,10 @@ import logging.config
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from pyinstrument import Profiler
 
 from backend.app.app_def import API_VERSION, ROOT_DIR
 from backend.app.build_parser import build_parser
@@ -78,6 +80,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def profile_request(request: Request, call_next):
+    """ Profiler middleware """
+
+    # Only profile if ?profile=true is in the URL
+    if "profile" in request.query_params:
+        profiler = Profiler(async_mode="enabled")
+        profiler.start()
+        await call_next(request)
+        profiler.stop()
+        return HTMLResponse(profiler.output_html())
+
+    return await call_next(request)
+
 
 for router in routers:
     app.include_router(router)
