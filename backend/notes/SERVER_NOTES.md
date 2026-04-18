@@ -132,11 +132,11 @@ to collide, because the counter only ever moves forward.
 
 ---
 
-## 🟡 Database Architecture
+## ✅ Database Architecture — Resolved
 
-### 2. Collection Strategy — Single Collection vs Per-Project Collections
+### 2. Collection Strategy — Single Collection per Entity Type *(Implemented)*
 
-**Decision: Keep the single shared collection per entity type.**
+**Decision: Single shared collection per entity type — implemented as designed.**
 
 **Why NOT per-project collections:**
 - MongoDB does not support cross-collection joins/queries — cross-project reports would require scatter-gather queries in application code.
@@ -297,7 +297,7 @@ Docker / Kubernetes can use this for readiness probes instead of relying on the 
 |---|---|---|---|---|
 | 1a | ✅ Resolved | Correctness | Concurrent race condition on auto-key generation — atomic `$inc` via `get_next_sequence` | ✅ Fixed 2026-04-17 |
 | 1b | ✅ Resolved | Correctness | Manual key skipping ahead collides with auto-generated keys — `$max` sync via `sync_sequence` | ✅ Fixed 2026-04-17 |
-| 2 | 🟡 Medium | Architecture | Single collection + indexes is better than per-project collections | ✅ Decision made |
+| 2 | ✅ Resolved | Architecture | Single collection + indexes is better than per-project collections | ✅ Implemented |
 | 3 | 🟡 Medium | Performance | Add compound indexes on `project_key`, `test_case_key`, `test_cycle_key` | ⏳ Pending |
 | 4 | 🟡 Medium | Performance | Use `explain()` / Compass to verify `IXSCAN` after index creation | ⏳ Pending |
 | 5 | 🟢 Low | Performance | Add pagination (`skip`/`limit`) to all list endpoints | ⏳ Pending |
