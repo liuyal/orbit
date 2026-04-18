@@ -79,7 +79,7 @@ class TestOrbitTMProjects(OrbitTMBaseTest):
             "labels": ["A", "B", "C", "A", "B", "C"]
         })
         assert response.status_code == 400
-        assert response.json()["error"] == f"Duplicate labels are not allowed"
+        assert response.json()["error"] == f"Duplicated labels in request"
 
         # Check no projects
         response = session.get(f"{self.__class__.url}/tm/projects")

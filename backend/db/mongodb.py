@@ -11,6 +11,7 @@ import logging
 
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import ReturnDocument
 
 from backend.app.app_def import (
     MONGODB_URL,
@@ -166,6 +167,50 @@ class MongoClient(DatabaseClient):
         result = await self._db_client[db_name][table].delete_one(query)
 
         return result, result.deleted_count
+
+    async def get_next_sequence(self, db_name: str, sequence_name: str) -> int:
+        """Return the next integer in a named atomic counter sequence.
+
+        Uses MongoDB's findOneAndUpdate + $inc to guarantee that no two
+        concurrent callers can ever receive the same value — eliminating the
+        read-max-then-insert race condition.
+
+        Counters are stored in the `counters` collection of `db_name`:
+            { "_id": "<sequence_name>", "seq": <int> }
+
+        The counter is created automatically on first use (upsert=True).
+        The sequence is 1-based: the first call returns 1.
+        """
+
+        result = await self._db_client[db_name]["counters"].find_one_and_update(
+            {"_id": sequence_name},
+            {"$inc": {"seq": 1}},
+            upsert=True,
+            return_document=ReturnDocument.AFTER,
+        )
+
+        return int(result["seq"])
+
+    async def sync_sequence(self, db_name: str, sequence_name: str, min_value: int) -> None:
+        """Advance the named counter to at least min_value.
+
+        Called whenever a manually-supplied key is accepted so that the next
+        auto-generated key can never collide with any key the user has already
+        inserted.
+
+        Uses MongoDB's $max operator, which is a no-op when the stored seq is
+        already >= min_value, and is itself atomic — safe under concurrency.
+
+        Example: user inserts keys T1, T2, T4 manually.
+            sync_sequence(..., 4) is called for each accepted key.
+            Counter ends up at 4.  Next auto-generated key → T5.
+        """
+
+        await self._db_client[db_name]["counters"].update_one(
+            {"_id": sequence_name},
+            {"$max": {"seq": min_value}},
+            upsert=True,
+        )
 
     async def execute_raw(self,
                           command,

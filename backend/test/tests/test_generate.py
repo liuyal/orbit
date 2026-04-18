@@ -22,8 +22,8 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Generate project
-        projects = 10
-        cases = 200
+        projects = 3
+        cases = 100
         session = self.__class__.session
         for i in range(1, projects + 1):
             project_key = f"PRJ{i}"

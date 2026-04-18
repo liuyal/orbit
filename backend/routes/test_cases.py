@@ -120,17 +120,9 @@ async def create_test_case_in_project(request: Request,
         test_case_key = None
 
     if test_case_key is None:
-        # Auto-generate test_case_key — fetch only _id fields, no full documents
-        existing_keys = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC,
-                                      {"project_key": project_key},
-                                      {"_id": 1})
-        if len(existing_keys) < 1:
-            last_tc = 1
-
-        else:
-            last_tc = max([int(case["_id"].split(TC_KEY_PREFIX)[-1]) for case in existing_keys]) + 1
-
-        test_case_key = f"{project_key}-{TC_KEY_PREFIX}{last_tc}"
+        # Auto-generate test_case_key using an atomic per-project counter
+        seq = await db.get_next_sequence(DB_NAME_TM, f"{project_key}_tc")
+        test_case_key = f"{project_key}-{TC_KEY_PREFIX}{seq}"
         request_data["test_case_key"] = test_case_key
 
     else:
@@ -154,6 +146,12 @@ async def create_test_case_in_project(request: Request,
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"{test_case_key} already exists"}
             )
+
+        # Advance the counter so future auto-generated keys never collide with
+        # manually-provided ones (e.g. user inserts T1, T2, T4 manually, then
+        # two auto-inserts must start at T5 not T3/T4).
+        manual_num = int(test_case_key.split(TC_KEY_PREFIX)[-1])
+        await db.sync_sequence(DB_NAME_TM, f"{project_key}_tc", manual_num)
 
     # Initialize counts and timestamps
     current_time = get_current_utc_time()

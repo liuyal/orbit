@@ -108,19 +108,9 @@ async def create_cycle_for_project(request: Request,
         test_cycle_key = None
 
     if test_cycle_key is None:
-        # Auto-generate test_cycle_key — query cycles directly (project already verified)
-        existing_cycles = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
-            "project_key": project_key
-        })
-
-        if len(existing_cycles) < 1:
-            last_tcy = 1
-
-        else:
-            key_n = [int(c["_id"].split(TCY_KEY_PREFIX)[-1]) for c in existing_cycles]
-            last_tcy = max(key_n) + 1
-
-        test_cycle_key = f"{project_key}-{TCY_KEY_PREFIX}{last_tcy}"
+        # Auto-generate test_cycle_key using an atomic per-project counter.
+        seq = await db.get_next_sequence(DB_NAME_TM, f"{project_key}_tcy")
+        test_cycle_key = f"{project_key}-{TCY_KEY_PREFIX}{seq}"
         request_data["test_cycle_key"] = test_cycle_key
 
     else:
@@ -142,6 +132,12 @@ async def create_cycle_for_project(request: Request,
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"{test_cycle_key} already exists"}
             )
+
+        # Advance the counter so future auto-generated keys never collide with
+        # manually-provided ones (e.g. user inserts C1, C2, C4 manually, then
+        # two auto-inserts must start at C5 not C3/C4).
+        manual_num = int(test_cycle_key.split(TCY_KEY_PREFIX)[-1])
+        await db.sync_sequence(DB_NAME_TM, f"{project_key}_tcy", manual_num)
 
     # Initialize counts and timestamps
     current_time = get_current_utc_time()

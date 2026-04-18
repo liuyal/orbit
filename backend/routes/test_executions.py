@@ -199,18 +199,9 @@ async def create_execution_by_test_case_key(request: Request,
         execution_key = None
 
     if execution_key is None:
-        # Auto-generate execution_key — fetch only _id fields (projection), no full documents
-        existing_keys = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE,
-                                      {"project_key": project_key},
-                                      {"_id": 1})
-        if len(existing_keys) < 1:
-            last_te = 1
-
-        else:
-            key_n = [int(e["_id"].split(TE_KEY_PREFIX)[-1]) for e in existing_keys]
-            last_te = max(key_n) + 1
-
-        execution_key = f"{project_key}-{TE_KEY_PREFIX}{last_te}"
+        # Auto-generate execution_key using an atomic per-project counter
+        seq = await db.get_next_sequence(DB_NAME_TM, f"{project_key}_te")
+        execution_key = f"{project_key}-{TE_KEY_PREFIX}{seq}"
         request_data["execution_key"] = execution_key
 
     else:
@@ -232,6 +223,12 @@ async def create_execution_by_test_case_key(request: Request,
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={"error": f"{execution_key} already exists"}
             )
+
+        # Advance the counter so future auto-generated keys never collide with
+        # manually-provided ones (e.g. user inserts E1, E2, E4 manually, then
+        # two auto-inserts must start at E5 not E3/E4).
+        manual_num = int(execution_key.split(TE_KEY_PREFIX)[-1])
+        await db.sync_sequence(DB_NAME_TM, f"{project_key}_te", manual_num)
 
     # Initialize missing keys
     current_time = get_current_utc_time()

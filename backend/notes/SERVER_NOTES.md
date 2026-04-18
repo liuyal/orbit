@@ -1,7 +1,7 @@
 # Backend Optimization Findings
 **Project:** Orbit API  
 **Author:** Jerry  
-**Last Updated:** 2026-04-17  
+**Last Updated:** 2026-04-17 (race-condition + manual-key collision fix applied)  
 
 ---
 
@@ -12,7 +12,7 @@ Findings are categorized by **priority** and cover correctness bugs, performance
 
 ---
 
-## ✅ Completed Optimizations (as of 2026-04-16)
+## ✅ Completed Optimizations (as of 2026-04-17)
 
 All route-level optimizations have been applied. See `API_OPTIMIZATION_NOTES.md` for the full breakdown.
 
@@ -24,33 +24,111 @@ Key improvements applied:
 - Redundant re-fetches eliminated by reusing already-fetched documents.
 - O(1) dict-keyed cache for runner status lookups.
 - Batch `$in` queries replace N×2 individual `find_one` loops in `get_cycle_executions`.
+- **Atomic counter (`get_next_sequence`) replaces `max()+1` key generation** in test cases, executions, and cycles — eliminates the concurrent duplicate-key race condition.
+- **`sync_sequence` advances the counter on every accepted manual key** — prevents auto-generated keys from colliding with manually-supplied keys that skipped ahead in the sequence (e.g. user inserts T1, T2, T4; next auto-key correctly yields T5 not T3/T4).
 
 ---
 
-## 🔴 Critical Issues (Fix Immediately)
+## ✅ Critical Issues — Resolved
 
-### 1. Race Condition on Key Generation
+### 1. Race Condition on Key Generation *(Fixed 2026-04-17)*
 
-**Files:** `routes/test_cases.py` → `create_test_case_in_project`  
-**Files:** `routes/test_executions.py` → `create_execution_by_test_case_key`
+**Files changed:**
+- `db/mongodb.py` — added `get_next_sequence` and `sync_sequence`
+- `routes/test_cases.py` → `create_test_case_in_project`
+- `routes/test_executions.py` → `create_execution_by_test_case_key`
+- `routes/test_cycles.py` → `create_cycle_for_project`
 
-**Problem:**  
-Auto-key generation fetches all existing `_id`s, computes `max() + 1`, then inserts. Under concurrent requests,
-two requests can read the same max and attempt to insert the same key — causing a duplicate key error.
+---
 
-**Fix:** Use MongoDB's atomic counter pattern with `findOneAndUpdate` + `$inc`:
+#### Part A — Concurrent auto-key race condition
+
+**Root cause:**  
+Auto-key generation fetched all existing `_id`s, computed `max() + 1`, then inserted.
+Under concurrent requests two callers could read the same max and attempt to insert the
+same key, producing a duplicate-key error.
+
+**Fix — `get_next_sequence`:**  
+Uses MongoDB's `findOneAndUpdate` + `$inc` against a dedicated `counters` collection.
+The operation is atomic on the MongoDB server — no two callers can ever receive the same
+sequence number regardless of concurrency.
 
 ```python
-# Add to mongodb.py
+# db/mongodb.py
 async def get_next_sequence(self, db_name: str, sequence_name: str) -> int:
     result = await self._db_client[db_name]["counters"].find_one_and_update(
         {"_id": sequence_name},
         {"$inc": {"seq": 1}},
         upsert=True,
-        return_document=True
+        return_document=ReturnDocument.AFTER,
     )
-    return result["seq"]
+    return int(result["seq"])
 ```
+
+Route handlers now call this instead of scanning:
+
+```python
+# Before (race condition)
+existing_keys = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TC, {"project_key": project_key}, {"_id": 1})
+last_tc = max([int(k["_id"].split(TC_KEY_PREFIX)[-1]) for k in existing_keys]) + 1
+
+# After (atomic, race-free)
+seq = await db.get_next_sequence(DB_NAME_TM, f"{project_key}_tc")
+test_case_key = f"{project_key}-{TC_KEY_PREFIX}{seq}"
+```
+
+Counter documents are auto-created on first use (`upsert=True`) — no schema migration needed.
+Each project gets its own counters (e.g. `PROJ-1_tc`, `PROJ-1_te`, `PROJ-1_tcy`).
+
+---
+
+#### Part B — Manual key skipping ahead in the sequence
+
+**Root cause:**  
+The `counters` collection and manually-provided keys were completely independent.
+If a user inserted T1, T2, T4 manually, the counter had no awareness of T4.
+The next two auto-inserts would generate T3 then T4, and T4 would crash with a
+`DuplicateKeyError`:
+
+```
+pymongo.errors.DuplicateKeyError: E11000 duplicate key error collection:
+orbit-tm.test-cases index: _id_ dup key: { _id: "PRJ0-T4" }
+```
+
+**Fix — `sync_sequence`:**  
+Called in the manual-key `else` branch of each route, immediately after the key passes
+both the format check and the duplicate check. Uses MongoDB's `$max` operator to advance
+the counter to at least the manually-provided key number — atomically and with no extra
+round-trips if the counter is already higher.
+
+```python
+# db/mongodb.py
+async def sync_sequence(self, db_name: str, sequence_name: str, min_value: int) -> None:
+    await self._db_client[db_name]["counters"].update_one(
+        {"_id": sequence_name},
+        {"$max": {"seq": min_value}},
+        upsert=True,
+    )
+```
+
+```python
+# routes/test_cases.py — inside the manual-key else branch
+manual_num = int(test_case_key.split(TC_KEY_PREFIX)[-1])
+await db.sync_sequence(DB_NAME_TM, f"{project_key}_tc", manual_num)
+```
+
+**Behaviour table:**
+
+| Inserted keys (manual) | Counter after syncs | Next auto key |
+|---|---|---|
+| T1, T2, T4 | 4 | **T5** ✅ |
+| T1, T2, T3 | 3 | **T4** ✅ |
+| T10 | 10 | **T11** ✅ |
+
+**Why deletion doesn't need special handling:**  
+The counter is monotonically increasing and never decrements. Deleting a key leaves a gap
+in the sequence (like SQL `AUTO_INCREMENT`) but never causes a future auto-generated key
+to collide, because the counter only ever moves forward.
 
 ---
 
@@ -217,7 +295,8 @@ Docker / Kubernetes can use this for readiness probes instead of relying on the 
 
 | # | Priority | Category | Finding | Status |
 |---|---|---|---|---|
-| 1 | 🔴 Critical | Correctness | Race condition on key generation — use atomic `$inc` counter | ⏳ Pending |
+| 1a | ✅ Resolved | Correctness | Concurrent race condition on auto-key generation — atomic `$inc` via `get_next_sequence` | ✅ Fixed 2026-04-17 |
+| 1b | ✅ Resolved | Correctness | Manual key skipping ahead collides with auto-generated keys — `$max` sync via `sync_sequence` | ✅ Fixed 2026-04-17 |
 | 2 | 🟡 Medium | Architecture | Single collection + indexes is better than per-project collections | ✅ Decision made |
 | 3 | 🟡 Medium | Performance | Add compound indexes on `project_key`, `test_case_key`, `test_cycle_key` | ⏳ Pending |
 | 4 | 🟡 Medium | Performance | Use `explain()` / Compass to verify `IXSCAN` after index creation | ⏳ Pending |
