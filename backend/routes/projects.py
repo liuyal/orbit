@@ -25,14 +25,14 @@ from backend.app.app_def import (
     DB_COLLECTION_TM_TCY,
     DB_NAME_TM
 )
-from backend.app.utility import (
-    get_current_utc_time
-)
 from backend.app.cache import (
     cache_get,
     cache_set,
     cache_invalidate,
     cache_invalidate_prefix
+)
+from backend.app.utility import (
+    get_current_utc_time
 )
 from backend.models.projects import (
     Project,

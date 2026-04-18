@@ -29,11 +29,11 @@ from backend.app.app_def import (
     DB_NAME_TM,
     TCY_KEY_PREFIX
 )
+from backend.app.cache import cache_invalidate
 from backend.app.utility import (
     get_current_utc_time,
     calculate_cycle_status
 )
-from backend.app.cache import cache_invalidate
 from backend.models.test_cycles import (
     TestCycle,
     TestCycleCreate,

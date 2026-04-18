@@ -184,4 +184,3 @@ def pydantic_to_mongo_jsonschema(pydantic_schema: dict) -> dict:
         result["required"] = required_fields
 
     return result
-

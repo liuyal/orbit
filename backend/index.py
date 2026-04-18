@@ -17,6 +17,7 @@ from pyinstrument import Profiler
 
 from backend.app.app_def import API_VERSION, ROOT_DIR
 from backend.app.build_parser import build_parser
+from backend.app.correlation import install_correlation_filter, set_request_id
 from backend.app.utility import configure_logging
 from backend.db.mongodb import MongoClient
 from backend.module.runners import save_runner_status
@@ -37,6 +38,11 @@ async def lifespan(app):
     mongodb_client = MongoClient()
     await mongodb_client.connect()
     await mongodb_client.configure()
+
+    # Attach correlation filter to all log handlers so every log line
+    # carries the request ID of the currently executing async task.
+    install_correlation_filter()
+    logger.info("Correlation log filter installed")
 
     if not args.skip_background_tasks:
         # Start the background task to save runner status periodically
@@ -95,6 +101,22 @@ async def profile_request(request: Request, call_next):
         return HTMLResponse(profiler.output_html())
 
     return await call_next(request)
+
+
+@app.middleware("http")
+async def correlation_id_middleware(request: Request, call_next):
+    """Correlation ID middleware.
+
+    Reads X-Request-ID from the incoming request (so clients can supply their
+    own traceable ID) or generates a fresh UUID4 if none is present.
+    The ID is stored in a ContextVar so every log line emitted during this
+    request automatically includes it via CorrelationFilter.
+    The same ID is echoed back in the X-Request-ID response header.
+    """
+    request_id = set_request_id(request.headers.get("X-Request-ID"))
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request_id
+    return response
 
 
 for router in routers:

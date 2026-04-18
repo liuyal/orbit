@@ -1,7 +1,7 @@
 # Backend Optimization Findings
 **Project:** Orbit API  
 **Author:** Jerry  
-**Last Updated:** 2026-04-17 (race-condition + manual-key collision + TTL cache + maxPoolSize fixes applied)  
+**Last Updated:** 2026-04-18 (race-condition + manual-key collision + TTL cache + maxPoolSize fixes applied)  
 
 ---
 
@@ -12,7 +12,7 @@ Findings are categorized by **priority** and cover correctness bugs, performance
 
 ---
 
-## ✅ Completed Optimizations (as of 2026-04-17)
+## ✅ Completed Optimizations (as of 2026-04-18)
 
 All route-level optimizations have been applied. See `API_OPTIMIZATION_NOTES.md` for the full breakdown.
 
@@ -311,10 +311,44 @@ Return only the fields the frontend actually needs to reduce payload size and se
 await db.find("test_cases", {"project_key": pk}, projection={"_id": 1, "name": 1, "status": 1})
 ```
 
-### 9. Structured Logging with Correlation IDs
+### 9. Structured Logging with Correlation IDs *(Implemented)*
 
-Add a request `X-Request-ID` header and propagate it through log lines.  
-This makes it possible to trace a single slow request through all log entries.
+Every log line now carries a `request_id` field that ties all log entries for a single
+HTTP request together, regardless of call depth or concurrency.
+
+**Files changed:**
+- `app/correlation.py` — new module: `ContextVar`, `CorrelationFilter`, helpers
+- `index.py` — new `correlation_id_middleware` + `install_correlation_filter()` called at startup
+- `log_conf.yaml` — format strings updated to include `[%(request_id)s]`
+
+**How it works:**
+
+| Component | Role |
+|---|---|
+| `ContextVar[str]` | Stores the request ID per async Task — concurrent requests never overwrite each other |
+| `CorrelationFilter` | `logging.Filter` subclass; stamps every `LogRecord` with `record.request_id` from the `ContextVar` |
+| `install_correlation_filter()` | Attaches the filter to all root-logger handlers at startup |
+| `correlation_id_middleware` | Reads `X-Request-ID` from request headers (client-supplied) or generates a fresh UUID4; sets the `ContextVar`; echoes the ID in `X-Request-ID` response header |
+
+**Log format (before / after):**
+```
+# Before
+[2026-04-17 12:00:00.123] INFO: projects[56] -> GET /api/v1/tm/projects
+
+# After
+[2026-04-17 12:00:00.123] INFO: projects[56] [a3f1c2d4-...] -> GET /api/v1/tm/projects
+```
+
+**Tracing a request:**
+```bash
+# Supply your own ID
+curl -H "X-Request-ID: my-trace-123" https://host/api/v1/tm/projects
+
+# All log lines for that request will show [my-trace-123]
+# The same ID is echoed in the response header for client-side correlation
+```
+
+Logs before the first request (startup, background tasks) show `[-]` as the placeholder.
 
 ### 10. Health-Check / Readiness Endpoint
 
@@ -336,6 +370,6 @@ Docker / Kubernetes can use this for readiness probes instead of relying on the 
 | 6 | ✅ Resolved | Performance | TTL in-memory cache for read-heavy endpoints | ✅ Implemented |
 | 7 | ✅ Resolved | Performance | Tune Motor connection pool (`maxPoolSize`) | ✅ Implemented |
 | 8 | 🟢 Low | Performance | Field projections on list endpoints to reduce payload size | ⏳ Pending |
-| 9 | 🟢 Low | Observability | Structured logging with per-request correlation IDs | ⏳ Pending |
+| 9 | ✅ Resolved | Observability | Structured logging with per-request correlation IDs | ✅ Implemented |
 | 10 | 🟢 Low | Reliability | Add `GET /health` readiness endpoint for Docker/k8s | ⏳ Pending |
 

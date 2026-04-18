@@ -28,12 +28,12 @@ from backend.app.app_def import (
     DB_NAME_TM,
     TC_KEY_PREFIX
 )
-from backend.app.utility import get_current_utc_time
 from backend.app.cache import (
     cache_get,
     cache_set,
     cache_invalidate
 )
+from backend.app.utility import get_current_utc_time
 from backend.models.test_cases import (
     TestCase,
     TestCaseCreate,

@@ -28,11 +28,11 @@ from backend.app.app_def import (
     DB_NAME_TM,
     TE_KEY_PREFIX
 )
+from backend.app.cache import cache_invalidate
 from backend.app.utility import (
     get_current_utc_time,
     calculate_cycle_status
 )
-from backend.app.cache import cache_invalidate
 from backend.models.test_executions import (
     TestExecution,
     TestExecutionCreate,
@@ -69,7 +69,6 @@ async def get_all_executions_by_project(request: Request,
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{project_key} not found"}
         )
-
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_executions)
@@ -136,7 +135,7 @@ async def get_all_executions_by_test_case_key(request: Request,
     project, tc_data = await asyncio.gather(
         db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
         db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": test_case_key,
-                                                       "project_key": project_key})
+                                                      "project_key": project_key})
     )
 
     if project is None:
@@ -179,7 +178,7 @@ async def create_execution_by_test_case_key(request: Request,
     project, tc_data = await asyncio.gather(
         db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {"project_key": project_key}),
         db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TC, {"test_case_key": test_case_key,
-                                                       "project_key": project_key})
+                                                      "project_key": project_key})
     )
 
     if project is None:

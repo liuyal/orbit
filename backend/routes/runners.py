@@ -59,4 +59,3 @@ async def get_runners_status_by_name(request: Request,
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=runner)
-
