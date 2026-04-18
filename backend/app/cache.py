@@ -27,23 +27,26 @@ _cache: TTLCache = TTLCache(maxsize=256, ttl=60)
 
 def cache_get(key: str):
     """Return cached value for key, or None if missing / expired."""
+
     return _cache.get(key)
 
 
 def cache_set(key: str, value) -> None:
     """Store value in cache under key."""
+
     _cache[key] = value
 
 
 def cache_invalidate(*keys: str) -> None:
     """Remove one or more specific keys from the cache."""
+
     for key in keys:
         _cache.pop(key, None)
 
 
 def cache_invalidate_prefix(prefix: str) -> None:
     """Remove all cache entries whose key starts with prefix."""
+
     for key in list(_cache.keys()):
         if key.startswith(prefix):
             _cache.pop(key, None)
-

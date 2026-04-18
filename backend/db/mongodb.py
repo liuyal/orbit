@@ -52,7 +52,7 @@ class MongoClient(DatabaseClient):
                      f"at {MONGODB_HOST}:{MONGODB_PORT} "
                      f"with user '{MONGODB_USER}'")
 
-        self._db_client = AsyncIOMotorClient(self._db_url)
+        self._db_client = AsyncIOMotorClient(self._db_url, maxPoolSize=50)
 
     async def close(self):
         """ Disconnect from the database. """

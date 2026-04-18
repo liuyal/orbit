@@ -32,6 +32,7 @@ from backend.app.utility import (
     get_current_utc_time,
     calculate_cycle_status
 )
+from backend.app.cache import cache_invalidate
 from backend.models.test_executions import (
     TestExecution,
     TestExecutionCreate,
@@ -113,6 +114,9 @@ async def delete_all_test_execution_by_project(request: Request,
         db.delete(DB_NAME_TM, DB_COLLECTION_TM_TE,
                   {"project_key": project_key})
     )
+
+    # Invalidate test case caches (all last_result / last_execution_key reset)
+    cache_invalidate("test_cases:all", f"test_cases:{project_key}")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -252,6 +256,9 @@ async def create_execution_by_test_case_key(request: Request,
         "test_case_key": test_case_key
     })
 
+    # Invalidate test case caches (last_result / last_execution_key changed)
+    cache_invalidate("test_cases:all", f"test_cases:{project_key}")
+
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content=request_data)
 
@@ -322,6 +329,9 @@ async def delete_all_execution_by_test_case_key(request: Request,
             content={"error": f"No test executions found "
                               f"for test case {test_case_key}"}
         )
+
+    # Invalidate test case caches (last_result / last_execution_key reset)
+    cache_invalidate("test_cases:all", f"test_cases:{project_key}")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -419,6 +429,11 @@ async def update_execution_by_key(request: Request,
         db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {"test_cycle_key": cycle_key})
     )
 
+    # Invalidate test case caches (last_result changed)
+    project_key = existing_execution.get("project_key")
+    if project_key:
+        cache_invalidate("test_cases:all", f"test_cases:{project_key}")
+
     # Return the updated execution (merge request_data into existing doc)
     existing_execution.update(request_data)
     return JSONResponse(status_code=status.HTTP_200_OK,
@@ -461,5 +476,10 @@ async def delete_execution_by_key(request: Request,
     await db.delete_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
         "execution_key": execution_key
     })
+
+    # Invalidate test case caches (last_execution_key / last_result may have changed)
+    project_key = test_execution.get("project_key")
+    if project_key:
+        cache_invalidate("test_cases:all", f"test_cases:{project_key}")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

@@ -29,6 +29,11 @@ from backend.app.app_def import (
     TC_KEY_PREFIX
 )
 from backend.app.utility import get_current_utc_time
+from backend.app.cache import (
+    cache_get,
+    cache_set,
+    cache_invalidate
+)
 from backend.models.test_cases import (
     TestCase,
     TestCaseCreate,
@@ -50,6 +55,10 @@ DB_COLLECTION_TM_TE = DB_COLLECTION_TM_TE.name
 async def get_all_test_cases(request: Request):
     """Get all test cases"""
 
+    cached = cache_get("test_cases:all")
+    if cached is not None:
+        return JSONResponse(status_code=status.HTTP_200_OK, content=cached)
+
     db = request.app.state.mdb
 
     # Retrieve all test cases from database
@@ -58,6 +67,7 @@ async def get_all_test_cases(request: Request):
     # Sort test cases by test_case_key using natsort
     test_cases = natsorted(test_cases, key=lambda x: x.get("test_case_key"))
 
+    cache_set("test_cases:all", test_cases)
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cases)
 
@@ -69,6 +79,11 @@ async def get_all_test_cases(request: Request):
 async def get_all_test_cases_by_project(request: Request,
                                         project_key: str):
     """Get all test cases in the specified project"""
+
+    cache_key = f"test_cases:{project_key}"
+    cached = cache_get(cache_key)
+    if cached is not None:
+        return JSONResponse(status_code=status.HTTP_200_OK, content=cached)
 
     db = request.app.state.mdb
 
@@ -86,6 +101,8 @@ async def get_all_test_cases_by_project(request: Request,
 
     # Sort test cases by test_case_key using natsort
     test_cases = natsorted(test_cases, key=lambda x: x.get("test_case_key"))
+
+    cache_set(cache_key, test_cases)
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cases)
@@ -175,6 +192,10 @@ async def create_test_case_in_project(request: Request,
         "project_key": project_key
     })
 
+    # Invalidate test case list and project caches (test_case_count changed)
+    cache_invalidate("test_cases:all", f"test_cases:{project_key}",
+                     "projects:all", f"projects:{project_key}")
+
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content=request_data)
 
@@ -219,6 +240,10 @@ async def delete_all_test_case_from_project(request: Request,
     await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })
+
+    # Invalidate all affected cache entries
+    cache_invalidate("test_cases:all", f"test_cases:{project_key}",
+                     "projects:all", f"projects:{project_key}")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -312,6 +337,10 @@ async def update_test_case_by_key(request: Request,
             "project_key": project_key
         })
 
+    # Invalidate stale test case and project caches
+    cache_invalidate("test_cases:all", f"test_cases:{project_key}",
+                     "projects:all", f"projects:{project_key}")
+
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=updated_test_case)
 
@@ -367,5 +396,9 @@ async def delete_test_case_by_key(request: Request,
     await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
         "project_key": project_key
     })
+
+    # Invalidate stale test case and project caches
+    cache_invalidate("test_cases:all", f"test_cases:{project_key}",
+                     "projects:all", f"projects:{project_key}")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)

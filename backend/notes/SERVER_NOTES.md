@@ -1,7 +1,7 @@
 # Backend Optimization Findings
 **Project:** Orbit API  
 **Author:** Jerry  
-**Last Updated:** 2026-04-17 (race-condition + manual-key collision fix applied)  
+**Last Updated:** 2026-04-17 (race-condition + manual-key collision + TTL cache + maxPoolSize fixes applied)  
 
 ---
 
@@ -26,6 +26,8 @@ Key improvements applied:
 - Batch `$in` queries replace N×2 individual `find_one` loops in `get_cycle_executions`.
 - **Atomic counter (`get_next_sequence`) replaces `max()+1` key generation** in test cases, executions, and cycles — eliminates the concurrent duplicate-key race condition.
 - **`sync_sequence` advances the counter on every accepted manual key** — prevents auto-generated keys from colliding with manually-supplied keys that skipped ahead in the sequence (e.g. user inserts T1, T2, T4; next auto-key correctly yields T5 not T3/T4).
+- **`maxPoolSize=50` set on `AsyncIOMotorClient`** — prevents connection pool exhaustion under high concurrency.
+- **TTL in-memory cache (`cachetools.TTLCache`, 30 s) added to all read-heavy GET endpoints** — `GET /projects`, `GET /projects/{key}`, `GET /projects/{key}/test-cases`, `GET /test-cases`; writes invalidate affected cache keys immediately.
 
 ---
 
@@ -153,7 +155,9 @@ to collide, because the counter only ever moves forward.
 
 ## 🟡 MongoDB Indexes
 
-### 3. What Are Indexes?
+### 3. Add Compound Indexes on Key Fields
+
+#### 3a. What Are Indexes?
 
 An **index** is a data structure that MongoDB maintains alongside a collection to allow fast lookups without scanning every document (a *collection scan*).  
 Without an index on `project_key`, every query like `{"project_key": "PROJ-1"}` reads **all** documents in the collection.  
@@ -163,7 +167,7 @@ With an index, MongoDB jumps directly to the matching documents — O(log n) ins
 - `1` = ascending
 - `-1` = descending
 
-### 4. How to Create Indexes
+#### 3b. How to Create Indexes
 
 The Motor (async MongoDB) method signature is:
 
@@ -206,7 +210,7 @@ async def create_indexes(self, db_name: str):
 
 Call `create_indexes()` once during app startup in `app/app_def.py` (e.g., inside the `lifespan` handler).
 
-### 5. Do You Need to Reset the Database After Creating Indexes?
+#### 3c. Do You Need to Reset the Database After Creating Indexes?
 
 **No.** `create_index` is non-destructive:
 - It reads existing documents and builds the index in the background.
@@ -214,7 +218,9 @@ Call `create_indexes()` once during app startup in `app/app_def.py` (e.g., insid
 - If the index already exists, the call is a no-op.
 - The database stays online and fully operational during index creation.
 
-### 6. How to Measure Performance Gains
+---
+
+### 4. Verify Index Usage with `explain()`
 
 Use MongoDB's `explain()` to inspect query plans before and after adding indexes:
 
@@ -239,7 +245,7 @@ print(plan["queryPlanner"]["winningPlan"])
 
 ## 🟢 Additional Backend Optimizations (Future Work)
 
-### 7. Pagination
+### 5. Pagination
 
 `GET /tm/test-cases` and similar list endpoints return **all** documents. As data grows this will be slow and memory-heavy.
 
@@ -252,25 +258,51 @@ async def get_all_test_cases(skip: int = 0, limit: int = 50):
     return docs
 ```
 
-### 8. Response Caching (read-heavy endpoints)
+### 6. Response Caching (read-heavy endpoints) *(Implemented)*
 
-Endpoints like `GET /tm/projects` are read-heavy and change infrequently. A short TTL in-memory cache (e.g., `cachetools.TTLCache`) avoids repeated DB hits for the same data within the TTL window.
+A `cachetools.TTLCache` (30-second TTL, 256-entry max) has been added in `app/cache.py`.  
+The following GET endpoints serve from cache on cache-hit, bypassing MongoDB entirely:
+
+| Cache key | Endpoint |
+|---|---|
+| `"projects:all"` | `GET /tm/projects` |
+| `"projects:{project_key}"` | `GET /tm/projects/{project_key}` |
+| `"test_cases:all"` | `GET /tm/test-cases` |
+| `"test_cases:{project_key}"` | `GET /tm/projects/{project_key}/test-cases` |
+
+**Cache invalidation** is called proactively on every write so stale data is never served beyond the current request:
+
+| Write operation | Keys invalidated |
+|---|---|
+| Create / update / delete project | `projects:all`, `projects:{key}` |
+| Create / update / delete test case | `test_cases:all`, `test_cases:{key}`, `projects:all`, `projects:{key}` |
+| Create / delete test cycle | `projects:all`, `projects:{key}` |
 
 ```python
+# app/cache.py
 from cachetools import TTLCache
-_cache = TTLCache(maxsize=128, ttl=30)  # 30-second TTL
+
+_cache: TTLCache = TTLCache(maxsize=256, ttl=30)
+
+def cache_get(key: str): return _cache.get(key)
+def cache_set(key: str, value) -> None: _cache[key] = value
+def cache_invalidate(*keys: str) -> None:
+    for key in keys: _cache.pop(key, None)
+def cache_invalidate_prefix(prefix: str) -> None:
+    for key in list(_cache.keys()):
+        if key.startswith(prefix): _cache.pop(key, None)
 ```
 
-### 9. MongoDB Connection Pool Tuning
+### 7. MongoDB Connection Pool Tuning *(Implemented)*
 
 Motor's default connection pool may be undersized for high concurrency.  
-Add `maxPoolSize` when creating the `AsyncIOMotorClient`:
+`maxPoolSize=50` has been applied to the `AsyncIOMotorClient` constructor in `db/mongodb.py`:
 
 ```python
-AsyncIOMotorClient(uri, maxPoolSize=50)
+self._db_client = AsyncIOMotorClient(self._db_url, maxPoolSize=50)
 ```
 
-### 10. Field Projections on List Endpoints
+### 8. Field Projections on List Endpoints
 
 List endpoints (`get_all_test_cases`, `get_all_projects`, etc.) return full documents.  
 Return only the fields the frontend actually needs to reduce payload size and serialization time:
@@ -279,12 +311,12 @@ Return only the fields the frontend actually needs to reduce payload size and se
 await db.find("test_cases", {"project_key": pk}, projection={"_id": 1, "name": 1, "status": 1})
 ```
 
-### 11. Structured Logging with Correlation IDs
+### 9. Structured Logging with Correlation IDs
 
 Add a request `X-Request-ID` header and propagate it through log lines.  
 This makes it possible to trace a single slow request through all log entries.
 
-### 12. Health-Check / Readiness Endpoint
+### 10. Health-Check / Readiness Endpoint
 
 Add a `GET /health` endpoint that pings MongoDB and returns `200 OK` or `503 Service Unavailable`.  
 Docker / Kubernetes can use this for readiness probes instead of relying on the process being alive.
@@ -299,10 +331,10 @@ Docker / Kubernetes can use this for readiness probes instead of relying on the 
 | 1b | ✅ Resolved | Correctness | Manual key skipping ahead collides with auto-generated keys — `$max` sync via `sync_sequence` | ✅ Fixed 2026-04-17 |
 | 2 | ✅ Resolved | Architecture | Single collection + indexes is better than per-project collections | ✅ Implemented |
 | 3 | 🟡 Medium | Performance | Add compound indexes on `project_key`, `test_case_key`, `test_cycle_key` | ⏳ Pending |
-| 4 | 🟡 Medium | Performance | Use `explain()` / Compass to verify `IXSCAN` after index creation | ⏳ Pending |
+| 4 | 🟡 Medium | Performance | Verify `IXSCAN` usage with `explain()` / Compass after index creation | ⏳ Pending |
 | 5 | 🟢 Low | Performance | Add pagination (`skip`/`limit`) to all list endpoints | ⏳ Pending |
-| 6 | 🟢 Low | Performance | TTL in-memory cache for read-heavy endpoints | ⏳ Pending |
-| 7 | 🟢 Low | Performance | Tune Motor connection pool (`maxPoolSize`) | ⏳ Pending |
+| 6 | ✅ Resolved | Performance | TTL in-memory cache for read-heavy endpoints | ✅ Implemented |
+| 7 | ✅ Resolved | Performance | Tune Motor connection pool (`maxPoolSize`) | ✅ Implemented |
 | 8 | 🟢 Low | Performance | Field projections on list endpoints to reduce payload size | ⏳ Pending |
 | 9 | 🟢 Low | Observability | Structured logging with per-request correlation IDs | ⏳ Pending |
 | 10 | 🟢 Low | Reliability | Add `GET /health` readiness endpoint for Docker/k8s | ⏳ Pending |

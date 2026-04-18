@@ -86,6 +86,18 @@ filecache = ["filelock (>=3.8.0)"]
 redis = ["redis (>=2.10.5)"]
 
 [[package]]
+name = "cachetools"
+version = "7.0.5"
+description = "Extensible memoizing collections and decorators"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "cachetools-7.0.5-py3-none-any.whl", hash = "sha256:46bc8ebefbe485407621d0a4264b23c080cedd913921bad7ac3ed2f26c183114"},
+    {file = "cachetools-7.0.5.tar.gz", hash = "sha256:0cd042c24377200c1dcd225f8b7b12b0ca53cc2c961b43757e774ebe190fd990"},
+]
+
+[[package]]
 name = "certifi"
 version = "2025.11.12"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -2074,4 +2086,4 @@ cffi = ["cffi (>=1.17,<2.0) ; platform_python_implementation != \"PyPy\" and pyt
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13.7"
-content-hash = "5af13e760701188b226b9271a2e144be06e5126f7739affd913ee9624f486595"
+content-hash = "85b7d003670d05fb638f2d0341bf56f1b35859a558effa82401d19603b73266e"

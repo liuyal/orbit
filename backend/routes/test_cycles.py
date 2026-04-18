@@ -33,6 +33,7 @@ from backend.app.utility import (
     get_current_utc_time,
     calculate_cycle_status
 )
+from backend.app.cache import cache_invalidate
 from backend.models.test_cycles import (
     TestCycle,
     TestCycleCreate,
@@ -160,6 +161,9 @@ async def create_cycle_for_project(request: Request,
         "project_key": project_key
     })
 
+    # Invalidate project caches (test_cycle_count changed)
+    cache_invalidate("projects:all", f"projects:{project_key}")
+
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content=request_data)
 
@@ -254,6 +258,12 @@ async def delete_cycle_by_key(request: Request,
                   {"test_cycle_key": None},
                   {"test_cycle_key": test_cycle_key})
     )
+
+    # Invalidate project caches (test_cycle_count changed)
+    # Retrieve the project_key from the cycle doc we already fetched
+    cycle_project_key = result.get("project_key")
+    if cycle_project_key:
+        cache_invalidate("projects:all", f"projects:{cycle_project_key}")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

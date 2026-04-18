@@ -28,6 +28,12 @@ from backend.app.app_def import (
 from backend.app.utility import (
     get_current_utc_time
 )
+from backend.app.cache import (
+    cache_get,
+    cache_set,
+    cache_invalidate,
+    cache_invalidate_prefix
+)
 from backend.models.projects import (
     Project,
     ProjectCreate,
@@ -50,6 +56,10 @@ DB_COLLECTION_TM_TCY = DB_COLLECTION_TM_TCY.name
 async def get_all_projects(request: Request):
     """Endpoint to get projects"""
 
+    cached = cache_get("projects:all")
+    if cached is not None:
+        return JSONResponse(status_code=status.HTTP_200_OK, content=cached)
+
     db = request.app.state.mdb
 
     # Retrieve all projects from database
@@ -67,6 +77,7 @@ async def get_all_projects(request: Request):
 
     projects = list(await asyncio.gather(*[fetch_counts(p) for p in projects]))
 
+    cache_set("projects:all", projects)
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=projects)
 
@@ -116,6 +127,9 @@ async def create_project_by_key(request: Request,
     # Create the project in the database
     await db.create(DB_NAME_TM, DB_COLLECTION_TM_PRJ, db_insert)
 
+    # Invalidate project list cache so next GET sees the new project
+    cache_invalidate("projects:all")
+
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content=request_data)
 
@@ -127,6 +141,11 @@ async def create_project_by_key(request: Request,
 async def get_project_by_key(request: Request,
                              project_key: str):
     """Endpoint to get project"""
+
+    cache_key = f"projects:{project_key}"
+    cached = cache_get(cache_key)
+    if cached is not None:
+        return JSONResponse(status_code=status.HTTP_200_OK, content=cached)
 
     db = request.app.state.mdb
 
@@ -147,6 +166,7 @@ async def get_project_by_key(request: Request,
     project["test_case_count"] = tc_count
     project["test_cycle_count"] = tcy_count
 
+    cache_set(cache_key, project)
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=project)
 
@@ -201,6 +221,9 @@ async def update_project_by_key(request: Request,
     updated_project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
+
+    # Invalidate stale cached entries for this project
+    cache_invalidate("projects:all", f"projects:{project_key}")
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=updated_project)
@@ -262,5 +285,9 @@ async def delete_project_by_key(request: Request,
     await db.delete(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
         "project_key": project_key
     })
+
+    # Invalidate all project-related cache entries
+    cache_invalidate("projects:all", f"projects:{project_key}")
+    cache_invalidate_prefix(f"test_cases:{project_key}")
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
