@@ -20,6 +20,7 @@ from backend.app.app_def import (
     DB_NAME_TM,
     DB_NAME_RUNNERS
 )
+from backend.app.cache import cache_invalidate_prefix
 
 router = APIRouter()
 
@@ -78,5 +79,9 @@ async def reset_database(request: Request,
                             content={"error": f"Invalid db_target value: {db_name}"})
 
     await db.configure(clean_db=db_target_list)
+
+    # Clear all in-memory caches so stale data is never served after a reset
+    for prefix in ("projects:", "test_cases:"):
+        cache_invalidate_prefix(prefix)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
