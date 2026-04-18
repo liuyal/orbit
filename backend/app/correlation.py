@@ -20,8 +20,9 @@
 #     stamps every LogRecord with a `request_id` attribute before it is
 #     formatted.  This means any format string can reference %(request_id)s.
 #
-# 3.  install_correlation_filter() walks every handler on the root logger and
-#     attaches the filter.  Call it once at application startup.
+# 3.  CorrelationFilter is registered in log_conf.yaml via dictConfig's ()
+#     factory syntax, so it is installed on every handler before the first
+#     log record is ever emitted — no timing issues at startup.
 #
 # Usage in route handlers (optional — the middleware does it automatically):
 #     from backend.app.correlation import set_request_id
@@ -57,24 +58,12 @@ class CorrelationFilter(logging.Filter):
 
     Reads from the ContextVar so the value is always correct for the
     currently executing async task, even under high concurrency.
+
+    Registered in log_conf.yaml via dictConfig's () factory syntax so it is
+    active before the first log record is emitted — no startup race condition.
     """
 
     def filter(self, record: logging.LogRecord) -> bool:
         record.request_id = get_request_id()
         return True
 
-
-def install_correlation_filter() -> None:
-    """Attach CorrelationFilter to every handler on the root logger.
-
-    Safe to call multiple times — will not add duplicate filters.
-    """
-
-    f = CorrelationFilter()
-    root = logging.getLogger()
-
-    for handler in root.handlers:
-        # Avoid registering the same filter class twice
-        if not any(isinstance(existing, CorrelationFilter)
-                   for existing in handler.filters):
-            handler.addFilter(f)

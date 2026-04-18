@@ -17,7 +17,7 @@ from pyinstrument import Profiler
 
 from backend.app.app_def import API_VERSION, ROOT_DIR
 from backend.app.build_parser import build_parser
-from backend.app.correlation import install_correlation_filter, set_request_id
+from backend.app.correlation import set_request_id
 from backend.app.utility import configure_logging
 from backend.db.mongodb import MongoClient
 from backend.module.runners import save_runner_status
@@ -38,11 +38,6 @@ async def lifespan(app):
     mongodb_client = MongoClient()
     await mongodb_client.connect()
     await mongodb_client.configure()
-
-    # Attach correlation filter to all log handlers so every log line
-    # carries the request ID of the currently executing async task.
-    install_correlation_filter()
-    logger.info("Correlation log filter installed")
 
     if not args.skip_background_tasks:
         # Start the background task to save runner status periodically
@@ -123,9 +118,7 @@ for router in routers:
     app.include_router(router)
 
 if __name__ == "__main__":
-    log_conf = configure_logging(ROOT_DIR / 'log_conf.yaml',
-                                 args.debug)
-
+    log_conf = configure_logging(ROOT_DIR / 'log_conf.yaml', args.debug)
     uvicorn.run("index:app",
                 host=args.host,
                 port=int(args.port),
