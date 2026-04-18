@@ -6,6 +6,7 @@ services:
       dockerfile: docker/Dockerfile_frontend
     image: frontend-app:latest
     container_name: frontend-app
+    restart: unless-stopped
     depends_on:
       - backend-app
     ports:
@@ -18,6 +19,7 @@ services:
       dockerfile: Dockerfile_backend
     image: backend-app:latest
     container_name: backend-app
+    restart: unless-stopped
     env_file:
       - ../env/.env
     environment:
@@ -39,6 +41,7 @@ services:
       dockerfile: Dockerfile_mongodb
     image: mongodb-app:latest
     container_name: mongodb-app
+    restart: unless-stopped
     ports:
       - "27017:27017"
     volumes:
@@ -50,10 +53,10 @@ services:
       dockerfile: Dockerfile_apache
     image: apache-app:latest
     container_name: apache-app
+    restart: unless-stopped
     volumes:
         - ../:/usr/local/apache2/htdocs/files
         - /datadrive/sftp_user/orbitfs:/usr/local/apache2/htdocs/files
     ports:
       - "8888:80"
       - "8443:443"
-    
