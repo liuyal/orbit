@@ -7,6 +7,7 @@
 
 # db/mongodb.py
 
+import asyncio
 import logging
 
 from bson import ObjectId
@@ -64,7 +65,31 @@ class MongoClient(DatabaseClient):
             self._db_client.close()
 
     async def configure(self, **kwargs) -> None:
-        """Configure database connection parameters"""
+        """Configure database connection parameters.
+
+        Retries up to 3 times with brief backoff to survive the transient
+        AutoReconnect that MongoDB sometimes raises immediately after a
+        drop_database while the server re-establishes internal state.
+        """
+
+        max_attempts = 3
+        for attempt in range(1, max_attempts + 1):
+            try:
+                await self._configure(**kwargs)
+                return
+
+            except Exception as e:
+                if attempt == max_attempts:
+                    raise
+
+                wait = attempt * 0.5
+                logging.warning(f"configure() attempt {attempt} failed ({e}); "
+                                f"retrying in {wait}s…")
+
+                await asyncio.sleep(wait)
+
+    async def _configure(self, **kwargs) -> None:
+        """Internal configure implementation (called by configure with retry)."""
 
         if "clean_db" in kwargs:
             for db in kwargs["clean_db"]:
