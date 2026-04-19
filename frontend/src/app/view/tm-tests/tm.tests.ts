@@ -36,6 +36,14 @@ export class TmTests implements OnInit {
     }
 
     ngOnInit(): void {
+        const projectKey = this.route.snapshot.paramMap.get('projectKey') ?? this.route.snapshot.queryParamMap.get('projectKey');
+        const savedProject = localStorage.getItem('tm-tests-projectKey');
+
+        if (projectKey !== savedProject) {
+            localStorage.removeItem('tm-tests-selectedTab');
+            localStorage.setItem('tm-tests-projectKey', projectKey ?? '');
+        }
+
         const saved = localStorage.getItem('tm-tests-selectedTab');
         if (saved) {
             this.selectedTab = saved;
