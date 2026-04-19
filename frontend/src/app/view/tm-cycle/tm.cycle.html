@@ -1,0 +1,22 @@
+<app-navbar [showBackButton]="true" [backButtonText]="'Back'" [backButtonAction]="goBack.bind(this)"></app-navbar>
+
+<div class="tabs-container">
+    <div class="tabs">
+        <button class="tab" [class.active]="selectedTab === 'executions'" (click)="selectTab('executions')">
+            <i class="fa-solid fa-flask"></i>
+            Executions
+        </button>
+        <button class="tab" [class.active]="selectedTab === 'details'" (click)="selectTab('details')">
+            <i class="fa-solid fa-circle-info"></i>
+            Details
+        </button>
+    </div>
+</div>
+
+<div class="cycle-executions-container" *ngIf="selectedTab === 'executions'">
+    X
+</div>
+
+<div class="cycle-details-container" *ngIf="selectedTab === 'details'">
+    O
+</div>

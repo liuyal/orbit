@@ -66,5 +66,19 @@ export class TmCyclesTableComponent implements OnInit {
       this.loadTestCycles();
     });
   }
+
+  onCycleClick(event: MouseEvent, cycleKey: string) {
+    if (event.button === 1) {
+      // Middle mouse button
+      event.preventDefault();
+      if (event.type === 'mousedown') {
+        const url = this.router.serializeUrl(this.router.createUrlTree(['/projects', this.projectKey, 'cycle', cycleKey]));
+        window.open(url, '_blank');
+      }
+    } else if (event.button === 0 && event.type === 'click') {
+      // Left mouse button
+      this.router.navigate(['/projects', this.projectKey, 'cycle', cycleKey]);
+    }
+  }
 }
 

@@ -70,5 +70,19 @@ export class TmCasesTableComponent implements OnInit {
     if (!labels) return [];
     return [...labels].sort((a, b) => String(a).localeCompare(String(b)));
   }
+
+  onCaseClick(event: MouseEvent, caseKey: string) {
+    if (event.button === 1) {
+      // Middle mouse button
+      event.preventDefault();
+      if (event.type === 'mousedown') {
+        const url = this.router.serializeUrl(this.router.createUrlTree(['/projects', this.projectKey, 'case', caseKey]));
+        window.open(url, '_blank');
+      }
+    } else if (event.button === 0 && event.type === 'click') {
+      // Left mouse button
+      this.router.navigate(['/projects', this.projectKey, 'case', caseKey]);
+    }
+  }
 }
 

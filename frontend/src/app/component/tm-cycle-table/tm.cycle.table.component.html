@@ -44,7 +44,9 @@
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                        (click)="onCycleClick($event, row.test_cycle_key)"
+                        (mousedown)="onCycleClick($event, row.test_cycle_key)">
                     </tr>
                 </table>
             </div>

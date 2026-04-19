@@ -2,49 +2,46 @@ import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
-import { TmCasesTableComponent } from '../../component/tm-cases-table/tm.cases.table.component';
-import { TmCyclesTableComponent } from '../../component/tm-cycle-table/tm.cycle.table.component';
 
 @Component({
-    selector: 'app-tm-tests',
+    selector: 'app-tm-cycle',
     standalone: true,
     imports: [
         CommonModule,
-        NavbarComponent,
-        TmCasesTableComponent,
-        TmCyclesTableComponent
+        NavbarComponent
     ],
-    styleUrls: ['./tm.tests.css'],
-    templateUrl: './tm.tests.html'
+    styleUrls: ['./tm.cycle.css'],
+    templateUrl: './tm.cycle.html'
 })
 
-export class TmTests implements OnInit {
+export class TmCycle implements OnInit {
     cdr = inject(ChangeDetectorRef);
     route = inject(ActivatedRoute);
     router = inject(Router);
     showCreateModal: boolean = false;
     showEditModal: boolean = false;
-    selectedTab: string = "tests";
+    selectedTab: string = "executions";
 
     selectTab(tab: string) {
         this.selectedTab = tab;
-        localStorage.setItem('tm-tests-selectedTab', tab);
+        localStorage.setItem('tm-cycle-selectedTab', tab);
     }
 
     goBack() {
-        this.router.navigate(['/projects']);
+        const projectKey = this.route.snapshot.paramMap.get('projectKey');
+        this.router.navigate([`projects/${projectKey}`]);
     }
 
     ngOnInit(): void {
         const projectKey = this.route.snapshot.paramMap.get('projectKey');
-        const savedProject = localStorage.getItem('tm-tests-projectKey');
+        const savedProject = localStorage.getItem('tm-cycle-projectKey');
 
         if (projectKey !== savedProject) {
-            localStorage.removeItem('tm-tests-selectedTab');
-            localStorage.setItem('tm-tests-projectKey', projectKey ?? '');
+            localStorage.removeItem('tm-cycle-selectedTab');
+            localStorage.setItem('tm-cycle-projectKey', projectKey ?? '');
         }
 
-        const saved = localStorage.getItem('tm-tests-selectedTab');
+        const saved = localStorage.getItem('tm-cycle-selectedTab');
         if (saved) {
             this.selectedTab = saved;
         }

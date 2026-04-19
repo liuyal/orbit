@@ -1,0 +1,35 @@
+<app-navbar [showBackButton]="true" [backButtonText]="'Back'" [backButtonAction]="goBack.bind(this)"></app-navbar>
+
+<div class="tabs-container">
+    <div class="tabs">
+        <button class="tab" [class.active]="selectedTab === 'details'" (click)="selectTab('details')">
+            <i class="fa-solid fa-circle-info"></i>
+            Details
+        </button>
+        <button class="tab" [class.active]="selectedTab === 'script'" (click)="selectTab('script')">
+            <i class="fa-solid fa-code"></i>
+            Script
+        </button>
+        <button class="tab" [class.active]="selectedTab === 'links'" (click)="selectTab('links')">
+            <i class="fa-solid fa-link"></i>
+            Links
+        </button>
+        <button class="tab" [class.active]="selectedTab === 'executions'" (click)="selectTab('executions')">
+            <i class="fa-solid fa-play"></i>
+            Executions
+        </button>
+    </div>
+</div>
+
+<div class="case-details-container" *ngIf="selectedTab === 'details'">
+    1
+</div>
+<div class="case-script-container" *ngIf="selectedTab === 'script'">
+    2
+</div>
+<div class="case-links-container" *ngIf="selectedTab === 'links'">
+    3
+</div>
+<div class="case-executions-container" *ngIf="selectedTab === 'executions'">
+    4
+</div>

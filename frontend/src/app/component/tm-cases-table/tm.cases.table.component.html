@@ -83,7 +83,9 @@
                     </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;">
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                        (click)="onCaseClick($event, row.test_case_key)"
+                        (mousedown)="onCaseClick($event, row.test_case_key)">
                     </tr>
                 </table>
             </div>
