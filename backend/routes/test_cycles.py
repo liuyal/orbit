@@ -18,6 +18,7 @@ from fastapi import (
     status,
     Response
 )
+from natsort import natsorted
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
@@ -71,7 +72,9 @@ async def get_all_cycles_for_project(request: Request,
             content={"error": f"{project_key} not found"}
         )
 
-    test_cycles = test_cycles[::-1]
+    test_cycles = natsorted(test_cycles,
+                            key=lambda x: x.get("test_cycle_key"),
+                            reverse=True)
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_cycles)

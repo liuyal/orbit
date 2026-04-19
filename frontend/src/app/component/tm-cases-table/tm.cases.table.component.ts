@@ -31,7 +31,7 @@ export class TmCasesTableComponent implements OnInit {
   isLoading = false;
   error = '';
   projectKey = '';
-  displayedColumns = ['KEY', 'TITLE', 'STATUS', 'FREQUENCY', 'LABELS','RESULT'];
+  displayedColumns = ['KEY', 'TITLE', 'FREQUENCY', 'LABELS', 'RESULT', 'STATUS'];
 
   constructor(
     private testCasesService: TestCasesService

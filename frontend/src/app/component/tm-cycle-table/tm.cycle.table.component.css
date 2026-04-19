@@ -2,15 +2,20 @@
 /*        Table Wrapper      */
 /* ========================= */
 
-:host {
-  display: block;
+.table-wrapper {
   width: 100%;
+  height: calc(85vh - 10px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.table-wrapper {
+.split-view {
+  display: flex;
+  flex-direction: row;
   flex: 1;
-  width: 100%;
-  max-height: calc(85vh - 10px);
+  overflow: hidden;
+  gap: 0;
 }
 
 /* ========================= */
@@ -29,26 +34,12 @@
    ======================================== */
 
 .test-cycle-table {
-  overflow-y: auto;
   flex: 1;
-  background-color: rgb(19, 22.5, 30.5);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
   width: 100%;
-}
-
-.test-cycle-table th:nth-child(1) {
-  width: 15%;
-}
-
-.test-cycle-table th:nth-child(2) {
-  width: 40%;
-}
-
-.test-cycle-table th:nth-child(3) {
-  width: 20%;
-}
-
-.test-cycle-table th:nth-child(4) {
-  width: 15%;
+  background-color: rgb(19, 22.5, 30.5);
 }
 
 .test-cycle-table table {
@@ -58,24 +49,35 @@
   background-color: #252525;
 }
 
-.test-cycle-table thead {
-  background-color: #0057ad;
+.test-cycle-table th {
   position: sticky;
   top: 0;
-  z-index: 10;
-}
-
-.test-cycle-table th {
-  padding: 8px 20px;
+  z-index: 12;
+  padding: 0px 16px;
   text-align: left;
   color: #fff;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 2px solid #004090;
+  background-color: #1b1b1b;
+}
+
+.test-cycle-table th:nth-child(1) {
   width: 20%;
-  background-color: #0057ad;
+}
+
+.test-cycle-table th:nth-child(2) {
+  width: 30%;
+}
+
+.test-cycle-table th:nth-child(3) {
+  width: 25%;
+}
+
+.test-cycle-table th:nth-child(4) {
+  width: 25%;
 }
 
 .test-cycle-table th:first-child {
@@ -88,13 +90,18 @@
   white-space: nowrap;
 }
 
-.test-cycle-table td {
-  padding: 6px 20px;
+.test-cycle-table td,
+.test-cycle-table .mat-mdc-cell {
+  padding: 0px 20px;
   border-bottom: 1px solid #333;
   color: #e0e0e0;
   font-size: 14px;
   vertical-align: middle;
   background-color: #171c25;
+}
+
+.test-cycle-table .mat-mdc-header-row {
+  height: 50px;
 }
 
 .test-cycle-table td:first-child {
@@ -109,16 +116,23 @@
   white-space: nowrap;
 }
 
-.test-cycle-table tbody tr {
-  transition: all 0.2s ease;
+.test-cycle-table tbody tr,
+.test-cycle-table .mat-mdc-row {
+  transition: background-color 0.2s ease;
 }
 
-.test-cycle-table tbody tr:hover {
+.test-cycle-table tbody tr:hover,
+.test-cycle-table .mat-mdc-row:hover {
   cursor: pointer;
 }
 
-.test-cycle-table tbody tr:hover td {
-  background-color: rgb(46, 46, 46);
+
+/* !important needed to override Angular Material MDC cell backgrounds */
+.test-cycle-table tbody tr:hover td,
+.test-cycle-table tbody tr:hover .mat-mdc-cell,
+.test-cycle-table .mat-mdc-row:hover td,
+.test-cycle-table .mat-mdc-row:hover .mat-mdc-cell {
+  background-color: rgb(28, 28, 28);
 }
 
 .test-cycle-table tbody tr:last-child td {

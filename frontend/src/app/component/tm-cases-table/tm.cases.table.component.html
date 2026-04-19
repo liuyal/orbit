@@ -54,15 +54,6 @@
                         <td mat-cell *matCellDef="let testCase">{{testCase.title}}</td>
                     </ng-container>
 
-                    <ng-container matColumnDef="STATUS">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
-                        <td mat-cell *matCellDef="let testCase">
-                            <app-status-badge [text]="testCase.status.toUpperCase()"
-                                [className]="'test_status ' + testCase.status.toLowerCase().replace(/ /g, '_')">
-                            </app-status-badge>
-                        </td>
-                    </ng-container>
-
                     <ng-container matColumnDef="FREQUENCY">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>FREQUENCY</th>
                         <td mat-cell *matCellDef="let testCase">{{testCase.test_frequency}}</td>
@@ -78,6 +69,15 @@
                         <td mat-cell *matCellDef="let testCase">
                             <app-status-badge [text]="testCase.last_result.toUpperCase()"
                                 [className]="'result ' + testCase.last_result.toLowerCase()">
+                            </app-status-badge>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="STATUS">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
+                        <td mat-cell *matCellDef="let testCase">
+                            <app-status-badge [text]="testCase.status.toUpperCase()"
+                                [className]="'test_status ' + testCase.status.toLowerCase().replace(/ /g, '_')">
                             </app-status-badge>
                         </td>
                     </ng-container>

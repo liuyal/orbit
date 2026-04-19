@@ -13,6 +13,10 @@ import pytest
 
 from .test_base import OrbitTMBaseTest
 
+PROJECT_COUNT = 1
+TEST_CASES_COUNT = 50
+TEST_CYCLES_COUNT = 20
+
 
 @pytest.mark.order(5)
 class TestOrbitTMGenerate(OrbitTMBaseTest):
@@ -22,8 +26,8 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
         self.__class__.reset_db()
 
         # Generate project
-        projects = 3
-        cases = 100
+        projects = PROJECT_COUNT
+        cases = TEST_CASES_COUNT
         session = self.__class__.session
         for i in range(1, projects + 1):
             project_key = f"PRJ{i}"
@@ -44,14 +48,14 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                     "title": f"Test Case #{j} ({project_key}) - {uuid.uuid4()}",
                     "description": f"Description for Test Case #{j} in {project_key} - {uuid.uuid4()}",
                     "status": random.choice(["APPROVED", "DRAFT", "EXPECTED FAIL"]),
-                    "test_frequency": [random.choice(["NIGHTLY", "WEEKLY"])],
-                    "labels": random.sample(["A", "B", "C"], k=random.randint(1, 3))
+                    "test_frequency": random.sample(["NIGHTLY", "WEEKLY"], k=random.randint(1, 2)),
+                    "labels": random.sample(["A", "B", "C", "D"], k=random.randint(1, 3))
                 })
                 assert response.status_code == 201
                 test_cases.append(test_case_key)
 
             # Create cycles
-            cycles = 10
+            cycles = TEST_CYCLES_COUNT
             for j in range(1, cycles + 1):
                 response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/cycles", json={
                     "title": f"Cycle #{j} ({project_key}) - {uuid.uuid4()}"
