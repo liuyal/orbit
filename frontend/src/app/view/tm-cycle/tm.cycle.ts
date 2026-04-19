@@ -33,12 +33,12 @@ export class TmCycle implements OnInit {
     }
 
     ngOnInit(): void {
-        const projectKey = this.route.snapshot.paramMap.get('projectKey');
-        const savedProject = localStorage.getItem('tm-cycle-projectKey');
+        const cycleKey = this.route.snapshot.paramMap.get('cycleKey');
+        const savedCycle = localStorage.getItem('tm-cycle-cycleKey');
 
-        if (projectKey !== savedProject) {
+        if (cycleKey !== savedCycle) {
             localStorage.removeItem('tm-cycle-selectedTab');
-            localStorage.setItem('tm-cycle-projectKey', projectKey ?? '');
+            localStorage.setItem('tm-cycle-cycleKey', cycleKey ?? '');
         }
 
         const saved = localStorage.getItem('tm-cycle-selectedTab');
