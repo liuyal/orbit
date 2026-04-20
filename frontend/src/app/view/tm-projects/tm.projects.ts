@@ -1,7 +1,7 @@
 import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../component/navbar/navbar';
-import { TmProjectsTableComponent } from '../../component/tm-projects-table/tm.project.table.component';
+import { TmProjectsTableComponent } from '../../component/tm-project/tm.project.table.component';
 
 @Component({
     selector: 'app-tm-projects',

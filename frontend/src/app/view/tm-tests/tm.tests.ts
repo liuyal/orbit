@@ -2,8 +2,8 @@ import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
-import { TmCasesTableComponent } from '../../component/tm-cases-table/tm.cases.table.component';
-import { TmCyclesTableComponent } from '../../component/tm-cycle-table/tm.cycle.table.component';
+import { TmCasesTableComponent } from '../../component/tm-case/tm.case.table.component';
+import { TmCyclesTableComponent } from '../../component/tm-cycle/tm.cycle.table.component';
 
 @Component({
     selector: 'app-tm-tests',

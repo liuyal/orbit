@@ -19,8 +19,8 @@ import { TestCasesService, TestCases } from '../../services/tm.cases.service';
     ErrorStateComponent,
     StatusBadgeComponent
   ],
-  styleUrls: ['./tm.cases.table.component.css'],
-  templateUrl: './tm.cases.table.component.html'
+  styleUrls: ['./tm.case.table.component.css'],
+  templateUrl: './tm.case.table.component.html'
 })
 
 export class TmCasesTableComponent implements OnInit {
