@@ -2,13 +2,16 @@ import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
+import { TmCyclesExecutionComponent } from '../../component/tm-cycle/tm.cycle.execution.component';
 
 @Component({
     selector: 'app-tm-cycle',
     standalone: true,
     imports: [
         CommonModule,
-        NavbarComponent
+        NavbarComponent,
+        TmCyclesExecutionComponent
+        
     ],
     styleUrls: ['./tm.cycle.css'],
     templateUrl: './tm.cycle.html'
