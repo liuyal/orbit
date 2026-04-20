@@ -1,0 +1,28 @@
+<div class="table-wrapper">
+    <div class="split-view">
+        <div class="execution-list-container">
+            
+        </div>
+        <div class="execution-info-container">
+            <ng-container *ngIf="isLoading; else notLoading">
+                <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+            </ng-container>
+
+            <ng-template #notLoading>
+                <ng-container *ngIf="!isLoading && error; else checkEmpty">
+                    <app-error-state [error]="error"></app-error-state>
+                </ng-container>
+            </ng-template>
+
+            <ng-template #checkEmpty>
+                <ng-container *ngIf="executionDataSource.data.length === 0; else showTable">
+                    <app-empty-state message="No execution cycles found."></app-empty-state>
+                </ng-container>
+            </ng-template>
+
+            <ng-template #showTable>
+                X
+            </ng-template>
+        </div>
+    </div>
+</div>

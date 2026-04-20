@@ -1,0 +1,31 @@
+/* ========================= */
+/*        Table Wrapper      */
+/* ========================= */
+
+.table-wrapper {
+  width: 100%;
+  height: calc(85vh - 10px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.split-view {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  gap: 0;
+}
+
+/* ========================= */
+/*   Light Theme (System)    */
+/* ========================= */
+
+@media (prefers-color-scheme: light) {
+  .table-wrapper {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+  }
+}
+
