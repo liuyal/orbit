@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { Landing } from './view/landing/landing';
 import { RunnersStatus } from './view/runners-status/runners.status';
-import { TmProjects } from './view/tm-projects/tm.projects';
+import { TmProjects } from './view/tm-project/tm.project';
 import { TmTests } from './view/tm-tests/tm.tests';
 import { TmCase } from './view/tm-case/tm.case';
 import { TmCycle } from './view/tm-cycle/tm.cycle';
