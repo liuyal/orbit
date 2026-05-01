@@ -18,6 +18,13 @@
   gap: 0;
 }
 
+.state-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* ========================= */
 /*   Light Theme (System)    */
 /* ========================= */

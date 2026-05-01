@@ -30,15 +30,15 @@
         </ng-container>
 
         <ng-template #notLoading>
-            <ng-container *ngIf="!isLoading && error; else checkEmpty">
+            <div class="state-container" *ngIf="!isLoading && error; else checkEmpty">
                 <app-error-state [error]="error"></app-error-state>
-            </ng-container>
+            </div>
         </ng-template>
 
         <ng-template #checkEmpty>
-            <ng-container *ngIf="testCasesDataSource.data.length === 0; else showTable">
-                <app-empty-state message="No test cases found."></app-empty-state>
-            </ng-container>
+            <div class="state-container" *ngIf="testCasesDataSource.data.length === 0; else showTable">
+                <app-empty-state message="No Test Cases Found"></app-empty-state>
+            </div>
         </ng-template>
 
         <ng-template #showTable>

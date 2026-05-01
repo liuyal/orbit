@@ -18,6 +18,13 @@
   }
 }
 
+.state-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 /* ============================== */
 /*   SPLIT VIEW LAYOUT SIDEBAR    */
 /* ============================== */

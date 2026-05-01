@@ -171,6 +171,47 @@ async def create_cycle_for_project(request: Request,
                         content=request_data)
 
 
+@router.delete(f"/api/{API_VERSION}/tm/projects/{{project_key}}/cycles",
+               tags=[DB_COLLECTION_TM_TCY],
+               status_code=status.HTTP_204_NO_CONTENT)
+async def delete_all_cycles_by_project(request: Request,
+                                       project_key: str):
+    """Delete all test cycles for a project"""
+
+    db = request.app.state.mdb
+
+    # Check project exists
+    project = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_PRJ, {
+        "project_key": project_key
+    })
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"error": f"{project_key} not found"}
+        )
+
+    # Concurrently delete all cycles and clear test_cycle_key on all linked executions
+    await asyncio.gather(
+        db.delete(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
+            "project_key": project_key
+        }),
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TE,
+                  {"test_cycle_key": None},
+                  {"project_key": project_key})
+    )
+
+    # Update project cycle count to 0
+    project["test_cycle_count"] = 0
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
+        "project_key": project_key
+    })
+
+    # Invalidate project caches
+    cache_invalidate("projects:all", f"projects:{project_key}")
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
 @router.get(f"/api/{API_VERSION}/tm/cycles/{{test_cycle_key}}",
             tags=[DB_COLLECTION_TM_TCY],
             response_model=TestCycle,

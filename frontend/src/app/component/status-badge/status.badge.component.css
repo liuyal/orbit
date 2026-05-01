@@ -60,7 +60,7 @@
 }
 
 /* Status Badge cycle status Variants */
-.status-badge.cycle_status.completed {
+.status-badge.cycle_status.complete {
   background-color: #4caf50;
   color: #fff;
   border: 1px solid #00744d;

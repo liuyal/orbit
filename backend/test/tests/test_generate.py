@@ -63,11 +63,17 @@ class TestOrbitTMGenerate(OrbitTMBaseTest):
                 assert response.status_code == 201
                 cycle_key = response.json().get("test_cycle_key")
 
+                # Randomly select result sets for executions
+                result_set_1 = ["PASS", "FAIL", "BLOCKED", "NOT_EXECUTED"]
+                result_set_2 = ["PASS", "FAIL", "BLOCKED"]
+                result_set_3 = ["NOT_EXECUTED"]
+                result_set = random.choices([result_set_1, result_set_2, result_set_3], weights=[10, 10, 4], k=1)[0]
+
                 # Generate test executions for test cases
                 for l in range(1, len(test_cases) + 1):
                     test_case_key = test_cases[l - 1]
                     response = session.post(f"{self.__class__.url}/tm/projects/{project_key}/test-cases/{test_case_key}/executions", json={
-                        "result": random.choice(["PASS", "FAIL", "BLOCKED", "NOT_EXECUTED"]),
+                        "result": random.choice(result_set),
                         "comments": f"Execution {l} for {test_case_key} - {uuid.uuid4()}"
                     })
                     assert response.status_code == 201
