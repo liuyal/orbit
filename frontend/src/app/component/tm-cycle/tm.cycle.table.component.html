@@ -1,7 +1,9 @@
 <div class="table-wrapper">
     <div class="split-view">
         <ng-container *ngIf="isLoading; else notLoading">
-            <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+            <div class="state-container">
+                <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+            </div>
         </ng-container>
 
         <ng-template #notLoading>
