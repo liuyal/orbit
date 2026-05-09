@@ -67,6 +67,9 @@ MONGODB_USER = os.getenv("MONGODB_USER", "admin").strip()
 MONGODB_PASS = os.getenv("MONGODB_PASS", "password").strip()
 MONGODB_URL = f"mongodb://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_HOST}:{MONGODB_PORT}"
 
+# DB Constants
+DB_CORE = "orbit"
+
 # Runner Constants
 API_QUERY_INTERVAL = 60
 RUNNER_STATUS_CACHE = "runner_status_cache"
@@ -126,10 +129,9 @@ DB_COLLECTION_RUNNERS_BUSY_STATS_BY_JOB = DBCollection(name="runners-stats-busy-
 DB_COLLECTION_RUNNERS_ONLINE_STATS = DBCollection(name="runners-stats-online")
 DB_COLLECTION_USER_LEADERBOARD_STATS = DBCollection(name="user-leaderboard-stats")
 
-# DB Constants
-DB_NAME = "orbit"
+# DB
 DB_NAME_TM = DB(
-    name=f"{DB_NAME}-tm",
+    name=f"{DB_CORE}-tm",
     collections=[
         DB_COLLECTION_TM_PRJ,
         DB_COLLECTION_TM_TC,
@@ -139,7 +141,7 @@ DB_NAME_TM = DB(
 )
 
 DB_NAME_RUNNERS = DB(
-    name=f"{DB_NAME}-runners",
+    name=f"{DB_CORE}-runners",
     collections=[
         DB_COLLECTION_RUNNERS_TIMESTAMP_STATS,
         DB_COLLECTION_RUNNERS_STATS_HISTORIC,
