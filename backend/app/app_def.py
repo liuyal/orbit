@@ -45,8 +45,8 @@ API_VERSION = "v1"
 
 # Directories
 ORBIT_ROOT_DIR = pathlib.Path(__file__).parents[2]
-ROOT_DIR = pathlib.Path(__file__).parents[1]
-TMP_DIR = ROOT_DIR / 'tmp'
+BACKEND_DIR = pathlib.Path(__file__).parents[1]
+TMP_DIR = BACKEND_DIR / 'tmp'
 TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 # Load environment variables from .env file
