@@ -3,6 +3,5 @@ __pycache__
 .idea/
 .pytest_cache/
 **/ssl
-**/db
 **/tmp
 **/.env

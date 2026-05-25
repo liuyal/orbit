@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pyinstrument import Profiler
 
-from backend.app.app_def import API_VERSION, ROOT_DIR
+from backend.app.app_def import API_VERSION, BACKEND_DIR
 from backend.app.build_parser import build_parser
 from backend.app.correlation import set_request_id
 from backend.app.utility import configure_logging
@@ -118,7 +118,7 @@ for router in routers:
     app.include_router(router)
 
 if __name__ == "__main__":
-    log_conf = configure_logging(ROOT_DIR / 'log_conf.yaml', args.debug)
+    log_conf = configure_logging(BACKEND_DIR / 'log_conf.yaml', args.debug)
     uvicorn.run("index:app",
                 host=args.host,
                 port=int(args.port),
