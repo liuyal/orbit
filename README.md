@@ -5,6 +5,10 @@ Contianerized web service using Angular + Nginx, FastAPI, and Mongodb.
 ![ORBIT Architecture](assets/orbit.drawio.svg)
 
 # Setup ENV
+The repository has submodules run the following command to pull the modules
+```
+git submodule update --init --recursive
+```
 Run cert generation script
 ```
 certs\generate-ssl-certs.bat
