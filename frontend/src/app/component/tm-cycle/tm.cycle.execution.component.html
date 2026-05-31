@@ -32,13 +32,13 @@
             </ng-template>
 
             <ng-template #checkEmpty>
-                <ng-container *ngIf="executionDataSource.data.length === 0; else showTable">
+                <ng-container *ngIf="executionDataSource.data.length === 0; else showDetails">
                     <app-empty-state message="No Executions Found"></app-empty-state>
                 </ng-container>
             </ng-template>
 
-            <ng-template #showTable>
-                X
+            <ng-template #showDetails>
+                <app-tm-execution-detail [execution]="selectedExecution"></app-tm-execution-detail>
             </ng-template>
         </div>
     </div>

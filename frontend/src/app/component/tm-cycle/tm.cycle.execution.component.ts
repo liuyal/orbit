@@ -6,6 +6,7 @@ import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestCyclesService, TestCycleExecution } from '../../services/tm.cycles.service';
+import { TmExecutionDetailComponent } from '../tm-execution/tm.execution.detail.component';
 
 @Component({
   selector: 'app-tm-cycles-execution',
@@ -16,6 +17,7 @@ import { TestCyclesService, TestCycleExecution } from '../../services/tm.cycles.
     LoaderComponent,
     EmptyStateComponent,
     ErrorStateComponent,
+    TmExecutionDetailComponent,
   ],
   styleUrls: ['./tm.cycle.execution.component.css'],
   templateUrl: './tm.cycle.execution.component.html'
