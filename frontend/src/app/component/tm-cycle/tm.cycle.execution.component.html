@@ -1,8 +1,11 @@
 <div class="table-wrapper">
     <div class="split-view">
-        <div class="execution-list-container">
-            
+        <div class="execution-list-sidebar">
+            <div class="execution-list-header">
+                <h3>Test Executions</h3>
+            </div>
         </div>
+
         <div class="execution-info-container">
             <ng-container *ngIf="isLoading; else notLoading">
                 <app-loader [active]="isLoading" [delay]="3000"></app-loader>
@@ -15,7 +18,7 @@
             </ng-template>
 
             <ng-template #checkEmpty>
-                <ng-container *ngIf="executionDataSource.data.length === 0; else showTable">
+                <ng-container class="state-container" *ngIf="executionDataSource.data.length === 0; else showTable">
                     <app-empty-state message="No Executions Found"></app-empty-state>
                 </ng-container>
             </ng-template>

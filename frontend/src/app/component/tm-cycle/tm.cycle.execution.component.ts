@@ -38,9 +38,25 @@ export class TmCyclesExecutionComponent implements OnInit {
   }
 
   loadTestExecutions() {
+    this.isLoading = true;
+    this.error = '';
+    this.testCyclesService.getCycleExecutionInfo(this.route.snapshot.paramMap.get('cycleKey') || '').subscribe({
+      next: (data) => {
+        this.executionDataSource.data = Array.isArray(data) ? data : Object.values(data as object);
+        this.isLoading = false;
+        this.cdr.markForCheck();
+        console.log('Test cycles execution data loaded:', this.executionDataSource.data);
+      },
+      error: (err) => {
+        this.error = 'Failed to load test executions';
+        this.isLoading = false;
+        console.error('Error loading test cycles execution data:', err);
+      }
+    });
   }
 
   ngOnInit(): void {
+    this.loadTestExecutions();
   }
 }
 

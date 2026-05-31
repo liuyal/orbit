@@ -1,5 +1,5 @@
 export const environment = {
   apiVersion: 'v1',
   production: false,
-  host: 'https://mushi',
+  host: 'http://localhost:5000',
 };
