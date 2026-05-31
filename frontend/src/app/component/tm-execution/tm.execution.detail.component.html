@@ -1,0 +1,122 @@
+<div class="detail-container" *ngIf="execution; else noSelection">
+
+    <div class="detail-header">
+        <div class="result-accent" [style.background-color]="getResultColor(execution.result)"></div>
+        <div class="detail-header-content">
+            <div class="detail-header-top">
+                <div class="detail-header-text">
+                    <span class="detail-execution-key">{{ execution.execution_key }}</span>
+                    <h2 class="detail-title">{{ execution.title }}</h2>
+                    <span class="detail-case-key">Test Case: {{ execution.test_case_key }}</span>
+                </div>
+                <span class="result-badge" [style.background-color]="getResultColor(execution.result)">
+                    {{ execution.result }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="detail-body">
+
+        <section class="detail-section">
+            <h4 class="section-label">Execution Info</h4>
+            <div class="detail-grid">
+                <div class="detail-field">
+                    <span class="field-label">Result</span>
+                    <span class="field-value">
+                        <span class="inline-result-dot" [style.background-color]="getResultColor(execution.result)"></span>
+                        {{ execution.result }}
+                    </span>
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">Status</span>
+                    <span class="field-value">{{ execution.status || '—' }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">Priority</span>
+                    <span class="field-value">{{ execution.priority || '—' }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">Project</span>
+                    <span class="field-value">{{ execution.project_key }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">Cycle</span>
+                    <span class="field-value">{{ execution.test_cycle_key }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">Folder</span>
+                    <span class="field-value">{{ execution.folder || '—' }}</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="detail-section">
+            <h4 class="section-label">Dates</h4>
+            <div class="detail-grid">
+                <div class="detail-field">
+                    <span class="field-label">Started</span>
+                    <span class="field-value">{{ formatDate(execution.started_at) }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">Finished</span>
+                    <span class="field-value">{{ formatDate(execution.finished_at) }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">Created</span>
+                    <span class="field-value">{{ formatDate(execution.created_at) }}</span>
+                </div>
+                <div class="detail-field">
+                    <span class="field-label">Updated</span>
+                    <span class="field-value">{{ formatDate(execution.updated_at) }}</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="detail-section" *ngIf="execution.description">
+            <h4 class="section-label">Description</h4>
+            <p class="detail-text">{{ execution.description }}</p>
+        </section>
+
+        <section class="detail-section" *ngIf="execution.comments">
+            <h4 class="section-label">Comments</h4>
+            <p class="detail-text">{{ execution.comments }}</p>
+        </section>
+
+        <section class="detail-section" *ngIf="execution.labels.length">
+            <h4 class="section-label">Labels</h4>
+            <div class="tag-list">
+                <span class="tag" *ngFor="let label of execution.labels">{{ label }}</span>
+            </div>
+        </section>
+
+        <section class="detail-section" *ngIf="execution.test_frequency.length">
+            <h4 class="section-label">Test Frequency</h4>
+            <div class="tag-list">
+                <span class="tag frequency" *ngFor="let freq of execution.test_frequency">{{ freq }}</span>
+            </div>
+        </section>
+
+        <!-- <section class="detail-section" *ngIf="execution.failing_steps">
+            <h4 class="section-label">Failing Steps</h4>
+            <p class="detail-text warn">{{ execution.failing_steps }}</p>
+        </section> -->
+
+        <section class="detail-section" *ngIf="execution.links.length">
+            <h4 class="section-label">Links</h4>
+            <div class="link-list">
+                <a class="detail-link" *ngFor="let link of execution.links" [href]="link" target="_blank" rel="noopener">
+                    {{ link }}
+                </a>
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<ng-template #noSelection>
+    <div class="no-selection">
+        <i class="fa-solid fa-flask"></i>
+        <p>Select a test case to view details</p>
+    </div>
+</ng-template>
