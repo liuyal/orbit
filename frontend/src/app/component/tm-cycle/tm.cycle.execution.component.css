@@ -35,6 +35,7 @@
   align-items: center;
   justify-content: space-between;
   height: 50px;
+  flex-shrink: 0;
 }
 
 .execution-list-header h3 {
@@ -42,6 +43,70 @@
   font-size: 16px;
   font-weight: 600;
   color: #e0e0e0;
+}
+
+.execution-count {
+  font-size: 11px;
+  font-weight: 600;
+  background-color: #3a3a3a;
+  color: #aaa;
+  border-radius: 10px;
+  padding: 2px 8px;
+}
+
+.execution-list-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.execution-list-item {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  cursor: pointer;
+  border-bottom: 1px solid #2e2e2e;
+  transition: background-color 0.12s ease;
+  min-height: 56px;
+}
+
+.execution-list-item:hover {
+  background-color: #2e2e2e;
+}
+
+.execution-list-item.selected {
+  background-color: #1a2e45;
+}
+
+.result-bar {
+  width: 5px;
+  flex-shrink: 0;
+}
+
+.execution-item-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 14px;
+  gap: 0px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.execution-key {
+  font-size: 12px;
+  font-weight: 600;
+  color: #7db8f7;
+  letter-spacing: 0.4px;
+}
+
+.execution-title {
+  font-size: 12px;
+  color: #c8ccd0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .execution-info-container {

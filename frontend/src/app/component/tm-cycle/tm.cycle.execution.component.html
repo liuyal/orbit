@@ -3,6 +3,20 @@
         <div class="execution-list-sidebar">
             <div class="execution-list-header">
                 <h3>Test Executions</h3>
+                <span class="execution-count">{{ executionDataSource.data.length }}</span>
+            </div>
+            <div class="execution-list-body">
+                <div
+                    *ngFor="let execution of executionDataSource.data"
+                    class="execution-list-item"
+                    [class.selected]="selectedExecution?.execution_key === execution.execution_key"
+                    (click)="selectExecution(execution)">
+                    <div class="result-bar" [style.background-color]="getResultColor(execution.result)"></div>
+                    <div class="execution-item-content">
+                        <span class="execution-key">{{ execution.test_case_key }}</span>
+                        <span class="execution-title">{{ execution.title }}</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -18,7 +32,7 @@
             </ng-template>
 
             <ng-template #checkEmpty>
-                <ng-container class="state-container" *ngIf="executionDataSource.data.length === 0; else showTable">
+                <ng-container *ngIf="executionDataSource.data.length === 0; else showTable">
                     <app-empty-state message="No Executions Found"></app-empty-state>
                 </ng-container>
             </ng-template>

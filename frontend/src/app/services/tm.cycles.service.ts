@@ -20,6 +20,29 @@ export interface TestCyclesResponseModel {
     test_cycles: TestCycles[];
 }
 
+export interface TestCycleExecution {
+    execution_key: string;
+    test_case_key: string;
+    test_cycle_key: string;
+    project_key: string;
+    title: string;
+    description: string;
+    result: string;
+    last_result: string;
+    status: string;
+    started_at: string;
+    finished_at: string | null;
+    created_at: string;
+    updated_at: string;
+    comments: string;
+    labels: string[];
+    folder: string | null;
+    priority: string | null;
+    custom_fields: object;
+    links: any[];
+    test_frequency: string[];
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -48,12 +71,12 @@ export class TestCyclesService {
     * @param testCycleKey The key of the test cycle to retrieve.
     * @return An observable that emits the test cycle details.
     */
-    getCycleExecutionInfo(testCycleKey: string): Observable<object> {
+    getCycleExecutionInfo(testCycleKey: string): Observable<{ [key: string]: TestCycleExecution }> {
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         });
 
-        return this.http.get<object>(`${this.apiUrl}/tm/cycles/${testCycleKey}/executions`, { headers });
+        return this.http.get<{ [key: string]: TestCycleExecution }>(`${this.apiUrl}/tm/cycles/${testCycleKey}/executions`, { headers });
     }
 }

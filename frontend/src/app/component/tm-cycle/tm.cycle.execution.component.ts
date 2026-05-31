@@ -4,9 +4,8 @@ import { LoaderComponent } from '../loader/loader.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
-import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TestCyclesService } from '../../services/tm.cycles.service';
+import { TestCyclesService, TestCycleExecution } from '../../services/tm.cycles.service';
 
 @Component({
   selector: 'app-tm-cycles-execution',
@@ -17,7 +16,6 @@ import { TestCyclesService } from '../../services/tm.cycles.service';
     LoaderComponent,
     EmptyStateComponent,
     ErrorStateComponent,
-    // StatusBadgeComponent
   ],
   styleUrls: ['./tm.cycle.execution.component.css'],
   templateUrl: './tm.cycle.execution.component.html'
@@ -27,14 +25,31 @@ export class TmCyclesExecutionComponent implements OnInit {
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
   route = inject(ActivatedRoute);
-  executionDataSource: MatTableDataSource<object>;
+  executionDataSource: MatTableDataSource<TestCycleExecution>;
+  selectedExecution: TestCycleExecution | null = null;
   isLoading = false;
   error = '';
+
+  private readonly resultColors: Record<string, string> = {
+    PASS: '#4caf50',
+    FAIL: '#f44336',
+    BLOCKED: '#2196f3',
+    NOT_EXECUTED: '#757575',
+    IN_PROGRESS: '#ffd700',
+  };
 
   constructor(
     private testCyclesService: TestCyclesService
   ) {
-    this.executionDataSource = new MatTableDataSource<object>([]);
+    this.executionDataSource = new MatTableDataSource<TestCycleExecution>([]);
+  }
+
+  getResultColor(result: string): string {
+    return this.resultColors[result?.toUpperCase()] ?? '#757575';
+  }
+
+  selectExecution(execution: TestCycleExecution): void {
+    this.selectedExecution = execution;
   }
 
   loadTestExecutions() {
@@ -42,7 +57,8 @@ export class TmCyclesExecutionComponent implements OnInit {
     this.error = '';
     this.testCyclesService.getCycleExecutionInfo(this.route.snapshot.paramMap.get('cycleKey') || '').subscribe({
       next: (data) => {
-        this.executionDataSource.data = Array.isArray(data) ? data : Object.values(data as object);
+        this.executionDataSource.data = Object.values(data);
+        this.selectedExecution = this.executionDataSource.data[0] ?? null;
         this.isLoading = false;
         this.cdr.markForCheck();
         console.log('Test cycles execution data loaded:', this.executionDataSource.data);
@@ -50,6 +66,7 @@ export class TmCyclesExecutionComponent implements OnInit {
       error: (err) => {
         this.error = 'Failed to load test executions';
         this.isLoading = false;
+        this.cdr.markForCheck();
         console.error('Error loading test cycles execution data:', err);
       }
     });
