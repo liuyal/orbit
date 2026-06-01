@@ -24,7 +24,8 @@
                 <div class="detail-field">
                     <span class="field-label">Result</span>
                     <span class="field-value">
-                        <span class="inline-result-dot" [style.background-color]="getResultColor(execution.result)"></span>
+                        <span class="inline-result-dot"
+                            [style.background-color]="getResultColor(execution.result)"></span>
                         {{ execution.result }}
                     </span>
                 </div>
@@ -51,6 +52,11 @@
             </div>
         </section>
 
+        <section class="detail-section" *ngIf="execution.description">
+            <h4 class="section-label">Test Case Description</h4>
+            <p class="detail-text">{{ execution.description }}</p>
+        </section>
+
         <section class="detail-section">
             <h4 class="section-label">Dates</h4>
             <div class="detail-grid">
@@ -73,23 +79,6 @@
             </div>
         </section>
 
-        <section class="detail-section" *ngIf="execution.description">
-            <h4 class="section-label">Description</h4>
-            <p class="detail-text">{{ execution.description }}</p>
-        </section>
-
-        <section class="detail-section" *ngIf="execution.comments">
-            <h4 class="section-label">Comments</h4>
-            <p class="detail-text">{{ execution.comments }}</p>
-        </section>
-
-        <section class="detail-section" *ngIf="execution.labels.length">
-            <h4 class="section-label">Labels</h4>
-            <div class="tag-list">
-                <span class="tag" *ngFor="let label of execution.labels">{{ label }}</span>
-            </div>
-        </section>
-
         <section class="detail-section" *ngIf="execution.test_frequency.length">
             <h4 class="section-label">Test Frequency</h4>
             <div class="tag-list">
@@ -97,15 +86,25 @@
             </div>
         </section>
 
-        <!-- <section class="detail-section" *ngIf="execution.failing_steps">
-            <h4 class="section-label">Failing Steps</h4>
-            <p class="detail-text warn">{{ execution.failing_steps }}</p>
-        </section> -->
+        <section class="detail-section" *ngIf="execution.labels.length">
+            <h4 class="section-label">Appliance Labels</h4>
+            <div class="tag-list">
+                <span class="tag" *ngFor="let label of execution.labels">{{ label }}</span>
+            </div>
+        </section>
+
+        <section class="detail-section" *ngIf="execution.comments">
+            <h4 class="section-label">Comments</h4>
+            <p class="detail-text">{{ execution.comments }}</p>
+        </section>
+
+        <!-- TODO: Add custom fields -->
 
         <section class="detail-section" *ngIf="execution.links.length">
             <h4 class="section-label">Links</h4>
             <div class="link-list">
-                <a class="detail-link" *ngFor="let link of execution.links" [href]="link" target="_blank" rel="noopener">
+                <a class="detail-link" *ngFor="let link of execution.links" [href]="link" target="_blank"
+                    rel="noopener">
                     {{ link }}
                 </a>
             </div>
