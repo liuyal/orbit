@@ -1,39 +1,39 @@
 services:
 
-  frontend-app:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile_frontend
-    image: frontend-app:latest
-    container_name: frontend-app
-    restart: unless-stopped
-    depends_on:
-      - backend-app
-    ports:
-      - "80:80"
-      - "443:443"
+  # frontend-app:
+  #   build:
+  #     context: ..
+  #     dockerfile: docker/Dockerfile_frontend
+  #   image: frontend-app:latest
+  #   container_name: frontend-app
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - backend-app
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
 
-  backend-app:
-    build:
-      context: .
-      dockerfile: Dockerfile_backend
-    image: backend-app:latest
-    container_name: backend-app
-    restart: unless-stopped
-    env_file:
-      - ../env/.env
-    environment:
-      - MONGODB_HOST=mongodb-app
-      - GITHUB_API_URL=${GITHUB_API_URL}
-      - GITHUB_OWNER=${GITHUB_OWNER}
-      - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
-      - GITHUB_TOKEN=${GITHUB_TOKEN}
-    depends_on:
-      - mongodb-app
-    ports:
-      - "5000:5000"
-    volumes:
-      - ../:/home/orbit
+  # backend-app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile_backend
+  #   image: backend-app:latest
+  #   container_name: backend-app
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ../env/.env
+  #   environment:
+  #     - MONGODB_HOST=mongodb-app
+  #     - GITHUB_API_URL=${GITHUB_API_URL}
+  #     - GITHUB_OWNER=${GITHUB_OWNER}
+  #     - GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+  #     - GITHUB_TOKEN=${GITHUB_TOKEN}
+  #   depends_on:
+  #     - mongodb-app
+  #   ports:
+  #     - "5000:5000"
+  #   volumes:
+  #     - ../:/home/orbit
 
   mongodb-app:
     build:
@@ -49,16 +49,16 @@ services:
     volumes:
       - /datadrive/sftp_user/mongodb:/data/db
 
-  fileserver-app:
-    build:
-      context: .
-      dockerfile: Dockerfile_apache
-    image: apache-app:latest
-    container_name: apache-app
-    restart: unless-stopped
-    volumes:
-        - ../:/usr/local/apache2/htdocs/files
-        - /datadrive/sftp_user/orbitfs:/usr/local/apache2/htdocs/files
-    ports:
-      - "8888:80"
-      - "8443:443"
+  # fileserver-app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile_apache
+  #   image: apache-app:latest
+  #   container_name: apache-app
+  #   restart: unless-stopped
+  #   volumes:
+  #       - ../:/usr/local/apache2/htdocs/files
+  #       - /datadrive/sftp_user/orbitfs:/usr/local/apache2/htdocs/files
+  #   ports:
+  #     - "8888:80"
+  #     - "8443:443"
