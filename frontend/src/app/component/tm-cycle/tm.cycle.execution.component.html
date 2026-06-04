@@ -18,7 +18,7 @@
                             [style.background-color]="group.color"></span>
                         <span class="group-label">{{ group.label }}</span>
                         <span class="group-count">{{ group.executions.length }}</span>
-                        <span class="group-chevron" [class.collapsed]="isGroupCollapsed(group.label)">&#8964;</span>
+                        <span class="material-icons group-chevron" [class.collapsed]="isGroupCollapsed(group.label)">expand_more</span>
                     </div>
                     <div *ngFor="let execution of group.executions" class="execution-list-item"
                         [style.display]="isGroupCollapsed(group.label) ? 'none' : null"

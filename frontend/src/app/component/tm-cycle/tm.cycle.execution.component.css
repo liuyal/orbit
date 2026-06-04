@@ -19,7 +19,11 @@
 }
 
 .execution-list-sidebar {
-  min-width: 250px;
+  width: 280px;
+  min-width: 400px;
+  max-width: 400px;
+  flex-shrink: 0;
+  flex-grow: 0;
   background-color: #252525;
   border-right: 1px solid #333;
   display: flex;
@@ -110,13 +114,19 @@
 }
 
 .group-chevron {
-  font-size: 14px;
-  color: #888;
+  font-size: 16px;
+  color: #555;
   margin-left: auto;
-  display: inline-block;
-  transition: transform 0.2s ease;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, color 0.15s ease;
   transform: rotate(0deg);
-  line-height: 1;
+}
+
+.execution-group-header:hover .group-chevron {
+  color: #999;
 }
 
 .group-chevron.collapsed {
