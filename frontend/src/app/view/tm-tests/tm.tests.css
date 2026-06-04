@@ -17,6 +17,12 @@
   width: 100%;
 }
 
+.test-results-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
 /* 
 * Tests Tabs
  */

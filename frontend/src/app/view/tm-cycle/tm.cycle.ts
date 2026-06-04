@@ -2,7 +2,7 @@ import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
-import { TmCyclesExecutionComponent } from '../../component/tm-cycle/tm.cycle.execution.component';
+import { TmCyclesRunListComponent } from '../../component/tm-cycle/tm.cycle.run.list.component';
 
 @Component({
     selector: 'app-tm-cycle',
@@ -10,7 +10,7 @@ import { TmCyclesExecutionComponent } from '../../component/tm-cycle/tm.cycle.ex
     imports: [
         CommonModule,
         NavbarComponent,
-        TmCyclesExecutionComponent
+        TmCyclesRunListComponent
         
     ],
     styleUrls: ['./tm.cycle.css'],

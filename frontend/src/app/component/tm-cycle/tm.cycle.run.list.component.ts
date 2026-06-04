@@ -9,7 +9,7 @@ import { TestCyclesService, TestCycleExecution } from '../../services/tm.cycles.
 import { TmExecutionDetailComponent } from '../tm-execution/tm.execution.detail.component';
 
 @Component({
-  selector: 'app-tm-cycles-execution',
+  selector: 'app-tm-cycles-run-list',
   standalone: true,
   imports: [
     CommonModule,
@@ -19,11 +19,11 @@ import { TmExecutionDetailComponent } from '../tm-execution/tm.execution.detail.
     ErrorStateComponent,
     TmExecutionDetailComponent,
   ],
-  styleUrls: ['./tm.cycle.execution.component.css'],
-  templateUrl: './tm.cycle.execution.component.html'
+  styleUrls: ['./tm.cycle.run.list.component.css'],
+  templateUrl: './tm.cycle.run.list.component.html'
 })
 
-export class TmCyclesExecutionComponent implements OnInit {
+export class TmCyclesRunListComponent implements OnInit {
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
   route = inject(ActivatedRoute);

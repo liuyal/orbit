@@ -4,17 +4,17 @@
     <div class="tabs">
         <button class="tab" [class.active]="selectedTab === 'executions'" (click)="selectTab('executions')">
             <i class="fa-solid fa-flask"></i>
-            Executions
+            EXECUTIONS
         </button>
         <button class="tab" [class.active]="selectedTab === 'details'" (click)="selectTab('details')">
             <i class="fa-solid fa-circle-info"></i>
-            Details
+            DETAILS
         </button>
     </div>
 </div>
 
-<div class="cycle-executions-container" *ngIf="selectedTab === 'executions'">
-    <app-tm-cycles-execution></app-tm-cycles-execution>
+<div class="cycle-run-list-container" *ngIf="selectedTab === 'executions'">
+    <app-tm-cycles-run-list></app-tm-cycles-run-list>
 </div>
 
 <div class="cycle-details-container" *ngIf="selectedTab === 'details'">

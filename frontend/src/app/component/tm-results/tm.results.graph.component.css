@@ -1,0 +1,9 @@
+/* ========================= */
+/*   Results Graph Wrapper   */
+/* ========================= */
+
+.results-graph-wrapper {
+  overflow: auto;
+  width: 100%;
+  max-height: calc(80vh - 10px);
+}

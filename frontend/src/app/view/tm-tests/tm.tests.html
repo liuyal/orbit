@@ -5,11 +5,15 @@
     <div class="tabs">
         <button class="tab" [class.active]="selectedTab === 'tests'" (click)="selectTab('tests')">
             <i class="fa-solid fa-flask"></i>
-            Test Cases
+            CASES
         </button>
         <button class="tab" [class.active]="selectedTab === 'cycles'" (click)="selectTab('cycles')">
             <i class="fa-regular fa-rectangle-list"></i>
-            Test Cycles
+            CYCLES
+        </button>
+        <button class="tab" [class.active]="selectedTab === 'results'" (click)="selectTab('results')">
+            <i class="fa-solid fa-chart-line"></i>
+            RESULTS
         </button>
     </div>
 </div>
@@ -20,4 +24,8 @@
 
 <div class="test-cycles-container" *ngIf="selectedTab === 'cycles'">
     <app-tm-cycles-table></app-tm-cycles-table>
+</div>
+
+<div class="test-results-container" *ngIf="selectedTab === 'results'">
+    <app-tm-results-graph></app-tm-results-graph>
 </div>

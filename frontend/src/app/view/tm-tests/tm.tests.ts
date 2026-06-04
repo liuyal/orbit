@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
 import { TmCasesTableComponent } from '../../component/tm-case/tm.case.table.component';
 import { TmCyclesTableComponent } from '../../component/tm-cycle/tm.cycle.table.component';
+import { TmResultsGraphComponent } from '../../component/tm-results/tm.results.graph.component';
 
 @Component({
     selector: 'app-tm-tests',
@@ -12,7 +13,8 @@ import { TmCyclesTableComponent } from '../../component/tm-cycle/tm.cycle.table.
         CommonModule,
         NavbarComponent,
         TmCasesTableComponent,
-        TmCyclesTableComponent
+        TmCyclesTableComponent,
+        TmResultsGraphComponent
     ],
     styleUrls: ['./tm.tests.css'],
     templateUrl: './tm.tests.html'
