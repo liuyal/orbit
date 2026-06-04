@@ -69,6 +69,8 @@ export class TmCyclesExecutionComponent implements OnInit {
     return this.collapsedGroups.has(label);
   }
 
+  private readonly statusOrder: string[] = ['PASS', 'FAIL', 'BLOCKED', 'NOT_EXECUTED', 'IN_PROGRESS'];
+
   get groupedExecutions(): { label: string; color?: string; executions: TestCycleExecution[] }[] {
     const data = this.executionDataSource.data;
     if (this.sortMode === 'folder') {
@@ -78,7 +80,9 @@ export class TmCyclesExecutionComponent implements OnInit {
         if (!map.has(key)) map.set(key, []);
         map.get(key)!.push(exec);
       }
-      return Array.from(map.entries()).map(([label, executions]) => ({ label, executions }));
+      return Array.from(map.entries())
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([label, executions]) => ({ label, executions }));
     }
     const map = new Map<string, TestCycleExecution[]>();
     for (const exec of data) {
@@ -86,11 +90,17 @@ export class TmCyclesExecutionComponent implements OnInit {
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(exec);
     }
-    return Array.from(map.entries()).map(([label, executions]) => ({
-      label,
-      color: this.getResultColor(label),
-      executions
-    }));
+    return Array.from(map.entries())
+      .sort(([a], [b]) => {
+        const ai = this.statusOrder.indexOf(a.toUpperCase());
+        const bi = this.statusOrder.indexOf(b.toUpperCase());
+        return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+      })
+      .map(([label, executions]) => ({
+        label,
+        color: this.getResultColor(label),
+        executions
+      }));
   }
 
   selectExecution(execution: TestCycleExecution): void {
