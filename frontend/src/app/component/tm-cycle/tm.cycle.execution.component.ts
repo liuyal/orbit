@@ -29,6 +29,7 @@ export class TmCyclesExecutionComponent implements OnInit {
   route = inject(ActivatedRoute);
   executionDataSource: MatTableDataSource<TestCycleExecution>;
   selectedExecution: TestCycleExecution | null = null;
+  sortMode: 'status' | 'folder' | 'default' = 'status';
   isLoading = false;
   error = '';
 
@@ -48,6 +49,34 @@ export class TmCyclesExecutionComponent implements OnInit {
 
   getResultColor(result: string): string {
     return this.resultColors[result?.toUpperCase()] ?? '#757575';
+  }
+
+  setSortMode(mode: 'status' | 'folder'): void {
+    this.sortMode = mode;
+  }
+
+  get groupedExecutions(): { label: string; color?: string; executions: TestCycleExecution[] }[] {
+    const data = this.executionDataSource.data;
+    if (this.sortMode === 'folder') {
+      const map = new Map<string, TestCycleExecution[]>();
+      for (const exec of data) {
+        const key = exec.folder ?? 'No Folder';
+        if (!map.has(key)) map.set(key, []);
+        map.get(key)!.push(exec);
+      }
+      return Array.from(map.entries()).map(([label, executions]) => ({ label, executions }));
+    }
+    const map = new Map<string, TestCycleExecution[]>();
+    for (const exec of data) {
+      const key = exec.result ?? 'NOT_EXECUTED';
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(exec);
+    }
+    return Array.from(map.entries()).map(([label, executions]) => ({
+      label,
+      color: this.getResultColor(label),
+      executions
+    }));
   }
 
   selectExecution(execution: TestCycleExecution): void {

@@ -19,7 +19,7 @@ export class TmResults implements OnInit {
     route = inject(ActivatedRoute);
     router = inject(Router);
 
-    goBack() {}
+    goBack() { }
 
     ngOnInit(): void { }
 
