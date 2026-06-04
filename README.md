@@ -5,6 +5,8 @@ Contianerized web service using Angular + Nginx, FastAPI, and Mongodb.
 ![ORBIT Architecture](assets/orbit.drawio.svg)
 
 # Setup ENV
+
+## Submodules & SSL Certs
 The repository has submodules run the following command to pull the modules
 ```
 git submodule update --init --recursive
@@ -17,17 +19,28 @@ or
 ```
 certs/generate-ssl-certs.sh
 ```
-Create .env file under env/ (All fields below are optional). GITHUB ENV variables are required for Runner status fetch otherwise optional.
+
+## ENV Variables
+Create env/.env file.
+
+MONGO DB ENV variables are required for database connection otherwise optional. If not provided, the application will attempt to connect to MongoDB using default settings (localhost:27017 without authentication).
 ```
 MONGODB_HOST=
 MONGODB_PORT=
 MONGODB_USER=
 MONGODB_PASSWORD=
-
+```
+GITHUB ENV variables are required for Runner status fetch otherwise optional.
+```
 GITHUB_API_URL=
 GITHUB_OWNER=
 GITHUB_REPOSITORY=
 GITHUB_TOKEN=
+```
+A DB_RESET_TOKEN is required for resetting the database through API endpoint. 
+This token should be kept secret and used in the request header when calling the reset endpoint.
+```
+DB_RESET_TOKEN
 ```
 
 # Build & Start Containers
@@ -50,7 +63,7 @@ Starting Docker containers...
  ✔ Container backend-app  Recreated 1.9s
  ✔ Container frontend-app Recreated 1.5s
 ```
-
+Container status can be checked using `docker ps`
 ```
 docker ps
 CONTAINER ID   IMAGE                 COMMAND                  CREATED         STATUS         PORTS                                                                                NAMES
