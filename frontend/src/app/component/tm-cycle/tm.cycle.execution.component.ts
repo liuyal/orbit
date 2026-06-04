@@ -29,7 +29,8 @@ export class TmCyclesExecutionComponent implements OnInit {
   route = inject(ActivatedRoute);
   executionDataSource: MatTableDataSource<TestCycleExecution>;
   selectedExecution: TestCycleExecution | null = null;
-  sortMode: 'status' | 'folder' | 'default' = 'status';
+  sortMode: 'status' | 'folder' = 'status';
+  collapsedGroups = new Set<string>();
   isLoading = false;
   error = '';
 
@@ -53,6 +54,19 @@ export class TmCyclesExecutionComponent implements OnInit {
 
   setSortMode(mode: 'status' | 'folder'): void {
     this.sortMode = mode;
+    this.collapsedGroups.clear();
+  }
+
+  toggleGroup(label: string): void {
+    if (this.collapsedGroups.has(label)) {
+      this.collapsedGroups.delete(label);
+    } else {
+      this.collapsedGroups.add(label);
+    }
+  }
+
+  isGroupCollapsed(label: string): boolean {
+    return this.collapsedGroups.has(label);
   }
 
   get groupedExecutions(): { label: string; color?: string; executions: TestCycleExecution[] }[] {

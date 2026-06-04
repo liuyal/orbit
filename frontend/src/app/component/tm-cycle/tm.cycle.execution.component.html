@@ -13,13 +13,15 @@
             </div>
             <div class="execution-list-body">
                 <ng-container *ngFor="let group of groupedExecutions">
-                    <div class="execution-group-header">
+                    <div class="execution-group-header" (click)="toggleGroup(group.label)">
                         <span *ngIf="sortMode === 'status'" class="group-result-dot"
                             [style.background-color]="group.color"></span>
                         <span class="group-label">{{ group.label }}</span>
                         <span class="group-count">{{ group.executions.length }}</span>
+                        <span class="group-chevron" [class.collapsed]="isGroupCollapsed(group.label)">&#8964;</span>
                     </div>
                     <div *ngFor="let execution of group.executions" class="execution-list-item"
+                        [style.display]="isGroupCollapsed(group.label) ? 'none' : null"
                         [class.selected]="selectedExecution?.execution_key === execution.execution_key"
                         (click)="selectExecution(execution)">
                         <div class="result-bar" [style.background-color]="getResultColor(execution.result)"></div>

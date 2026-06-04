@@ -101,6 +101,26 @@
   position: sticky;
   top: 0;
   z-index: 1;
+  cursor: pointer;
+  user-select: none;
+}
+
+.execution-group-header:hover {
+  background-color: #252525;
+}
+
+.group-chevron {
+  font-size: 14px;
+  color: #888;
+  margin-left: auto;
+  display: inline-block;
+  transition: transform 0.2s ease;
+  transform: rotate(0deg);
+  line-height: 1;
+}
+
+.group-chevron.collapsed {
+  transform: rotate(-90deg);
 }
 
 .group-result-dot {
