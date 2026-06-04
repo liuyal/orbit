@@ -16,7 +16,7 @@
 
 .hero-section {
   text-align: center;
-  padding: 4vh;
+  padding: 8vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
@@ -58,7 +58,7 @@ hr.landing-seperator {
 }
 
 .feature-card {
-  padding: 5vh;
+  padding: 8vh;
   transition: transform 0.3s ease;
   text-align: center;
   text-decoration: none;
