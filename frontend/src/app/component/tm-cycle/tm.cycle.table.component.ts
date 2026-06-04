@@ -81,8 +81,20 @@ export class TmCyclesTableComponent implements OnInit {
         counts[key] = (counts[key] ?? 0) + 1;
       }
       const total = Object.values(counts).reduce((s, c) => s + c, 0);
+      console.log(`Cycle ${cycle.test_cycle_key} - Counts:`, counts, 'Total:', total);
+
+
       if (total === 0) continue;
-      this.progressSummaries[cycle.test_cycle_key] = Object.entries(counts).map(([result, count]) => ({
+      const order = ['PASS', 'FAIL', 'BLOCKED', 'NOT_EXECUTED'];
+      const sortedEntries = Object.entries(counts).sort(([a], [b]) => {
+        const ai = order.indexOf(a);
+        const bi = order.indexOf(b);
+        if (ai === -1 && bi === -1) return a.localeCompare(b);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+      });
+      this.progressSummaries[cycle.test_cycle_key] = sortedEntries.map(([result, count]) => ({
         result,
         count,
         color: this.resultColors[result] ?? '#9e9e9e',
