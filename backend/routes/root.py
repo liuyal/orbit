@@ -18,7 +18,8 @@ from backend.app.app_def import (
     API_VERSION,
     DB_ALL,
     DB_NAME_TM,
-    DB_NAME_RUNNERS
+    DB_NAME_RUNNERS,
+    DB_RESET_TOKEN
 )
 from backend.app.cache import cache_invalidate_prefix
 
@@ -59,8 +60,13 @@ async def root_api(request: Request):
              tags=["root"],
              status_code=status.HTTP_204_NO_CONTENT)
 async def reset_database(request: Request,
-                         db_name: DbTarget):
+                         db_name: DbTarget,
+                         db_reset_token: str):
     """ Root endpoint to reset server database. """
+
+    if db_reset_token != DB_RESET_TOKEN:
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
+                            content={"error": f"Invalid token for db reset"})
 
     db = request.app.state.mdb
 

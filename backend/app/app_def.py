@@ -68,6 +68,7 @@ MONGODB_PASS = os.getenv("MONGODB_PASS", "password").strip()
 MONGODB_URL = f"mongodb://{MONGODB_USER}:{MONGODB_PASS}@{MONGODB_HOST}:{MONGODB_PORT}"
 
 # DB Constants
+DB_RESET_TOKEN = os.getenv("DB_RESET_TOKEN", "default").strip()
 DB_CORE = "orbit"
 
 # Runner Constants
