@@ -1,4 +1,16 @@
 <div class="table-wrapper">
+
+    <!-- Fixed tooltip rendered outside table overflow context -->
+    <div class="progress-tooltip-fixed"
+        *ngIf="tooltipVisible"
+        [style.top.px]="tooltipPosition.top"
+        [style.left.px]="tooltipPosition.left">
+        <div class="tooltip-row" *ngFor="let seg of activeTooltipSegments">
+            <span class="tooltip-dot" [style.background-color]="seg.color"></span>
+            <span class="tooltip-label">{{ seg.result }}</span>
+            <span class="tooltip-count">{{ seg.count }}</span>
+        </div>
+    </div>
     <div class="split-view">
         <ng-container *ngIf="isLoading; else notLoading">
             <div class="state-container">
@@ -33,7 +45,22 @@
 
                     <ng-container matColumnDef="PROGRESS">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>PROGRESS</th>
-                        <td mat-cell *matCellDef="let cycle">{{cycle.progress || 'N/A'}}</td>
+                        <td mat-cell *matCellDef="let cycle">
+                            <ng-container *ngIf="progressSummaries[cycle.test_cycle_key]?.length; else noProgress">
+                                <div class="progress-bar-wrapper"
+                                    (mouseenter)="showProgressTooltip($event, progressSummaries[cycle.test_cycle_key])"
+                                    (mouseleave)="hideProgressTooltip()">
+                                    <div class="progress-bar">
+                                        <div class="progress-segment"
+                                            *ngFor="let seg of progressSummaries[cycle.test_cycle_key]"
+                                            [style.width.%]="seg.percent"
+                                            [style.background-color]="seg.color">
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+                            <ng-template #noProgress><span class="no-progress">—</span></ng-template>
+                        </td>
                     </ng-container>
 
                     <ng-container matColumnDef="STATUS">

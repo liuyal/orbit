@@ -13,7 +13,7 @@ export interface TestCycles {
     created_at: string;
     updated_at: string;
     status: string;
-    executions: object;
+    executions: { [execKey: string]: string };
 }
 
 export interface TestCyclesResponseModel {
