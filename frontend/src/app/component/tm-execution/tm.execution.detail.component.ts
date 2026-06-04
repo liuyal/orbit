@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
 import { TestCycleExecution } from '../../services/tm.cycles.service';
 
 @Component({
@@ -11,6 +13,13 @@ import { TestCycleExecution } from '../../services/tm.cycles.service';
 })
 export class TmExecutionDetailComponent {
   @Input() execution: TestCycleExecution | null = null;
+
+  constructor(private sanitizer: DomSanitizer) {}
+
+  renderMarkdown(text: string): SafeHtml {
+    const html = marked.parse(text, { async: false }) as string;
+    return this.sanitizer.bypassSecurityTrustHtml(html);
+  }
 
   private readonly resultColors: Record<string, string> = {
     PASS: '#4caf50',

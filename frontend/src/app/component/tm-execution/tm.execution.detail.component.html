@@ -95,7 +95,7 @@
 
         <section class="detail-section" *ngIf="execution.comments">
             <h4 class="section-label">Comments</h4>
-            <p class="detail-text">{{ execution.comments }}</p>
+            <div class="detail-text markdown-body" [innerHTML]="renderMarkdown(execution.comments)"></div>
         </section>
 
         <!-- TODO: Add custom fields -->

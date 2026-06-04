@@ -46,8 +46,8 @@ services:
     command: ["mongod", "--wiredTigerCacheSizeGB", "0.5"]
     ports:
       - "27017:27017"
-    volumes:
-      - /datadrive/sftp_user/mongodb:/data/db
+    # volumes:
+    #   - /datadrive/sftp_user/mongodb:/data/db
 
   fileserver-app:
     build:

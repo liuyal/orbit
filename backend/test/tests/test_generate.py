@@ -13,7 +13,7 @@ import pytest
 
 from .test_base import OrbitTMBaseTest
 
-PROJECT_COUNT = 1
+PROJECT_COUNT = 3
 TEST_CASES_COUNT = 50
 TEST_CYCLES_COUNT = 20
 
