@@ -4,7 +4,7 @@
 
 .landing-container {
   max-width: 80%;
-  margin: 6vh auto;
+  margin: 4vh auto;
   padding: 4vh;
   display: flex;
   flex-direction: column;
@@ -16,13 +16,13 @@
 
 .hero-section {
   text-align: center;
-  padding: 8vh;
+  padding: 10vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
 }
 
 .hero-section .title {
-  font-size: 6vh;
+  font-size: 10vh;
   font-weight: bold;
   margin: 0 0 0 0;
   font-family: 'Kanit', sans-serif;
