@@ -11,13 +11,31 @@
     </ng-template>
 
     <ng-template #checkEmpty>
-        <ng-container *ngIf="cyclesDataSource.data.length === 0; else showGraph">
+        <ng-container *ngIf="cyclesDataSource.data.length === 0; else showGraphTpl">
             <app-empty-state message="No cycles results found."></app-empty-state>
         </ng-container>
     </ng-template>
 
-    <ng-template #showGraph>
+    <ng-template #showGraphTpl>
+        <div class="filter-bar">
+            <div class="custom-dropdown" (click)="$event.stopPropagation()">
+                <button class="dropdown-trigger" (click)="toggleDropdown($event)">
+                    <span>{{ activeFilter }}</span>
+                    <i class="fa-solid" [class.fa-chevron-down]="!dropdownOpen" [class.fa-chevron-up]="dropdownOpen"></i>
+                </button>
+                <div class="dropdown-panel" *ngIf="dropdownOpen">
+                    <div
+                        *ngFor="let f of filterOptions"
+                        class="dropdown-item"
+                        [class.selected]="activeFilter === f"
+                        (click)="setFilter(f)">
+                        {{ f }}
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div #chartContainer class="echarts-container"></div>
     </ng-template>
 
 </div>
