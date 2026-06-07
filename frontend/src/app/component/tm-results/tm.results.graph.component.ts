@@ -42,6 +42,12 @@ export class TmResultsGraphComponent implements OnInit, OnDestroy {
       this.chartEl = el.nativeElement;
       this.chartInstance?.dispose();
       this.chartInstance = echarts.init(el.nativeElement);
+      this.chartInstance.on('click', (params: any) => {
+        const cycleKey = params.name ?? params.value;
+        if (cycleKey) {
+          window.open(`/projects/${this.projectKey}/cycle/${cycleKey}`, '_blank');
+        }
+      });
       this.updateChart();
     }
   }
@@ -130,6 +136,7 @@ export class TmResultsGraphComponent implements OnInit, OnDestroy {
       smooth: false,
       symbol: 'circle',
       symbolSize: 7,
+      cursor: 'pointer',
       itemStyle: { color: STATUS_COLORS[status] ?? '#9e9e9e' },
       data: cycles.map((c) => {
         const segments = this.progressSummaries[c.test_cycle_key] ?? [];
