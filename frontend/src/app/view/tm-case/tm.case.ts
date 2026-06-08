@@ -25,6 +25,7 @@ export class TmCase implements OnInit {
     selectTab(tab: string) {
         this.selectedTab = tab;
         localStorage.setItem('tm-case-selectedTab', tab);
+        this.router.navigate([], { fragment: tab, replaceUrl: true });
     }
 
     goBack() {
@@ -41,9 +42,15 @@ export class TmCase implements OnInit {
             localStorage.setItem('tm-case-caseKey', caseKey ?? '');
         }
 
-        const saved = localStorage.getItem('tm-case-selectedTab');
-        if (saved) {
-            this.selectedTab = saved;
+        const fragment = this.route.snapshot.fragment;
+        if (fragment) {
+            this.selectedTab = fragment;
+            localStorage.setItem('tm-case-selectedTab', fragment);
+        } else {
+            const saved = localStorage.getItem('tm-case-selectedTab');
+            if (saved) {
+                this.selectedTab = saved;
+            }
         }
     }
 

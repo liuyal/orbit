@@ -31,6 +31,7 @@ export class TmTests implements OnInit {
     selectTab(tab: string) {
         this.selectedTab = tab;
         localStorage.setItem('tm-tests-selectedTab', tab);
+        this.router.navigate([], { fragment: tab, replaceUrl: true });
     }
 
     goBack() {
@@ -46,9 +47,15 @@ export class TmTests implements OnInit {
             localStorage.setItem('tm-tests-projectKey', projectKey ?? '');
         }
 
-        const saved = localStorage.getItem('tm-tests-selectedTab');
-        if (saved) {
-            this.selectedTab = saved;
+        const fragment = this.route.snapshot.fragment;
+        if (fragment) {
+            this.selectedTab = fragment;
+            localStorage.setItem('tm-tests-selectedTab', fragment);
+        } else {
+            const saved = localStorage.getItem('tm-tests-selectedTab');
+            if (saved) {
+                this.selectedTab = saved;
+            }
         }
     }
 
