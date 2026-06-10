@@ -26,7 +26,7 @@ export class TmTests implements OnInit {
     router = inject(Router);
     showCreateModal: boolean = false;
     showEditModal: boolean = false;
-    selectedTab: string = "tests";
+    selectedTab: string = "cases";
 
     selectTab(tab: string) {
         this.selectedTab = tab;
