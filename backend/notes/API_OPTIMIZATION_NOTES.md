@@ -181,7 +181,7 @@ Last updated: 2026-04-16 (all optimizations complete)
 
 ### `GET /api/{version}` → `root_api` — Redirect only. No DB calls.
 
-### `POST /api/{version}/reset-database` → `reset_database` — Admin utility.
+### `POST /api/{version}/db-reset` → `reset_database` — Admin utility.
 
 ---
 

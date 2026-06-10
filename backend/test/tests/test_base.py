@@ -43,5 +43,5 @@ class OrbitTMBaseTest:
         """Reset the database"""
 
         params = {"db_name": "ALL", "db_reset_token": "jerry"}
-        response = cls.session.post(f"{cls.url}/reset-database", params=params)
+        response = cls.session.post(f"{cls.url}/db-reset", params=params)
         assert response.status_code == 204

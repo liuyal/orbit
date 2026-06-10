@@ -78,7 +78,7 @@ def query_github_jobs(repo: str):
 
 
 def fetch_runner_status():
-    """ fetch runner status from github """
+    """ fetch runner status from GitHub """
 
     try:
         # Get runner status from GitHub APIs

@@ -44,9 +44,14 @@ def cache_invalidate(*keys: str) -> None:
         _cache.pop(key, None)
 
 
-def cache_invalidate_prefix(prefix: str) -> None:
+def cache_invalidate_prefix(prefix: str | None = None) -> None:
     """Remove all cache entries whose key starts with prefix."""
 
     for key in list(_cache.keys()):
-        if key.startswith(prefix):
+        if prefix and key.startswith(prefix):
+            # If prefix provided and key matches, invalidate it
+            _cache.pop(key, None)
+
+        else:
+            # If no prefix provided, invalidate all entries
             _cache.pop(key, None)

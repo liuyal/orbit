@@ -74,16 +74,20 @@ class DatabaseClient(ABC):
         self._db_mode = db_mode
 
     @abstractmethod
-    def configure(self, **kwargs):
-        """ Configure database connection & init parameters """
-
-    @abstractmethod
     def connect(self):
         """ Connect to the database. """
 
     @abstractmethod
     def close(self):
         """ Disconnect from the database. """
+
+    @abstractmethod
+    def configure(self, **kwargs):
+        """ Configure database connection & init parameters """
+
+    @abstractmethod
+    def export(self, db_name: str, **kwargs):
+        """ export the database. """
 
     @abstractmethod
     def create(self, db_name: str, table: str, data: dict):

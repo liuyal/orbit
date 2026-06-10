@@ -66,10 +66,9 @@ class MongoClient(DatabaseClient):
 
     async def configure(self, **kwargs) -> None:
         """Configure database connection parameters.
-
-        Retries up to 3 times with brief backoff to survive the transient
-        AutoReconnect that MongoDB sometimes raises immediately after a
-        drop_database while the server re-establishes internal state.
+            Retries up to 3 times with brief backoff to survive the transient
+            AutoReconnect that MongoDB sometimes raises immediately after a
+            drop_database while the server re-establishes internal state.
         """
 
         max_attempts = 3
@@ -120,6 +119,21 @@ class MongoClient(DatabaseClient):
                         unique=True
                     )
 
+    async def export(self, db_name: str, **kwargs) -> dict:
+        """Export the entire contents of a database as a dict. """
+
+        db = self._db_client[db_name]
+
+        export_data = {}
+        collection_names = await db.list_collection_names()
+        for collection_name in collection_names:
+            cursor = db[collection_name].find({})
+            documents = await cursor.to_list(length=None)
+            documents = [self._convert_object_id(doc) for doc in documents]
+            export_data[collection_name] = documents
+
+        return export_data
+
     async def create(self,
                      db_name: str,
                      table: str,
@@ -142,7 +156,7 @@ class MongoClient(DatabaseClient):
                    db_name: str,
                    table: str,
                    query: dict,
-                   projection: dict = None) -> list:
+                   projection: dict | None = None) -> list:
         """Retrieve records from the database."""
 
         cursor = self._db_client[db_name][table].find(query, projection)

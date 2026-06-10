@@ -10,6 +10,7 @@
 import os
 import pathlib
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -19,6 +20,12 @@ from backend.models.schema import pydantic_to_mongo_jsonschema
 from backend.models.test_cases import TestCase
 from backend.models.test_cycles import TestCycle
 from backend.models.test_executions import TestExecution
+
+
+class DBTarget(str, Enum):
+    RUNNERS = "RUNNERS"
+    TM = "TM"
+    ALL = "ALL"
 
 
 @dataclass
@@ -55,10 +62,15 @@ if not (ORBIT_ROOT_DIR / 'env' / '.env').exists():
 load_dotenv(ORBIT_ROOT_DIR / 'env' / '.env')
 
 # GitHub Configuration Constants
-GITHUB_API_URL = os.getenv("GITHUB_API_URL").strip()
-GITHUB_OWNER = os.getenv("GITHUB_OWNER").strip()
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN").strip()
-GITHUB_REPOSITORY = [m.strip() for m in os.getenv("GITHUB_REPOSITORY").split(",")]
+try:
+    GITHUB_REPOSITORY = [m.strip() for m in os.getenv("GITHUB_REPOSITORY").split(",")]
+
+except Exception as err:
+    GITHUB_REPOSITORY = []
+
+GITHUB_API_URL = os.getenv("GITHUB_API_URL", "").strip()
+GITHUB_OWNER = os.getenv("GITHUB_OWNER", "").strip()
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
 
 # MongoDB Connection Details
 MONGODB_HOST = os.getenv("MONGODB_HOST", "localhost").strip()
