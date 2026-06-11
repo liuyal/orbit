@@ -49,7 +49,10 @@ export class RunnersStatusTableComponent implements OnInit, AfterViewInit, OnDes
     this.isLoading = true;
     this.runnerStatusServices.getRunners().subscribe({
       next: (response) => {
-        this.runnersDataSource.data = Array.isArray(response) ? response : [];
+        const data = Array.isArray(response) ? response : [];
+        this.runnersDataSource.data = data.slice().sort((a, b) =>
+          a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' })
+        );
         console.log('Runners data received:', this.runnersDataSource.data);
         this.isLoading = false;
         this.cdr.markForCheck();
