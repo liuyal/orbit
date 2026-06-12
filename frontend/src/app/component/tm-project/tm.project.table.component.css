@@ -15,62 +15,111 @@
 .projects-table {
   width: 100%;
   table-layout: fixed;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 /* ========================= */
 /*      Table Header         */
 /* ========================= */
 
-.projects-table .mat-mdc-header-row th {
+.projects-table .mat-mdc-header-row {
+  height: 48px;
+}
+
+.projects-table th {
   position: sticky;
   top: 0;
   z-index: 50;
+  padding: 0 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: #1b1b1b;
+  border-bottom: 2px solid #004090;
 }
 
-/* ========================= */
-/*      Table Header Cell    */
-/* ========================= */
+.projects-table th:first-child {
+  padding-left: 24px;
+  width: 18%;
+}
 
-.projects-table th {
+.projects-table th:nth-child(2) {
+  width: 28%;
+}
+
+.projects-table th:nth-child(3),
+.projects-table th:nth-child(4) {
+  width: 18%;
   text-align: center;
-  font-size: 15px;
-  color: #deedff;
-  text-transform: uppercase;
-  width: auto;
-  background: #1e1e1e;
+}
+
+.projects-table th:last-child {
+  padding-right: 24px;
+  width: 18%;
+  text-align: center;
 }
 
 /* ========================= */
 /*      Table Body Rows      */
 /* ========================= */
 
-.projects-table .mat-mdc-row {
-  border: 1px solid #1e1e1e;
+.projects-table .mat-mdc-row,
+.projects-table tbody tr {
+  transition: background-color 0.15s ease;
 }
 
-.projects-table .mat-mdc-row:hover td {
-  background-color: #181818;
-}
-
-/* Make rows appear clickable */
-.projects-table .mat-mdc-row:hover {
+.projects-table .mat-mdc-row:hover,
+.projects-table tbody tr:hover {
   cursor: pointer;
+}
+
+.projects-table .mat-mdc-row:hover td,
+.projects-table .mat-mdc-row:hover .mat-mdc-cell,
+.projects-table tbody tr:hover td {
+  background-color: #1c1c1c;
+}
+
+.projects-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* ========================= */
 /*      Table Body Cells     */
 /* ========================= */
 
-.projects-table td {
-  padding: 12px;
-  font-size: 16px;
-  color: #ffffff;
-  text-align: center;
-  width: auto;
-  background-color: #13171f;
+.projects-table td,
+.projects-table .mat-mdc-cell {
+  padding: 0 16px;
+  height: 52px;
+  font-size: 14px;
+  color: #e0e0e0;
+  text-align: left;
+  vertical-align: middle;
+  background-color: #171c25;
+  border-bottom: 1px solid #2a2d35;
   white-space: normal;
   word-break: break-word;
+}
+
+.projects-table td:first-child {
+  padding-left: 24px;
+  font-weight: 600;
+  color: #4da6ff;
+}
+
+.projects-table td:nth-child(3),
+.projects-table td:nth-child(4) {
+  text-align: center;
+  color: #b0bec5;
+}
+
+.projects-table td:last-child {
+  padding-right: 24px;
+  text-align: center;
 }
 
 /* ========================= */
@@ -84,25 +133,30 @@
   }
 
   .projects-table th {
-    background-color: #f7f7f7;
-    color: #000;
+    background-color: #f3f4f6;
+    color: #111827;
+    border-bottom: 2px solid #3b82f6;
   }
 
-  .projects-table .mat-mdc-row {
-    border: 1px solid #e5e7eb;
-  }
-
-  .projects-table .mat-mdc-row:hover td {
-    background-color: #f9fafb;
-  }
-
-  /* Make rows appear clickable in light theme */
-  .projects-table .mat-mdc-row:hover {
-    cursor: pointer;
-  }
-
-  .projects-table td {
+  .projects-table td,
+  .projects-table .mat-mdc-cell {
     background-color: #ffffff;
-    color: #000;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .projects-table td:first-child {
+    color: #1d4ed8;
+  }
+
+  .projects-table td:nth-child(3),
+  .projects-table td:nth-child(4) {
+    color: #6b7280;
+  }
+
+  .projects-table .mat-mdc-row:hover td,
+  .projects-table .mat-mdc-row:hover .mat-mdc-cell,
+  .projects-table tbody tr:hover td {
+    background-color: #f9fafb;
   }
 }
