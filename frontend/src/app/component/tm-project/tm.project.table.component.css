@@ -42,24 +42,35 @@
   border-bottom: 2px solid #004090;
 }
 
-.projects-table th:first-child {
-  padding-left: 24px;
-  width: 18%;
+/* ========================= */
+/*      Column Widths        */
+/* ========================= */
+
+.projects-table th:nth-child(1),
+.projects-table td:nth-child(1) {
+  width: 20%;
 }
 
-.projects-table th:nth-child(2) {
-  width: 28%;
+.projects-table th:nth-child(2),
+.projects-table td:nth-child(2) {
+  width: 20%;
 }
 
 .projects-table th:nth-child(3),
-.projects-table th:nth-child(4) {
-  width: 18%;
+.projects-table td:nth-child(3) {
+  width: 20%;
   text-align: center;
 }
 
-.projects-table th:last-child {
-  padding-right: 24px;
-  width: 18%;
+.projects-table th:nth-child(4),
+.projects-table td:nth-child(4) {
+  width: 20%;
+  text-align: center;
+}
+
+.projects-table th:nth-child(5),
+.projects-table td:nth-child(5) {
+  width: 20%;
   text-align: center;
 }
 
@@ -105,21 +116,24 @@
   word-break: break-word;
 }
 
+.projects-table th:first-child,
 .projects-table td:first-child {
   padding-left: 24px;
+}
+
+.projects-table td:first-child {
   font-weight: 600;
   color: #4da6ff;
 }
 
-.projects-table td:nth-child(3),
-.projects-table td:nth-child(4) {
-  text-align: center;
-  color: #b0bec5;
-}
-
+.projects-table th:last-child,
 .projects-table td:last-child {
   padding-right: 24px;
-  text-align: center;
+}
+
+.projects-table td:nth-child(3),
+.projects-table td:nth-child(4) {
+  color: #b0bec5;
 }
 
 /* ========================= */
