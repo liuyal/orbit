@@ -15,7 +15,7 @@ import { LoaderComponent } from '../loader/loader.component';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { TestCyclesService, TestCycle } from '../../services/tm.cycles.service';
-import { computeProgressSummaries, ProgressSegment } from '../tm-cycle/tm.cycle.table.component';
+import { computeProgressSummaries, ProgressSegment } from '../tm-cycle/tm.cycle.progress.utils';
 import * as echarts from 'echarts';
 import { STATUS_ORDER, STATUS_COLORS, buildChartOption } from './tm.results.graph.options';
 
@@ -131,7 +131,7 @@ export class TmResultsGraphComponent implements OnInit, OnDestroy {
       name: status.replace('_', ' '),
       type: 'line',
       stack: 'total',
-      areaStyle: {},
+      areaStyle: { opacity: 0.3 },
       emphasis: { focus: 'series' },
       smooth: false,
       symbol: 'circle',

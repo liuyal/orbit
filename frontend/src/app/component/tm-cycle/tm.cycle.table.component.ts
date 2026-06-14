@@ -7,62 +7,7 @@ import { ErrorStateComponent } from '../error-state/error.state.component';
 import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestCyclesService, TestCycle } from '../../services/tm.cycles.service';
-
-export interface ProgressSegment {
-  result: string;
-  count: number;
-  color: string;
-  percent: number;
-}
-
-const resultColors: Record<string, string> = {
-  PASS: '#4caf50',
-  FAIL: '#f44336',
-  BLOCKED: '#2196f3',
-  NOT_EXECUTED: '#757575',
-  IN_PROGRESS: '#ffd700',
-};
-
-export function computeProgressSummaries(cycles: TestCycle[]): Record<string, ProgressSegment[]> {
-  const summaries: Record<string, ProgressSegment[]> = {};
-
-  for (const cycle of cycles) {
-    const counts: Record<string, number> = {};
-
-    for (const result of Object.values(cycle.executions ?? {})) {
-      const key = (result ?? 'UNKNOWN').toUpperCase();
-      counts[key] = (counts[key] ?? 0) + 1;
-    }
-
-    const total = Object.values(counts).reduce((s, c) => s + c, 0);
-
-    if (total === 0) {
-      continue;
-    }
-
-    const order = ['PASS', 'FAIL', 'BLOCKED', 'NOT_EXECUTED'];
-    const sortedEntries = Object.entries(counts).sort(([a], [b]) => {
-      const ai = order.indexOf(a);
-      const bi = order.indexOf(b);
-      if (ai === -1 && bi === -1) return a.localeCompare(b);
-      if (ai === -1) return 1;
-      if (bi === -1) return -1;
-      return ai - bi;
-    });
-
-    summaries[cycle.test_cycle_key] = sortedEntries.map(([result, count]) => ({
-      result,
-      count,
-      color: resultColors[result] ?? '#9e9e9e',
-      percent: (count / total) * 100,
-      title: cycle.title,
-    }));
-
-  }
-
-  console.log('Progress summaries:', summaries);
-  return summaries;
-}
+import { ProgressSegment, computeProgressSummaries } from './tm.cycle.progress.utils';
 
 @Component({
   selector: 'app-tm-cycles-table',

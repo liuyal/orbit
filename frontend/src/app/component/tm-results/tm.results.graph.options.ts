@@ -3,7 +3,7 @@ import * as echarts from 'echarts';
 export const STATUS_ORDER: string[] = ['NOT_EXECUTED', 'BLOCKED', 'FAIL', 'PASS'];
 
 export const STATUS_COLORS: Record<string, string> = {
-  PASS: '#33aa37',
+  PASS: '#3fb950',
   FAIL: '#f44336',
   BLOCKED: '#2196f3',
   NOT_EXECUTED: '#757575',
@@ -85,7 +85,7 @@ export function buildChartOption(
     legend: {
       data: STATUS_ORDER.map((s) => s.replace('_', ' ')),
       bottom: 0,
-      textStyle: { color: '#e0e0e0', fontSize: 12},
+      textStyle: { color: '#e0e0e0', fontSize: 12 },
     },
     grid: { left: '2%', right: '2%', bottom: '6%', top: '7%', containLabel: true },
     xAxis: {
