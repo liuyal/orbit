@@ -1,0 +1,104 @@
+<div class="cycle-details-wrapper">
+
+    <ng-container *ngIf="isLoading; else notLoading">
+        <div class="state-container">
+            <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+        </div>
+    </ng-container>
+
+    <ng-template #notLoading>
+        <div class="state-container" *ngIf="!isLoading && error">
+            <app-error-state [error]="error"></app-error-state>
+        </div>
+    </ng-template>
+
+    <!-- Cycle detail -->
+    <ng-container *ngIf="!isLoading && !error && cyclesDataSource.data.length > 0">
+        <ng-container *ngFor="let cycle of cyclesDataSource.data">
+
+            <div class="cycle-header">
+                <div class="cycle-status-accent" [ngClass]="'status-' + cycle.status.toUpperCase()"></div>
+                <div class="cycle-header-content">
+                    <div class="cycle-header-top">
+                        <div class="cycle-header-text">
+                            <span class="cycle-key-label">{{ cycle.test_cycle_key }}</span>
+                            <h2 class="cycle-title">{{ cycle.title }}</h2>
+                        </div>
+                        <app-status-badge [text]="(cycle.status || 'NOT_STARTED').toUpperCase()"
+                            [className]="'cycle_status ' + (cycle.status || 'NOT_STARTED').toLowerCase()"
+                            [font_size]="'14px'">
+                        </app-status-badge>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cycle-body">
+
+                <section class="detail-section">
+                    <h4 class="section-label">Progress</h4>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-segment"
+                            *ngFor="let entry of getProgressSummary(cycle)"
+                            [style.width.%]="entry.pct"
+                            [ngClass]="'progress-seg-' + entry.key"
+                            [title]="entry.label + ': ' + entry.count">
+                        </div>
+                    </div>
+                    <div class="progress-legend">
+                        <div class="legend-item" *ngFor="let entry of getProgressSummary(cycle)">
+                            <span class="legend-dot" [ngClass]="'progress-seg-' + entry.key"></span>
+                            <span class="legend-label">{{ entry.label }}</span>
+                            <span class="legend-count">{{ entry.count }}</span>
+                        </div>
+                        <div class="legend-item legend-total">
+                            <span class="legend-label">Total</span>
+                            <span class="legend-count">{{ getExecutionCount(cycle) }}</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="detail-section">
+                    <h4 class="section-label">Description</h4>
+                    <p class="detail-text">{{ cycle.description || 'N/A' }}</p>
+                </section>
+
+                <section class="detail-section">
+                    <h4 class="section-label">Dates</h4>
+                    <div class="detail-grid">
+                        <div class="detail-field">
+                            <span class="field-label">Created</span>
+                            <span class="field-value">{{ formatDate(cycle.created_at) || 'N/A' }}</span>
+                        </div>
+                        <div class="detail-field">
+                            <span class="field-label">Updated</span>
+                            <span class="field-value">{{ formatDate(cycle.updated_at) || 'N/A' }}</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="detail-section">
+                    <h4 class="section-label">Cycle Info</h4>
+                    <div class="detail-grid">
+                        <div class="detail-field">
+                            <span class="field-label">Cycle Key</span>
+                            <span class="field-value">{{ cycle.test_cycle_key || 'N/A' }}</span>
+                        </div>
+                        <div class="detail-field">
+                            <span class="field-label">Project</span>
+                            <span class="field-value">{{ cycle.project_key || 'N/A' }}</span>
+                        </div>
+                        <div class="detail-field">
+                            <span class="field-label">Status</span>
+                            <span class="field-value">{{ cycle.status || '—' }}</span>
+                        </div>
+                        <div class="detail-field">
+                            <span class="field-label">Executions</span>
+                            <span class="field-value">{{ getExecutionCount(cycle) || 'N/A' }}</span>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </ng-container>
+    </ng-container>
+</div>
