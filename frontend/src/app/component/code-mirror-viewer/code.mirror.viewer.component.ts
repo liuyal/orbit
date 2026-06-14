@@ -32,19 +32,38 @@ import { monokai } from '@uiw/codemirror-theme-monokai';
   imports: [CommonModule],
   encapsulation: ViewEncapsulation.None,
   template: `<div #editorHost class="cm-host"></div>`,
+  host: {  },
   styles: [
     `
       app-code-mirror-viewer .cm-host {
         border-radius: 0px;
         overflow: hidden;
         font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
       }
       app-code-mirror-viewer .cm-editor {
-        max-height: 600px;
+        max-height: 650px;
       }
       app-code-mirror-viewer .cm-scroller {
         overflow: auto;
         font-family: 'Consolas', 'Courier New', monospace;
+      }
+      app-code-mirror-viewer.full-height .cm-host {
+        height: 100%;
+      }
+      app-code-mirror-viewer.full-height .cm-editor {
+        max-height: none !important;
+        height: 100% !important;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      app-code-mirror-viewer.full-height .cm-scroller {
+        flex: 1;
+        min-height: 0;
+        overflow: auto !important;
       }
     `,
   ],
@@ -52,6 +71,7 @@ import { monokai } from '@uiw/codemirror-theme-monokai';
 export class CodeMirrorViewerComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() code = '';
   @Input() language: string | null = null;
+  @Input() fullHeight = false;
 
   @ViewChild('editorHost', { static: true }) editorHost!: ElementRef<HTMLDivElement>;
 

@@ -13,7 +13,11 @@ main {
   overflow: hidden;
 }
 
-main > * {
+main > router-outlet {
+  display: none;
+}
+
+main > *:not(router-outlet) {
   flex: 1;
   min-height: 0;
   overflow: hidden;
