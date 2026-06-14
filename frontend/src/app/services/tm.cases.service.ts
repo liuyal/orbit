@@ -47,4 +47,19 @@ export class TestCasesService {
 
         return this.http.get<TestCasesResponseModel>(`${this.apiUrl}/tm/projects/${projectKey}/test-cases`, { headers });
     }
+
+    /**
+    * Get details of a specific test case by its key
+    * @param projectKey The key of the project the test case belongs to
+    * @param caseKey The key of the test case to retrieve
+    * @returns An observable that emits the test case details.
+    */
+    getTestCasebyKey(projectKey: string, caseKey: string): Observable<TestCases> {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        });
+
+        return this.http.get<TestCases>(`${this.apiUrl}/tm/projects/${projectKey}/test-cases/${caseKey}`, { headers });
+    }
 }

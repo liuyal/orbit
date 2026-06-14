@@ -69,7 +69,7 @@
                     <ng-container matColumnDef="RESULT">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>RESULT</th>
                         <td mat-cell *matCellDef="let testCase">
-                            <app-status-badge [text]="testCase.last_result.toUpperCase()"
+                            <app-status-badge
                                 [className]="'result ' + testCase.last_result.toLowerCase()">
                             </app-status-badge>
                         </td>

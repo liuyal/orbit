@@ -1,0 +1,36 @@
+<div class="case-links-wrapper">
+
+    <app-loader *ngIf="isLoading"></app-loader>
+
+    <div class="state-container" *ngIf="!isLoading && error">
+        <app-error-state [error]="error"></app-error-state>
+    </div>
+
+    <ng-container *ngIf="!isLoading && !error && testCase">
+
+        <app-tm-case-header [testCase]="testCase"></app-tm-case-header>
+
+        <div class="links-body">
+
+            <ng-container *ngIf="testCase.links.length; else noLinks">
+                <div class="links-list">
+                    <a class="link-row"
+                        *ngFor="let link of testCase.links"
+                        [href]="asString(link)"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        <i class="fa-solid fa-arrow-up-right-from-square link-icon"></i>
+                        <span class="link-url">{{ asString(link) }}</span>
+                    </a>
+                </div>
+            </ng-container>
+
+            <ng-template #noLinks>
+                <app-empty-state message="No links attached to this test case."></app-empty-state>
+            </ng-template>
+
+        </div>
+
+    </ng-container>
+
+</div>

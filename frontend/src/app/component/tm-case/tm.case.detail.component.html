@@ -1,0 +1,85 @@
+<div class="case-detail-wrapper">
+
+    <app-loader *ngIf="isLoading"></app-loader>
+
+    <div class="state-container" *ngIf="!isLoading && error">
+        <app-error-state [error]="error"></app-error-state>
+    </div>
+
+    <ng-container *ngIf="!isLoading && !error && testCase">
+
+        <app-tm-case-header [testCase]="testCase"></app-tm-case-header>
+
+        <div class="case-body">
+
+            <section class="detail-section">
+                <h4 class="section-label">Info</h4>
+                <div class="detail-grid">
+                    <div class="detail-field">
+                        <span class="field-label">Case Key</span>
+                        <span class="field-value">{{ testCase.test_case_key }}</span>
+                    </div>
+                    <div class="detail-field">
+                        <span class="field-label">Project</span>
+                        <span class="field-value">{{ testCase.project_key }}</span>
+                    </div>
+                    <div class="detail-field">
+                        <span class="field-label">Priority</span>
+                        <span class="field-value">{{ testCase.priority || '—' }}</span>
+                    </div>
+                    <div class="detail-field">
+                        <span class="field-label">Last Result</span>
+                        <span class="field-value">{{ testCase.last_result || '—' }}</span>
+                    </div>
+                    <div class="detail-field">
+                        <span class="field-label">Last Execution</span>
+                        <span class="field-value">{{ testCase.last_execution_key || '—' }}</span>
+                    </div>
+                    <div class="detail-field">
+                        <span class="field-label">Folder</span>
+                        <span class="field-value">{{ testCase.folder || '—' }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="detail-section" *ngIf="testCase.description">
+                <h4 class="section-label">Description</h4>
+                <p class="detail-text">{{ testCase.description }}</p>
+            </section>
+
+            <section class="detail-section" *ngIf="testCase.failing_steps">
+                <h4 class="section-label">Failing Steps</h4>
+                <p class="detail-text">{{ testCase.failing_steps }}</p>
+            </section>
+
+            <section class="detail-section" *ngIf="testCase.labels.length">
+                <h4 class="section-label">Labels</h4>
+                <div class="tag-list">
+                    <span class="tag" *ngFor="let label of testCase.labels">{{ label }}</span>
+                </div>
+            </section>
+
+            <section class="detail-section" *ngIf="testCase.test_frequency.length">
+                <h4 class="section-label">Test Frequency</h4>
+                <div class="tag-list">
+                    <span class="tag frequency" *ngFor="let freq of testCase.test_frequency">{{ freq }}</span>
+                </div>
+            </section>
+
+            <section class="detail-section">
+                <h4 class="section-label">Dates</h4>
+                <div class="detail-grid">
+                    <div class="detail-field">
+                        <span class="field-label">Created</span>
+                        <span class="field-value">{{ formatDate(testCase.created_at) }}</span>
+                    </div>
+                    <div class="detail-field">
+                        <span class="field-label">Updated</span>
+                        <span class="field-value">{{ formatDate(testCase.updated_at) }}</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </ng-container>
+</div>

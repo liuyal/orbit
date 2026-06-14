@@ -22,14 +22,16 @@
 </div>
 
 <div class="case-details-container" *ngIf="selectedTab === 'details'">
-    1
+    <app-tm-case-detail [testCase]="testCase" [isLoading]="isLoading" [error]="error"></app-tm-case-detail>
 </div>
+
 <div class="case-script-container" *ngIf="selectedTab === 'script'">
-    2
+    <app-tm-case-script [testCase]="testCase" [isLoading]="isLoading" [error]="error"></app-tm-case-script>
 </div>
+
 <div class="case-links-container" *ngIf="selectedTab === 'links'">
-    3
+    <app-tm-case-links [testCase]="testCase" [isLoading]="isLoading" [error]="error"></app-tm-case-links>
 </div>
+
 <div class="case-executions-container" *ngIf="selectedTab === 'executions'">
-    4
 </div>
