@@ -2,6 +2,12 @@
  * Test Case View
  */
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
  .case-details-container {
   padding: 0px;
   color: #e0e0e0;
@@ -9,7 +15,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);
+  flex: 1;
 }
 
 .case-executions-container {
@@ -19,7 +25,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);
+  flex: 1;
 }
 
 .case-script-container {
@@ -27,7 +33,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);
+  flex: 1;
 }
 
 .case-links-container {
@@ -35,7 +41,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);
+  flex: 1;
 }
 
 /* 
