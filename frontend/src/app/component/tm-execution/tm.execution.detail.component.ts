@@ -8,7 +8,10 @@ import { CodeMirrorViewerComponent } from '../code-mirror-viewer/code.mirror.vie
 @Component({
   selector: 'app-tm-execution-detail',
   standalone: true,
-  imports: [CommonModule, CodeMirrorViewerComponent],
+  imports: [
+    CommonModule,
+    CodeMirrorViewerComponent
+  ],
   styleUrls: ['./tm.execution.detail.component.css'],
   templateUrl: './tm.execution.detail.component.html'
 })

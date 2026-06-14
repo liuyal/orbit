@@ -115,6 +115,7 @@ export class CodeMirrorViewerComponent implements AfterViewInit, OnChanges, OnDe
     if (!code) return null;
     const trimmed = code.trimStart();
 
+    if (/^(Feature:|Scenario:|Scenario Outline:|Background:|Given |When |Then |And |But )/.test(trimmed)) return 'Gherkin';
     if (/^(import |from |def |class |async def |#!.*python)/.test(trimmed)) return 'Python';
     if (/\bconst\b|\blet\b|\bvar\b|\bfunction\b|\b=>\b/.test(trimmed.slice(0, 200))) return 'JavaScript';
     if (/^(public |private |protected |void |int |class |interface )/.test(trimmed)) return 'Java';
@@ -125,6 +126,6 @@ export class CodeMirrorViewerComponent implements AfterViewInit, OnChanges, OnDe
     if (/^(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER)\b/i.test(trimmed)) return 'SQL';
     if (/#/.test(trimmed.slice(0, 500)) && /\b(install|package|version)\b/i.test(trimmed.slice(0, 500))) return 'Shell';
 
-    return 'Python'; // reasonable default for test scripts
+    return 'Gherkin';
   }
 }
