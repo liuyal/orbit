@@ -149,6 +149,9 @@ async def create_cycle_for_project(request: Request,
     request_data["created_at"] = current_time
     request_data["updated_at"] = current_time
 
+    if request_data.get("folder", None) is None:
+        request_data["folder"] = "/"
+
     # Assign _id
     db_insert = TestCycle(**request_data).model_dump()
     db_insert["_id"] = test_cycle_key

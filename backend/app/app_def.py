@@ -57,9 +57,8 @@ TMP_DIR = BACKEND_DIR / 'tmp'
 TMP_DIR.mkdir(parents=True, exist_ok=True)
 
 # Load environment variables from .env file
-if not (ORBIT_ROOT_DIR / 'env' / '.env').exists():
-    raise Exception("Environment file .env not found in env directory.")
-load_dotenv(ORBIT_ROOT_DIR / 'env' / '.env')
+if (ORBIT_ROOT_DIR / 'env' / '.env').exists():
+    load_dotenv(ORBIT_ROOT_DIR / 'env' / '.env')
 
 # GitHub Configuration Constants
 try:
