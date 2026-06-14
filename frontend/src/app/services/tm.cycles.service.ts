@@ -41,6 +41,7 @@ export interface TestCycleExecution {
     custom_fields: object;
     links: any[];
     test_frequency: string[];
+    test_script: string | null;
 }
 
 @Injectable({

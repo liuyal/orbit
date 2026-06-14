@@ -98,8 +98,6 @@
             <div class="detail-text markdown-body" [innerHTML]="renderMarkdown(execution.comments)"></div>
         </section>
 
-        <!-- TODO: Add custom fields -->
-
         <section class="detail-section" *ngIf="execution.links.length">
             <h4 class="section-label">Links</h4>
             <div class="link-list">
@@ -110,6 +108,10 @@
             </div>
         </section>
 
+        <section class="detail-section" *ngIf="execution.test_script">
+            <h4 class="section-label">Test Script</h4>
+            <app-code-mirror-viewer [code]="execution.test_script"></app-code-mirror-viewer>
+        </section>
     </div>
 </div>
 
