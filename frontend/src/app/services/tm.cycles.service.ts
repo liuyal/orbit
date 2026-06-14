@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { MatList } from '@angular/material/list';
 
-export interface TestCycles {
+export interface TestCycle {
     id: string;
     test_cycle_key: string;
     project_key: string;
@@ -17,7 +17,7 @@ export interface TestCycles {
 }
 
 export interface TestCyclesResponseModel {
-    test_cycles: TestCycles[];
+    test_cycles: TestCycle[];
 }
 
 export interface TestCycleExecution {
@@ -79,5 +79,19 @@ export class TestCyclesService {
         });
 
         return this.http.get<{ [key: string]: TestCycleExecution }>(`${this.apiUrl}/tm/cycles/${testCycleKey}/executions`, { headers });
+    }
+
+    /**
+    * Get a specific test cycle info
+    * @param testCycleKey The key of the test cycle to retrieve.
+    * @return An observable that emits the test cycle details.
+    */
+    getCycleInfo(testCycleKey: string): Observable<TestCycle> {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        });
+
+        return this.http.get<TestCycle>(`${this.apiUrl}/tm/cycles/${testCycleKey}`, { headers });
     }
 }

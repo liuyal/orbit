@@ -6,7 +6,7 @@ import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TestCyclesService, TestCycles } from '../../services/tm.cycles.service';
+import { TestCyclesService, TestCycle } from '../../services/tm.cycles.service';
 
 export interface ProgressSegment {
   result: string;
@@ -23,7 +23,7 @@ const resultColors: Record<string, string> = {
   IN_PROGRESS: '#ffd700',
 };
 
-export function computeProgressSummaries(cycles: TestCycles[]): Record<string, ProgressSegment[]> {
+export function computeProgressSummaries(cycles: TestCycle[]): Record<string, ProgressSegment[]> {
   const summaries: Record<string, ProgressSegment[]> = {};
 
   for (const cycle of cycles) {
@@ -83,7 +83,7 @@ export class TmCyclesTableComponent implements OnInit {
   cdr = inject(ChangeDetectorRef);
   router = inject(Router);
   route = inject(ActivatedRoute);
-  cyclesDataSource: MatTableDataSource<TestCycles>;
+  cyclesDataSource: MatTableDataSource<TestCycle>;
   isLoading = false;
   error = '';
   projectKey = '';
@@ -96,7 +96,7 @@ export class TmCyclesTableComponent implements OnInit {
   constructor(
     private testCyclesService: TestCyclesService
   ) {
-    this.cyclesDataSource = new MatTableDataSource<TestCycles>([]);
+    this.cyclesDataSource = new MatTableDataSource<TestCycle>([]);
   }
 
   showProgressTooltip(event: MouseEvent, segments: ProgressSegment[]): void {
@@ -113,7 +113,7 @@ export class TmCyclesTableComponent implements OnInit {
     this.tooltipVisible = false;
   }
 
-  private computeProgressSummaries(cycles: TestCycles[]): void {
+  private computeProgressSummaries(cycles: TestCycle[]): void {
     this.progressSummaries = computeProgressSummaries(cycles);
   }
 

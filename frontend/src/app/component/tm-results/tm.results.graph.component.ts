@@ -14,7 +14,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { LoaderComponent } from '../loader/loader.component';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
-import { TestCyclesService, TestCycles } from '../../services/tm.cycles.service';
+import { TestCyclesService, TestCycle } from '../../services/tm.cycles.service';
 import { computeProgressSummaries, ProgressSegment } from '../tm-cycle/tm.cycle.table.component';
 import * as echarts from 'echarts';
 import { STATUS_ORDER, STATUS_COLORS, buildChartOption } from './tm.results.graph.options';
@@ -56,7 +56,7 @@ export class TmResultsGraphComponent implements OnInit, OnDestroy {
   router = inject(Router);
   route = inject(ActivatedRoute);
 
-  cyclesDataSource: MatTableDataSource<TestCycles>;
+  cyclesDataSource: MatTableDataSource<TestCycle>;
   progressSummaries: Record<string, ProgressSegment[]> = {};
   projectKey = '';
   isLoading = false;
@@ -72,17 +72,17 @@ export class TmResultsGraphComponent implements OnInit, OnDestroy {
   };
 
   constructor(private testCyclesService: TestCyclesService) {
-    this.cyclesDataSource = new MatTableDataSource<TestCycles>([]);
+    this.cyclesDataSource = new MatTableDataSource<TestCycle>([]);
   }
 
-  get filteredCycles(): TestCycles[] {
+  get filteredCycles(): TestCycle[] {
     const cycles = this.cyclesDataSource.data;
     if (this.activeFilter === 'ALL') return cycles;
     const keyword = this.activeFilter.toLowerCase();
     return cycles.filter((c) => c.title?.toLowerCase().includes(keyword));
   }
 
-  get sortedFilteredCycles(): TestCycles[] {
+  get sortedFilteredCycles(): TestCycle[] {
     return [...this.filteredCycles].sort((a, b) => {
       const na = parseInt(a.test_cycle_key.replace(/\D+/g, ''), 10) || 0;
       const nb = parseInt(b.test_cycle_key.replace(/\D+/g, ''), 10) || 0;

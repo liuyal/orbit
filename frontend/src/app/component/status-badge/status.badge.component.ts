@@ -13,4 +13,5 @@ export class StatusBadgeComponent {
     @Input() text: string = '';
     @Input() className: string = '';
     @Input() icon: string = '';
+    @Input() font_size: string = '12px';
 }

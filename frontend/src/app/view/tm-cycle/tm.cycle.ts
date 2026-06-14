@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
 import { TmCyclesRunListComponent } from '../../component/tm-cycle/tm.cycle.run.list.component';
+import { TmCyclesDetailsComponent } from '../../component/tm-cycle/tm.cycle.details.component';
 
 @Component({
     selector: 'app-tm-cycle',
@@ -10,8 +11,8 @@ import { TmCyclesRunListComponent } from '../../component/tm-cycle/tm.cycle.run.
     imports: [
         CommonModule,
         NavbarComponent,
-        TmCyclesRunListComponent
-        
+        TmCyclesRunListComponent,
+        TmCyclesDetailsComponent
     ],
     styleUrls: ['./tm.cycle.css'],
     templateUrl: './tm.cycle.html'
