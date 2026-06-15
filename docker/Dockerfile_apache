@@ -35,10 +35,9 @@ RUN sed -i '/<Directory "\/usr\/local\/apache2\/htdocs">/,/<\/Directory>/ s/Allo
     sed -i 's/#LoadModule dav_lock_module/LoadModule dav_lock_module/' /usr/local/apache2/conf/httpd.conf && \
     sed -i 's/#Include conf\/extra\/httpd-ssl.conf/Include conf\/extra\/httpd-ssl.conf/' /usr/local/apache2/conf/httpd.conf
 
-# Create DAV lock DB directory and set permissions for Apache (daemon)
+# Create DAV lock DB directory with open permissions so Apache can write the lock file
 RUN mkdir -p /usr/local/apache2/var && \
-    chown -R daemon:daemon /usr/local/apache2/var && \
-    chmod 755 /usr/local/apache2/var
+    chmod 777 /usr/local/apache2/var
 
 # Add WebDAV config
 COPY webdav.conf /usr/local/apache2/conf/extra/webdav.conf
