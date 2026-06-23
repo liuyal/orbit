@@ -400,34 +400,49 @@ async def add_execution_to_cycle(request: Request,
                               f"{test_execution['project_key']}"}
         )
 
-    # Check execution does not have cycle already
-    if test_execution.get("test_cycle_key", None) is not None:
+    # Check execution does not already belong to a different cycle
+    existing_cycle_key = test_execution.get("test_cycle_key", None)
+    if existing_cycle_key is not None and existing_cycle_key != test_cycle_key:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"error": f"Execution {execution_key} "
                               f"already in cycle "
-                              f"{test_execution['test_cycle_key']}"}
+                              f"{existing_cycle_key}"}
         )
 
-    # Check execution not already in cycle
-    if test_execution["test_case_key"] in cycle_data["executions"]:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": f"Execution {execution_key} "
-                              f"already in cycle {test_cycle_key}"}
-        )
+    # Check for an existing execution in this cycle that covers the same test case.
+    # If found, replace it with the newly provided execution.
+    old_execution_key = None
+    tc_key = test_execution["test_case_key"]
+    if cycle_data["executions"]:
+        current_exec_keys = list(cycle_data["executions"].keys())
+        # Batch-fetch only executions already in the cycle that share the test_case_key
+        duplicate_execs = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+            "execution_key": {"$in": current_exec_keys},
+            "test_case_key": tc_key
+        })
+        if duplicate_execs:
+            old_execution_key = duplicate_execs[0]["execution_key"]
+            cycle_data["executions"].pop(old_execution_key, None)
 
-    # Add execution to cycle
-    exec_data = {execution_key: test_execution["result"]}
-    cycle_data["executions"].update(exec_data)
+    # Add the new execution to the cycle
+    cycle_data["executions"][execution_key] = test_execution["result"]
     cycle_data = calculate_cycle_status(cycle_data)
 
-    # Update execution cycle id and cycle data concurrently
+    # Build concurrent update tasks
     test_execution["test_cycle_key"] = test_cycle_key
-    await asyncio.gather(
+    update_tasks = [
         db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {"test_cycle_key": test_cycle_key}),
-        db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {"execution_key": execution_key})
-    )
+        db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {"execution_key": execution_key}),
+    ]
+    # If we displaced an old execution, clear its cycle link at the same time
+    if old_execution_key:
+        update_tasks.append(
+            db.update(DB_NAME_TM, DB_COLLECTION_TM_TE,
+                      {"test_cycle_key": None},
+                      {"execution_key": old_execution_key})
+        )
+    await asyncio.gather(*update_tasks)
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=cycle_data)
