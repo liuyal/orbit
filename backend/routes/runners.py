@@ -59,3 +59,12 @@ async def get_runners_status_by_name(request: Request,
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=runner)
+
+
+@router.get(f"/api/{API_VERSION}/runners/history/{{name}}",
+            tags=["runners"],
+            response_model=Runner,
+            status_code=status.HTTP_200_OK)
+async def get_runners_status_history(request: Request,
+                                     name: str):
+    """ Get the status history of runners """
