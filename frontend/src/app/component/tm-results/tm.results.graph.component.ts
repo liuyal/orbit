@@ -126,7 +126,12 @@ export class TmResultsGraphComponent implements OnInit, OnDestroy {
 
     const cycles = this.sortedFilteredCycles;
     const categories = cycles.map((c) => c.test_cycle_key);
-
+    const xLabels = cycles.map((c) => {
+      if (!c.created_at) return '';
+      const d = new Date(c.created_at);
+      return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
+    });
+    // console.log('[chart] cycle keys + created_at dates:', cycles.map((c) => ({ key: c.test_cycle_key, created_at: c.created_at, label: xLabels[cycles.indexOf(c)] })));
     const series: echarts.SeriesOption[] = STATUS_ORDER.map((status) => ({
       name: status.replace('_', ' '),
       type: 'line',
@@ -144,7 +149,7 @@ export class TmResultsGraphComponent implements OnInit, OnDestroy {
       }),
     }));
 
-    this.chartInstance.setOption(buildChartOption(categories, series, this.projectKey), { notMerge: true });
+    this.chartInstance.setOption(buildChartOption(categories, series, this.projectKey, xLabels), { notMerge: true });
   }
 
   loadTestCycles(): void {
