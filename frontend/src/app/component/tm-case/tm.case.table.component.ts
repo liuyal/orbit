@@ -33,10 +33,60 @@ export class TmCasesTableComponent implements OnInit {
   projectKey = '';
   displayedColumns = ['KEY', 'TITLE', 'FREQUENCY', 'LABELS', 'RESULT', 'STATUS'];
 
+  pageSize = 20;
+  pageIndex = 0;
+  readonly pageSizeOptions = [20, 50, 100];
+
   constructor(
     private testCasesService: TestCasesService
   ) {
     this.testCasesDataSource = new MatTableDataSource<TestCases>([]);
+  }
+
+  get totalItems(): number {
+    return this.testCasesDataSource.data.length;
+  }
+
+  get pagedTestCases(): TestCases[] {
+    const start = this.pageIndex * this.pageSize;
+    return this.testCasesDataSource.data.slice(start, start + this.pageSize);
+  }
+
+  get rangeStart(): number {
+    return this.totalItems === 0 ? 0 : this.pageIndex * this.pageSize + 1;
+  }
+
+  get rangeEnd(): number {
+    return Math.min(this.totalItems, (this.pageIndex + 1) * this.pageSize);
+  }
+
+  get hasPreviousPage(): boolean {
+    return this.pageIndex > 0;
+  }
+
+  get hasNextPage(): boolean {
+    return this.rangeEnd < this.totalItems;
+  }
+
+  goToFirstPage(): void {
+    if (this.hasPreviousPage) this.pageIndex = 0;
+  }
+
+  goToPreviousPage(): void {
+    if (this.hasPreviousPage) this.pageIndex--;
+  }
+
+  goToNextPage(): void {
+    if (this.hasNextPage) this.pageIndex++;
+  }
+
+  goToLastPage(): void {
+    this.pageIndex = Math.max(0, Math.ceil(this.totalItems / this.pageSize) - 1);
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.pageIndex = 0;
   }
 
   loadTestCases() {
@@ -45,6 +95,7 @@ export class TmCasesTableComponent implements OnInit {
     this.testCasesService.getTestCasesbyProjectKey(this.projectKey).subscribe({
       next: (response) => {
         this.testCasesDataSource.data = Array.isArray(response) ? response : [];
+        this.pageIndex = 0;
         console.log('Test cases data loaded:', this.testCasesDataSource.data);
         this.isLoading = false;
         this.cdr.markForCheck();

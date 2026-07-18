@@ -3,7 +3,9 @@
         <div class="folder-sidebar">
             <div class="folder-header">
                 <h3>Folders</h3>
+                <span class="folder-total-count">{{ testCasesDataSource.data.length }}</span>
             </div>
+
             <!-- <div class="folder-list">
                 <div class="folder-item" [class.selected]="selectedFolder === null" (click)="selectFolder(null)">
                     <i class="fa-solid fa-folder"></i>
@@ -45,7 +47,8 @@
 
         <ng-template #showTable>
             <div class="test-case-table">
-                <table mat-table [dataSource]="testCasesDataSource">
+                <div class="table-scroll">
+                <table mat-table [dataSource]="pagedTestCases">
                     <ng-container matColumnDef="KEY">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>KEY</th>
                         <td mat-cell *matCellDef="let testCase">{{testCase.test_case_key}}</td>
@@ -90,6 +93,42 @@
                         (mousedown)="onCaseClick($event, row.test_case_key)">
                     </tr>
                 </table>
+                </div>
+                <div class="pagination-bar">
+                    <div class="pagination-size">
+                        <span class="pagination-size-label">Items per page:</span>
+                        <div class="pagination-size-select-wrapper">
+                            <i class="fa-solid fa-chevron-down pagination-size-select-chevron"></i>
+                            <select class="pagination-size-select" [value]="pageSize"
+                                (change)="onPageSizeChange(+$any($event.target).value)">
+                                @for (size of pageSizeOptions; track size) {
+                                <option [value]="size">{{ size }}</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="pagination-range">
+                        <span>{{ rangeStart }} – {{ rangeEnd }} of {{ totalItems }}</span>
+                    </div>
+                    <div class="pagination-nav">
+                        <button class="pagination-nav-btn" [disabled]="!hasPreviousPage" (click)="goToFirstPage()"
+                            aria-label="First page">
+                            <i class="fa-solid fa-angles-left"></i>
+                        </button>
+                        <button class="pagination-nav-btn" [disabled]="!hasPreviousPage" (click)="goToPreviousPage()"
+                            aria-label="Previous page">
+                            <i class="fa-solid fa-angle-left"></i>
+                        </button>
+                        <button class="pagination-nav-btn" [disabled]="!hasNextPage" (click)="goToNextPage()"
+                            aria-label="Next page">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </button>
+                        <button class="pagination-nav-btn" [disabled]="!hasNextPage" (click)="goToLastPage()"
+                            aria-label="Last page">
+                            <i class="fa-solid fa-angles-right"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
         </ng-template>
     </div>
