@@ -46,7 +46,7 @@ export class PaginationComponent {
     const current = this.currentPage;
     if (total <= 1) return [1];
 
-    const delta = 3;
+    const delta = 2;
     const rangeStart = Math.max(2, current - delta);
     const rangeEnd = Math.min(total - 1, current + delta);
 
