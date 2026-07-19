@@ -9,6 +9,7 @@ export interface TestCycle {
     test_cycle_key: string;
     project_key: string;
     title: string;
+    folder: string;
     description: string;
     created_at: string;
     updated_at: string;

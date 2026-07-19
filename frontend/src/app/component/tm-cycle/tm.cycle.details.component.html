@@ -37,10 +37,8 @@
                 <section class="detail-section">
                     <h4 class="section-label">Progress</h4>
                     <div class="progress-bar-track">
-                        <div class="progress-bar-segment"
-                            *ngFor="let entry of getProgressSummary(cycle)"
-                            [style.width.%]="entry.pct"
-                            [ngClass]="'progress-seg-' + entry.key"
+                        <div class="progress-bar-segment" *ngFor="let entry of getProgressSummary(cycle)"
+                            [style.width.%]="entry.pct" [ngClass]="'progress-seg-' + entry.key"
                             [title]="entry.label + ': ' + entry.count">
                         </div>
                     </div>
@@ -79,21 +77,21 @@
                 <section class="detail-section">
                     <h4 class="section-label">Cycle Info</h4>
                     <div class="detail-grid">
+                         <div class="detail-field">
+                            <span class="field-label">Project</span>
+                            <span class="field-value">{{ cycle.project_key || 'N/A' }}</span>
+                        </div>
+                        <div class="detail-field">
+                            <span class="field-label">Folder</span>
+                            <span class="field-value">{{ cycle.folder || 'N/A' }}</span>
+                        </div>
                         <div class="detail-field">
                             <span class="field-label">Cycle Key</span>
                             <span class="field-value">{{ cycle.test_cycle_key || 'N/A' }}</span>
                         </div>
                         <div class="detail-field">
-                            <span class="field-label">Project</span>
-                            <span class="field-value">{{ cycle.project_key || 'N/A' }}</span>
-                        </div>
-                        <div class="detail-field">
                             <span class="field-label">Status</span>
                             <span class="field-value">{{ cycle.status || '—' }}</span>
-                        </div>
-                        <div class="detail-field">
-                            <span class="field-label">Executions</span>
-                            <span class="field-value">{{ getExecutionCount(cycle) || 'N/A' }}</span>
                         </div>
                     </div>
                 </section>
