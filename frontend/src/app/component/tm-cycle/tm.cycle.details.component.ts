@@ -7,6 +7,7 @@ import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestCyclesService, TestCycle } from '../../services/tm.cycles.service';
 import { ProgressSegment, getProgressSummary as cycleProgress } from './tm.cycle.progress.utils';
+import { formatDate } from '../../utils/date.utils';
 
 @Component({
   selector: 'app-tm-cycles-details',
@@ -65,10 +66,8 @@ export class TmCyclesDetailsComponent implements OnInit {
     });
   }
 
-  formatDate(value: string | null | undefined): string {
-    if (!value) return '—';
-    const d = new Date(value);
-    return isNaN(d.getTime()) ? value : d.toLocaleString();
+  formatDate(dateStr: string | null): string {
+    return formatDate(dateStr);
   }
 
   getExecutionCount(cycle: TestCycle): number {

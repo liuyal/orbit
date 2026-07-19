@@ -4,13 +4,14 @@ import { LoaderComponent } from '../loader/loader.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { TmCaseHeaderComponent } from './tm.case.header.component';
 import { TestCases } from '../../services/tm.cases.service';
+import { formatDate } from '../../utils/date.utils';
 
 @Component({
     selector: 'app-tm-case-detail',
     standalone: true,
     imports: [
         CommonModule,
-        LoaderComponent, 
+        LoaderComponent,
         ErrorStateComponent,
         TmCaseHeaderComponent,
     ],
@@ -22,9 +23,7 @@ export class TmCaseDetailComponent {
     @Input() isLoading = false;
     @Input() error = '';
 
-    formatDate(value: string | null | undefined): string {
-        if (!value) return '—';
-        const d = new Date(value);
-        return isNaN(d.getTime()) ? value : d.toLocaleString();
+    formatDate(dateStr: string | null): string {
+        return formatDate(dateStr);
     }
 }

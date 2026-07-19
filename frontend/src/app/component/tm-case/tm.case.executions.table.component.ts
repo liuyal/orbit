@@ -8,6 +8,7 @@ import { ErrorStateComponent } from '../error-state/error.state.component';
 import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 import { PaginationComponent } from '../pagination/pagination.component';
 import { TestExecutionsService, TestExecutions } from '../../services/tm.executions.service';
+import { formatDate } from '../../utils/date.utils';
 
 @Component({
   selector: 'app-tm-case-executions-table',
@@ -59,8 +60,7 @@ export class TmCaseExecutionsTableComponent implements OnInit {
   }
 
   formatDate(dateStr: string | null): string {
-    if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleString();
+    return formatDate(dateStr);
   }
 
   onExecutionClick(event: MouseEvent, executionKey: string) {
