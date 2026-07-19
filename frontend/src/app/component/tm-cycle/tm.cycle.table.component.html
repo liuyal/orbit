@@ -58,7 +58,8 @@
 
         <ng-template #showTable>
             <div class="test-cycle-table">
-                <table mat-table [dataSource]="cyclesDataSource">
+                <div class="table-scroll">
+                <table mat-table [dataSource]="pagedCycles">
                     <ng-container matColumnDef="KEY">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>KEY</th>
                         <td mat-cell *matCellDef="let cycle">{{cycle.test_cycle_key}}</td>
@@ -104,6 +105,15 @@
                         (mousedown)="onCycleClick($event, row.test_cycle_key)">
                     </tr>
                 </table>
+                </div>
+                <app-pagination
+                    [pageIndex]="pageIndex"
+                    [pageSize]="pageSize"
+                    [totalItems]="totalItems"
+                    [pageSizeOptions]="pageSizeOptions"
+                    (pageIndexChange)="pageIndex = $event"
+                    (pageSizeChange)="onPageSizeChange($event)">
+                </app-pagination>
             </div>
         </ng-template>
     </div>

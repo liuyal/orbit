@@ -27,7 +27,7 @@
   flex: 1;
   overflow: hidden;
   gap: 0;
-  height: 120vh;
+  height: 100%;
 }
 
 .folder-sidebar {
@@ -85,8 +85,14 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow: hidden;
   width: 100%;
+  background-color: rgb(19, 22.5, 30.5);
+}
+
+.test-cycle-table .table-scroll {
+  flex: 1;
+  overflow: auto;
   background-color: rgb(19, 22.5, 30.5);
 }
 

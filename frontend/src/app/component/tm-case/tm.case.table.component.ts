@@ -6,6 +6,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { StatusBadgeComponent } from '../status-badge/status.badge.component';
+import { PaginationComponent } from '../pagination/pagination.component';
 import { TestCasesService, TestCases } from '../../services/tm.cases.service';
 
 @Component({
@@ -17,7 +18,8 @@ import { TestCasesService, TestCases } from '../../services/tm.cases.service';
     LoaderComponent,
     EmptyStateComponent,
     ErrorStateComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    PaginationComponent
   ],
   styleUrls: ['./tm.case.table.component.css'],
   templateUrl: './tm.case.table.component.html'
@@ -52,72 +54,9 @@ export class TmCasesTableComponent implements OnInit {
     return this.testCasesDataSource.data.slice(start, start + this.pageSize);
   }
 
-  get rangeStart(): number {
-    return this.totalItems === 0 ? 0 : this.pageIndex * this.pageSize + 1;
-  }
-
-  get rangeEnd(): number {
-    return Math.min(this.totalItems, (this.pageIndex + 1) * this.pageSize);
-  }
-
-  get hasPreviousPage(): boolean {
-    return this.pageIndex > 0;
-  }
-
-  get hasNextPage(): boolean {
-    return this.rangeEnd < this.totalItems;
-  }
-
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
-  }
-
-  get currentPage(): number {
-    return this.pageIndex + 1;
-  }
-
-  get visiblePages(): (number | 'ellipsis')[] {
-    const total = this.totalPages;
-    const current = this.currentPage;
-    if (total <= 1) return [1];
-
-    const delta = 3;
-    const rangeStart = Math.max(2, current - delta);
-    const rangeEnd = Math.min(total - 1, current + delta);
-
-    const pages: (number | 'ellipsis')[] = [1];
-    if (rangeStart > 2) pages.push('ellipsis');
-    for (let i = rangeStart; i <= rangeEnd; i++) pages.push(i);
-    if (rangeEnd < total - 1) pages.push('ellipsis');
-    pages.push(total);
-    return pages;
-  }
-
-  goToFirstPage(): void {
-    if (this.hasPreviousPage) this.pageIndex = 0;
-  }
-
-  goToPreviousPage(): void {
-    if (this.hasPreviousPage) this.pageIndex--;
-  }
-
-  goToNextPage(): void {
-    if (this.hasNextPage) this.pageIndex++;
-  }
-
-  goToLastPage(): void {
-    this.pageIndex = Math.max(0, Math.ceil(this.totalItems / this.pageSize) - 1);
-  }
-
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.pageIndex = 0;
-  }
-
-  goToPage(page: number): void {
-    if (!Number.isFinite(page)) return;
-    const clamped = Math.min(Math.max(Math.trunc(page), 1), this.totalPages);
-    this.pageIndex = clamped - 1;
   }
 
   loadTestCases() {

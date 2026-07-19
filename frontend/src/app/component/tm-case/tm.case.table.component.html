@@ -94,41 +94,14 @@
                     </tr>
                 </table>
                 </div>
-                <div class="pagination-bar">
-                    <div class="pagination-size">
-                        <span class="pagination-size-label">Items per page:</span>
-                        <div class="pagination-size-select-wrapper">
-                            <i class="fa-solid fa-chevron-down pagination-size-select-chevron"></i>
-                            <select class="pagination-size-select" [value]="pageSize"
-                                (change)="onPageSizeChange(+$any($event.target).value)">
-                                @for (size of pageSizeOptions; track size) {
-                                <option [value]="size">{{ size }}</option>
-                                }
-                            </select>
-                        </div>
-                    </div>
-                    <div class="pagination-range">
-                        <span>{{ rangeStart }} – {{ rangeEnd }} of {{ totalItems }}</span>
-                    </div>
-                    <div class="pagination-pages">
-                        <button class="pagination-pages-arrow" [disabled]="!hasPreviousPage"
-                            (click)="goToPreviousPage()" aria-label="Previous page">
-                            <i class="fa-solid fa-chevron-left"></i>
-                        </button>
-                        @for (page of visiblePages; track $index) {
-                        @if (page === 'ellipsis') {
-                        <span class="pagination-pages-ellipsis">…</span>
-                        } @else {
-                        <button class="pagination-pages-btn" [class.active]="page === currentPage"
-                            (click)="goToPage(page)">{{ page }}</button>
-                        }
-                        }
-                        <button class="pagination-pages-arrow" [disabled]="!hasNextPage" (click)="goToNextPage()"
-                            aria-label="Next page">
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
+                <app-pagination
+                    [pageIndex]="pageIndex"
+                    [pageSize]="pageSize"
+                    [totalItems]="totalItems"
+                    [pageSizeOptions]="pageSizeOptions"
+                    (pageIndexChange)="pageIndex = $event"
+                    (pageSizeChange)="onPageSizeChange($event)">
+                </app-pagination>
             </div>
         </ng-template>
     </div>

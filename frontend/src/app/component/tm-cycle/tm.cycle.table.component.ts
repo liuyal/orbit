@@ -5,6 +5,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { StatusBadgeComponent } from '../status-badge/status.badge.component';
+import { PaginationComponent } from '../pagination/pagination.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestCyclesService, TestCycle } from '../../services/tm.cycles.service';
 import { ProgressSegment, computeProgressSummaries } from './tm.cycle.progress.utils';
@@ -18,7 +19,8 @@ import { ProgressSegment, computeProgressSummaries } from './tm.cycle.progress.u
     LoaderComponent,
     EmptyStateComponent,
     ErrorStateComponent,
-    StatusBadgeComponent
+    StatusBadgeComponent,
+    PaginationComponent
   ],
   styleUrls: ['./tm.cycle.table.component.css'],
   templateUrl: './tm.cycle.table.component.html'
@@ -38,10 +40,28 @@ export class TmCyclesTableComponent implements OnInit {
   tooltipPosition = { top: 0, left: 0 };
   activeTooltipSegments: ProgressSegment[] = [];
 
+  pageSize = 20;
+  pageIndex = 0;
+  readonly pageSizeOptions = [20, 50, 100];
+
   constructor(
     private testCyclesService: TestCyclesService
   ) {
     this.cyclesDataSource = new MatTableDataSource<TestCycle>([]);
+  }
+
+  get totalItems(): number {
+    return this.cyclesDataSource.data.length;
+  }
+
+  get pagedCycles(): TestCycle[] {
+    const start = this.pageIndex * this.pageSize;
+    return this.cyclesDataSource.data.slice(start, start + this.pageSize);
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.pageIndex = 0;
   }
 
   showProgressTooltip(event: MouseEvent, segments: ProgressSegment[]): void {
@@ -70,6 +90,7 @@ export class TmCyclesTableComponent implements OnInit {
       next: (response) => {
         this.cyclesDataSource.data = Array.isArray(response) ? response : [];
         this.computeProgressSummaries(this.cyclesDataSource.data);
+        this.pageIndex = 0;
         console.log('Test cycles data loaded:', this.cyclesDataSource.data);
         this.isLoading = false;
         this.cdr.markForCheck();
