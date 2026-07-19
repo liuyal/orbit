@@ -1,3 +1,66 @@
 <div class="execution-table-container">
+    <ng-container *ngIf="isLoading; else notLoading">
+        <div class="state-container">
+            <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+        </div>
+    </ng-container>
 
+    <ng-template #notLoading>
+        <div class="state-container" *ngIf="!isLoading && error; else checkEmpty">
+            <app-error-state [error]="error"></app-error-state>
+        </div>
+    </ng-template>
+
+    <ng-template #checkEmpty>
+        <div class="state-container" *ngIf="executionsDataSource.data.length === 0; else showTable">
+            <app-empty-state message="No Test Executions Found"></app-empty-state>
+        </div>
+    </ng-template>
+
+    <ng-template #showTable>
+        <div class="table-scroll">
+            <table mat-table [dataSource]="pagedExecutions">
+                <ng-container matColumnDef="KEY">
+                    <th mat-header-cell *matHeaderCellDef>EXECUTION KEY</th>
+                    <td mat-cell *matCellDef="let execution">{{execution.execution_key}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="CYCLE">
+                    <th mat-header-cell *matHeaderCellDef>CYCLE</th>
+                    <td mat-cell *matCellDef="let execution">{{execution.test_cycle_key || '—'}}</td>
+                </ng-container>
+
+
+
+                <ng-container matColumnDef="STARTED">
+                    <th mat-header-cell *matHeaderCellDef>STARTED</th>
+                    <td mat-cell *matCellDef="let execution">{{formatDate(execution.started_at)}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="FINISHED">
+                    <th mat-header-cell *matHeaderCellDef>FINISHED</th>
+                    <td mat-cell *matCellDef="let execution">{{formatDate(execution.finished_at)}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="RESULT">
+                    <th mat-header-cell *matHeaderCellDef>RESULT</th>
+                    <td mat-cell *matCellDef="let execution">
+                        <app-status-badge [text]="(execution.result || 'NOT_EXECUTED').toUpperCase()"
+                            [className]="'result-text ' + (execution.result || 'not_executed').toLowerCase()">
+                        </app-status-badge>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                    (click)="onExecutionClick($event, row.execution_key)"
+                    (mousedown)="onExecutionClick($event, row.execution_key)">
+                </tr>
+            </table>
+        </div>
+        <app-pagination [pageIndex]="pageIndex" [pageSize]="pageSize" [totalItems]="totalItems"
+            [pageSizeOptions]="pageSizeOptions" (pageIndexChange)="pageIndex = $event"
+            (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
+    </ng-template>
 </div>

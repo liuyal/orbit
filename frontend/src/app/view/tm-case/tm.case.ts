@@ -5,6 +5,7 @@ import { NavbarComponent } from '../../component/navbar/navbar';
 import { TmCaseDetailComponent } from '../../component/tm-case/tm.case.detail.component';
 import { TmCaseScriptComponent } from '../../component/tm-case/tm.case.script.component';
 import { TmCaseLinksComponent } from '../../component/tm-case/tm.case.links.component';
+import { TmCaseExecutionsTableComponent } from '../../component/tm-case/tm.case.executions.table.component';
 import { TestCasesService, TestCases } from '../../services/tm.cases.service';
 
 @Component({
@@ -16,6 +17,7 @@ import { TestCasesService, TestCases } from '../../services/tm.cases.service';
         TmCaseDetailComponent,
         TmCaseScriptComponent,
         TmCaseLinksComponent,
+        TmCaseExecutionsTableComponent,
     ],
     styleUrls: ['./tm.case.css'],
     templateUrl: './tm.case.html'

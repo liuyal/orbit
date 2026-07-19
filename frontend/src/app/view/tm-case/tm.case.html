@@ -34,4 +34,5 @@
 </div>
 
 <div class="case-executions-container" *ngIf="selectedTab === 'executions'">
+    <app-tm-case-executions-table [projectKey]="projectKey" [caseKey]="caseKey"></app-tm-case-executions-table>
 </div>
