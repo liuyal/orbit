@@ -9,6 +9,7 @@ import { PaginationComponent } from '../pagination/pagination.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestCyclesService, TestCycle } from '../../services/tm.cycles.service';
 import { ProgressSegment, computeProgressSummaries } from './tm.cycle.progress.utils';
+import { FolderTreeComponent, FolderNode, buildFolderTree, isFolderPathMatch } from '../folder-tree/folder.tree.component';
 
 @Component({
   selector: 'app-tm-cycles-table',
@@ -20,7 +21,8 @@ import { ProgressSegment, computeProgressSummaries } from './tm.cycle.progress.u
     EmptyStateComponent,
     ErrorStateComponent,
     StatusBadgeComponent,
-    PaginationComponent
+    PaginationComponent,
+    FolderTreeComponent
   ],
   styleUrls: ['./tm.cycle.table.component.css'],
   templateUrl: './tm.cycle.table.component.html'
@@ -40,6 +42,9 @@ export class TmCyclesTableComponent implements OnInit {
   tooltipPosition = { top: 0, left: 0 };
   activeTooltipSegments: ProgressSegment[] = [];
 
+  folderTree: FolderNode[] = [];
+  selectedFolder: string | null = null;
+
   pageSize = 20;
   pageIndex = 0;
   readonly pageSizeOptions = [20, 50, 100];
@@ -50,13 +55,22 @@ export class TmCyclesTableComponent implements OnInit {
     this.cyclesDataSource = new MatTableDataSource<TestCycle>([]);
   }
 
+  get filteredCycles(): TestCycle[] {
+    return this.cyclesDataSource.data.filter(cycle => isFolderPathMatch(cycle.folder, this.selectedFolder));
+  }
+
   get totalItems(): number {
-    return this.cyclesDataSource.data.length;
+    return this.filteredCycles.length;
   }
 
   get pagedCycles(): TestCycle[] {
     const start = this.pageIndex * this.pageSize;
-    return this.cyclesDataSource.data.slice(start, start + this.pageSize);
+    return this.filteredCycles.slice(start, start + this.pageSize);
+  }
+
+  onFolderSelected(path: string | null): void {
+    this.selectedFolder = path;
+    this.pageIndex = 0;
   }
 
   onPageSizeChange(size: number): void {
@@ -89,6 +103,8 @@ export class TmCyclesTableComponent implements OnInit {
     this.testCyclesService.getTestCyclesbyProjectKey(this.projectKey).subscribe({
       next: (response) => {
         this.cyclesDataSource.data = Array.isArray(response) ? response : [];
+        this.folderTree = buildFolderTree(this.cyclesDataSource.data.map(cycle => cycle.folder));
+        this.selectedFolder = null;
         this.computeProgressSummaries(this.cyclesDataSource.data);
         this.pageIndex = 0;
         console.log('Test cycles data loaded:', this.cyclesDataSource.data);

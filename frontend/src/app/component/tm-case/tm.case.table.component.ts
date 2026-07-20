@@ -7,6 +7,7 @@ import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { StatusBadgeComponent } from '../status-badge/status.badge.component';
 import { PaginationComponent } from '../pagination/pagination.component';
+import { FolderTreeComponent, FolderNode, buildFolderTree, isFolderPathMatch } from '../folder-tree/folder.tree.component';
 import { TestCasesService, TestCases } from '../../services/tm.cases.service';
 
 @Component({
@@ -19,7 +20,8 @@ import { TestCasesService, TestCases } from '../../services/tm.cases.service';
     EmptyStateComponent,
     ErrorStateComponent,
     StatusBadgeComponent,
-    PaginationComponent
+    PaginationComponent,
+    FolderTreeComponent
   ],
   styleUrls: ['./tm.case.table.component.css'],
   templateUrl: './tm.case.table.component.html'
@@ -35,6 +37,9 @@ export class TmCasesTableComponent implements OnInit {
   projectKey = '';
   displayedColumns = ['KEY', 'TITLE', 'FREQUENCY', 'LABELS', 'RESULT', 'STATUS'];
 
+  folderTree: FolderNode[] = [];
+  selectedFolder: string | null = null;
+
   pageSize = 20;
   pageIndex = 0;
   readonly pageSizeOptions = [20, 50, 100];
@@ -45,13 +50,17 @@ export class TmCasesTableComponent implements OnInit {
     this.testCasesDataSource = new MatTableDataSource<TestCases>([]);
   }
 
+  get filteredTestCases(): TestCases[] {
+    return this.testCasesDataSource.data.filter(testCase => isFolderPathMatch(testCase.folder, this.selectedFolder));
+  }
+
   get totalItems(): number {
-    return this.testCasesDataSource.data.length;
+    return this.filteredTestCases.length;
   }
 
   get pagedTestCases(): TestCases[] {
     const start = this.pageIndex * this.pageSize;
-    return this.testCasesDataSource.data.slice(start, start + this.pageSize);
+    return this.filteredTestCases.slice(start, start + this.pageSize);
   }
 
   onPageSizeChange(size: number): void {
@@ -65,6 +74,8 @@ export class TmCasesTableComponent implements OnInit {
     this.testCasesService.getTestCasesbyProjectKey(this.projectKey).subscribe({
       next: (response) => {
         this.testCasesDataSource.data = Array.isArray(response) ? response : [];
+        this.folderTree = buildFolderTree(this.testCasesDataSource.data.map(testCase => testCase.folder));
+        this.selectedFolder = null;
         this.pageIndex = 0;
         console.log('Test cases data loaded:', this.testCasesDataSource.data);
         this.isLoading = false;
@@ -77,6 +88,11 @@ export class TmCasesTableComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  onFolderSelected(path: string | null): void {
+    this.selectedFolder = path;
+    this.pageIndex = 0;
   }
 
   ngOnInit(): void {

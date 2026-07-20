@@ -12,31 +12,13 @@
     </div>
 
     <div class="split-view">
-        <div class="folder-sidebar">
-            <div class="folder-header">
-                <h3>Folders</h3>
-                <span class="folder-total-count">{{ cyclesDataSource.data.length }}</span>
-            </div>
-            <!-- <div class="folder-list">
-                <div class="folder-item" [class.selected]="selectedFolder === null" (click)="selectFolder(null)">
-                    <i class="fa-solid fa-folder"></i>
-                    <span>Test Cycles</span>
-                    <span class="folder-count">{{ testCycles.length }}</span>
-                </div>
-                @for (folder of folders; track folder.name) {
-                <div class="folder-item" [class.selected]="selectedFolder === folder.name"
-                    (click)="selectFolder(folder.name)">
-                    <i class="fa-solid fa-folder"></i>
-                    <span>{{ folder.name }}</span>
-                    <span class="folder-count">{{ folder.count }}</span>
-                    <button class="folder-delete-btn" (click)="$event.stopPropagation(); deleteFolder(folder.name)"
-                        title="Delete Folder">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </div>
-                }
-            </div>-->
-        </div>
+        <app-folder-tree
+            [title]="'Folders'"
+            [totalCount]="cyclesDataSource.data.length"
+            [folderTree]="folderTree"
+            [selectedFolder]="selectedFolder"
+            (folderSelected)="onFolderSelected($event)">
+        </app-folder-tree>
 
         <ng-container *ngIf="isLoading; else notLoading">
             <div class="state-container">
