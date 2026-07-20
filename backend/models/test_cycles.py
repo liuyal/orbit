@@ -31,6 +31,7 @@ class TestCycleCreate(BaseModel):
     test_cycle_key: str = None
     title: str = None
     description: str = None
+    created_at: str = None
     status: str = None
     folder: str = None
     executions: dict = {}
