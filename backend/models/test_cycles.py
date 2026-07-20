@@ -40,6 +40,7 @@ class TestCycleCreate(BaseModel):
 class TestCycleUpdate(BaseModel):
     title: str = None
     description: str = None
+    created_at: str = None
     status: str = None
     folder: str = None
     executions: dict = {}
