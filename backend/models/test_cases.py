@@ -60,6 +60,6 @@ class TestCaseUpdate(BaseModel):
     last_result: str = None
     last_execution_key: str = None
     failing_steps: str = None
-    test_frequency: list = []
-    labels: list = []
-    links: list = []
+    test_frequency: list = None
+    labels: list = None
+    links: list = None

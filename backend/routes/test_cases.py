@@ -314,7 +314,6 @@ async def update_test_case_by_key(request: Request,
     # Prepare request data, excluding None values
     request_data = test_case.model_dump()
     request_data = {k: v for k, v in request_data.items() if v is not None}
-    request_data["labels"] = [l.strip() for l in request_data.get("labels", [])]
     request_data["updated_at"] = get_current_utc_time()
 
     # Update the test case in the database

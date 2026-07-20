@@ -37,5 +37,5 @@ class ProjectCreate(BaseModel):
 class ProjectUpdate(BaseModel):
     description: str = None
     is_active: bool = None
-    labels: list = []
+    labels: list = None
     model_config = {"extra": "forbid"}

@@ -44,5 +44,5 @@ class TestCycleUpdate(BaseModel):
     created_at: str = None
     status: str = None
     folder: str = None
-    executions: dict = {}
+    executions: dict = None
     model_config = {"extra": "forbid"}

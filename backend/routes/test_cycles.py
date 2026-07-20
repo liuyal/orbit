@@ -257,8 +257,6 @@ async def update_cycle_by_key(request: Request,
     request_data = cycle.model_dump()
     request_data = {k: v for k, v in request_data.items() if v is not None}
     request_data["updated_at"] = get_current_utc_time()
-    if len(request_data.get("executions", {})) == 0:
-        request_data.pop("executions")
 
     # Update the cycle in the database
     result, matched_count = await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, request_data, {

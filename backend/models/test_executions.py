@@ -47,5 +47,5 @@ class TestExecutionUpdate(BaseModel):
     comments: str = None
     started_at: str = None
     finished_at: str = None
-    links: list = []
+    links: list = None
     model_config = {"extra": "forbid"}

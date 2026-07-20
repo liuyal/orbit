@@ -26,11 +26,14 @@ def _build_object_schema(items_schema: dict) -> dict:
 
 
 def _convert_array_field(field: dict) -> dict | None:
-    """Convert array fields (list of str, int, float, or dict)."""
+    """Convert array fields (list of str, int, float, dict, or untyped list)."""
+
+    if field.get("type") != "array":
+        return None
+
     items = field.get("items", {})
     items_type = items.get("type")
 
-    # Only support list of str, int, float, dict
     if items_type == "string":
         return {"bsonType": "array", "items": {"bsonType": "string"}}
 
@@ -43,7 +46,10 @@ def _convert_array_field(field: dict) -> dict | None:
     if items_type == "object":
         return {"bsonType": "array", "items": {"bsonType": "object"}}
 
-    return None
+    # Untyped list (e.g. bare `list` with no generic parameter, or items
+    # constrained via anyOf/other unsupported schema) - accept any array
+    # contents rather than dropping the field entirely.
+    return {"bsonType": "array"}
 
 
 def _convert_dict_field(field: dict) -> dict | None:
