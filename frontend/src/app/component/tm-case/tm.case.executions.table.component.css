@@ -2,6 +2,14 @@
 /*     Detail Container      */
 /* ========================= */
 
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .execution-table-container {
   display: flex;
   flex-direction: column;
@@ -9,4 +17,121 @@
   overflow: hidden;
   height: 100%;
   width: 100%;
+  background-color: #171c25;
+}
+
+.state-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-scroll {
+  flex: 1;
+  overflow: auto;
+  background-color: #171c25;
+}
+
+/* ========================= */
+/*     Executions Table      */
+/* ========================= */
+
+.execution-table-container table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #252525;
+}
+
+.execution-table-container th {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  padding: 0px 16px;
+  text-align: center;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #004090;
+  background-color: #1b1b1b;
+}
+
+.execution-table-container th:first-child {
+  padding-left: 24px;
+}
+
+.execution-table-container th:last-child {
+  padding-right: 24px;
+}
+
+/* Column width layout: 20% each for 5 columns */
+.execution-table-container th:nth-child(1) {
+  width: 20%;
+}
+
+.execution-table-container th:nth-child(2) {
+  width: 20%;
+}
+
+.execution-table-container th:nth-child(3) {
+  width: 20%;
+}
+
+.execution-table-container th:nth-child(4) {
+  width: 20%;
+}
+
+.execution-table-container th:nth-child(5) {
+  width: 20%;
+}
+
+.execution-table-container td,
+.execution-table-container .mat-mdc-cell {
+  padding: 0px 20px;
+  border-bottom: 1px solid #333;
+  color: #e0e0e0;
+  font-size: 14px;
+  text-align: center;
+  vertical-align: middle;
+  background-color: #171c25;
+}
+
+.execution-table-container .mat-mdc-header-row {
+  height: 50px;
+}
+
+.execution-table-container td:first-child {
+  padding-left: 24px;
+  font-weight: 500;
+  color: #4da6ff;
+}
+
+.execution-table-container td:last-child {
+  padding-right: 24px;
+}
+
+.execution-table-container tbody tr,
+.execution-table-container .mat-mdc-row {
+  transition: background-color 0.2s ease;
+}
+
+.execution-table-container tbody tr:hover,
+.execution-table-container .mat-mdc-row:hover {
+  cursor: pointer;
+}
+
+/* !important needed to override Angular Material MDC cell backgrounds */
+.execution-table-container tbody tr:hover td,
+.execution-table-container tbody tr:hover .mat-mdc-cell,
+.execution-table-container .mat-mdc-row:hover td,
+.execution-table-container .mat-mdc-row:hover .mat-mdc-cell {
+  background-color: rgb(28, 28, 28);
+}
+
+.execution-table-container tbody tr:last-child td {
+  border-bottom: none;
 }

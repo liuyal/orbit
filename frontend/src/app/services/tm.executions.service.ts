@@ -4,19 +4,16 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface TestExecutions {
-    id: string;
-    test_cycle_key: string;
+    execution_key: string;
     project_key: string;
-    title: string;
-    description: string;
-    created_at: string;
-    updated_at: string;
-    status: string;
-    executions: object;
-}
-
-export interface TestExecutionsResponseModel {
-    test_executions: TestExecutions[];
+    test_case_key: string;
+    test_cycle_key: string | null;
+    result: string | null;
+    custom_fields: Record<string, unknown> | null;
+    comments: string | null;
+    started_at: string | null;
+    finished_at: string | null;
+    links: any[];
 }
 
 @Injectable({
@@ -30,14 +27,14 @@ export class TestExecutionsService {
 
     /**
     * Get a list of test executions by test case key
-    * @returns An observable that emits the test executions response model containing an array of test executions.
+    * @returns An observable that emits an array of test executions for the given test case.
     */
-    getTestExecutionsbyTestCase(projectKey: string, testCaseKey: string): Observable<TestExecutionsResponseModel> {
+    getTestExecutionsbyTestCase(projectKey: string, testCaseKey: string): Observable<TestExecutions[]> {
         const headers = new HttpHeaders({
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         });
 
-        return this.http.get<TestExecutionsResponseModel>(`${this.apiUrl}/tm/projects/${projectKey}/test-cases/${testCaseKey}/test-executions`, { headers });
+        return this.http.get<TestExecutions[]>(`${this.apiUrl}/tm/projects/${projectKey}/test-cases/${testCaseKey}/executions`, { headers });
     }
 }

@@ -1,0 +1,40 @@
+<div class="folder-sidebar">
+    <div class="folder-header">
+        <h3>{{ title }}</h3>
+        <span class="folder-total-count">{{ totalCount }}</span>
+    </div>
+
+    <div class="folder-list">
+        <div class="folder-item" [class.selected]="selectedFolder === null" (click)="selectFolder(null)">
+            <span class="folder-toggle-spacer"></span>
+            <i class="fa-solid fa-folder-tree"></i>
+            <span class="folder-name">{{ allLabel }}</span>
+            <span class="folder-count">{{ totalCount }}</span>
+        </div>
+
+        <ng-container *ngFor="let node of folderTree">
+            <ng-container *ngTemplateOutlet="folderNodeTpl; context: { $implicit: node, depth: 0 }"></ng-container>
+        </ng-container>
+    </div>
+</div>
+
+<ng-template #folderNodeTpl let-node let-depth="depth">
+    <div class="folder-item" [class.selected]="selectedFolder === node.path"
+        [style.paddingLeft.px]="20 + depth * 16" (click)="selectFolder(node.path)">
+        <button *ngIf="node.children.length; else noToggle" class="folder-toggle"
+            (click)="$event.stopPropagation(); toggleFolder(node)">
+            <i class="fa-solid" [class.fa-chevron-right]="!node.expanded" [class.fa-chevron-down]="node.expanded"></i>
+        </button>
+        <ng-template #noToggle>
+            <span class="folder-toggle-spacer"></span>
+        </ng-template>
+        <i class="fa-regular fa-folder"></i>
+        <span class="folder-name">{{ node.name }}</span>
+        <span class="folder-count">{{ node.count }}</span>
+    </div>
+    <ng-container *ngIf="node.expanded">
+        <ng-container *ngFor="let child of node.children">
+            <ng-container *ngTemplateOutlet="folderNodeTpl; context: { $implicit: child, depth: depth + 1 }"></ng-container>
+        </ng-container>
+    </ng-container>
+</ng-template>

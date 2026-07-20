@@ -4,6 +4,7 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
 import { TestCycleExecution } from '../../services/tm.cycles.service';
 import { CodeMirrorViewerComponent } from '../code-mirror-viewer/code.mirror.viewer.component';
+import { formatDate } from '../../utils/date.utils';
 
 @Component({
   selector: 'app-tm-execution-detail',
@@ -38,7 +39,7 @@ export class TmExecutionDetailComponent {
   }
 
   formatDate(dateStr: string | null): string {
-    if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleString();
+    return formatDate(dateStr);
   }
 }
+1

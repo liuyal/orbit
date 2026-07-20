@@ -17,6 +17,7 @@ from fastapi import (
     status,
     Response
 )
+from natsort import natsorted
 from starlette.responses import JSONResponse
 
 from backend.app.app_def import (
@@ -156,7 +157,7 @@ async def get_all_executions_by_test_case_key(request: Request,
         "test_case_key": test_case_key
     })
 
-    test_executions = list(reversed(test_executions))
+    test_executions = list(reversed(natsorted(test_executions, key=lambda x: x.get("execution_key"))))
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=test_executions)

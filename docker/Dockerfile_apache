@@ -75,5 +75,5 @@ RUN chmod +x /usr/local/bin/apache-entrypoint.sh
 # Expose both HTTP and HTTPS ports
 EXPOSE 80 443
 
-ENTRYPOINT ["apache-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/apache-entrypoint.sh"]
 

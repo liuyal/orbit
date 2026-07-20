@@ -32,7 +32,7 @@
 }
 
 .case-key-label {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
     color: #7db8f7;
     letter-spacing: 0.5px;
@@ -41,7 +41,7 @@
 
 .case-title {
     margin: 0;
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
     color: #e8e8e8;
     white-space: nowrap;

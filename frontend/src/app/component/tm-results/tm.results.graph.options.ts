@@ -48,7 +48,10 @@ export function buildChartOption(
   categories: string[],
   series: echarts.SeriesOption[],
   projectKey: string,
+  xLabels: string[] = [],
 ): echarts.EChartsOption {
+  const labelInterval = Math.max(0, Math.ceil(categories.length / 16) - 1);
+  const labelMap = new Map<string, string>(categories.map((key, i) => [key, xLabels[i] ?? key]));
   return {
     toolbox: {
       right: 20,
@@ -92,8 +95,14 @@ export function buildChartOption(
       type: 'category',
       boundaryGap: false,
       data: categories,
-      axisLabel: { show: false },
-      axisTick: { show: false },
+      axisLabel: {
+        show: true,
+        interval: labelInterval,
+        color: '#9e9e9e',
+        fontSize: 11,
+        formatter: (value: string) => labelMap.get(value) ?? value,
+      },
+      axisTick: { show: true, interval: labelInterval },
     },
     yAxis: {
       type: 'value',
