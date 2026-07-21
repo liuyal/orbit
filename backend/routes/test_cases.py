@@ -329,7 +329,7 @@ async def update_test_case_by_key(request: Request,
     })
 
     # Update project labels if changed
-    new_label_set = list(set(project.get("labels", []) + request_data["labels"]))
+    new_label_set = list(set(project.get("labels", []) + request_data.get("labels", [])))
     if project["labels"] != new_label_set:
         project["labels"] = new_label_set
         await db.update(DB_NAME_TM, DB_COLLECTION_TM_PRJ, project, {
