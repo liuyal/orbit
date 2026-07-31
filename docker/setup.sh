@@ -16,6 +16,7 @@ show_help() {
   echo "  -p, --stop            Stop and remove all Docker containers"
   echo "  -b, --build           Build Docker images"
   echo "  -s, --start           Start Docker containers"
+  echo "  -f, --force-recreate  Force recreate containers on start"
   echo
 }
 
@@ -47,6 +48,9 @@ for ((i=0; i<$#; i++)); do
 
   elif [[ "$arg" == "--start" || "$arg" == "-s" ]]; then
     START_FLAG="--start"
+
+  elif [[ "$arg" == "--force-recreate" || "$arg" == "-f" ]]; then
+    FORCE_RECREATE_FLAG="--force-recreate"
   fi
 done
 
@@ -74,7 +78,7 @@ fi
 
 if [[ -n "$START_FLAG" ]]; then
   echo "Starting Docker containers..."
-  docker compose -f docker-compose.yml up -d
+  docker compose -f docker-compose.yml up -d $FORCE_RECREATE_FLAG
   echo "Access the application at: https://localhost"
 fi
 
