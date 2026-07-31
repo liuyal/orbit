@@ -77,34 +77,34 @@ async def root_api(request: Request):
     return RedirectResponse(url=f"{base_url}/api/{API_VERSION}/docs")
 
 
-@router.get(f"/api/{API_VERSION}/db-export",
-            tags=["root"])
-async def get_database_export(request: Request,
-                              db_name: DBTarget):
-    """ Root api endpoint to get a dump of the database. """
-
-    db = request.app.state.mdb
-
-    # Select the database
-    db_target_list = db_selection(db_name)
-
-    zip_buffer = io.BytesIO()
-    with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-        for db_item in db_target_list:
-            # Call the export database function
-            export_data = await db.export(db_name=db_item.name)
-            # Write the exported data to the zip file as JSON
-            for collection_name, documents in export_data.items():
-                json_bytes = json.dumps(documents, indent=2).encode("utf-8")
-                zf.writestr(f"{db_item.name}/{collection_name}.json", json_bytes)
-    zip_buffer.seek(0)
-
-    return StreamingResponse(
-        zip_buffer,
-        status_code=status.HTTP_200_OK,
-        media_type="application/zip",
-        headers={"Content-Disposition": f'attachment; filename="db-export-{db_name.value}.zip"'}
-    )
+# @router.get(f"/api/{API_VERSION}/db-export",
+#             tags=["root"])
+# async def get_database_export(request: Request,
+#                               db_name: DBTarget):
+#     """ Root api endpoint to get a dump of the database. """
+#
+#     db = request.app.state.mdb
+#
+#     # Select the database
+#     db_target_list = db_selection(db_name)
+#
+#     zip_buffer = io.BytesIO()
+#     with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+#         for db_item in db_target_list:
+#             # Call the export database function
+#             export_data = await db.export(db_name=db_item.name)
+#             # Write the exported data to the zip file as JSON
+#             for collection_name, documents in export_data.items():
+#                 json_bytes = json.dumps(documents, indent=2).encode("utf-8")
+#                 zf.writestr(f"{db_item.name}/{collection_name}.json", json_bytes)
+#     zip_buffer.seek(0)
+#
+#     return StreamingResponse(
+#         zip_buffer,
+#         status_code=status.HTTP_200_OK,
+#         media_type="application/zip",
+#         headers={"Content-Disposition": f'attachment; filename="db-export-{db_name.value}.zip"'}
+#     )
 
 
 @router.post(f"/api/{API_VERSION}/db-reset",
