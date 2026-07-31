@@ -90,6 +90,15 @@ class DatabaseClient(ABC):
         """ export the database. """
 
     @abstractmethod
+    def list_collections(self, db_name: str):
+        """ List collection names for a database. """
+
+    @abstractmethod
+    def export_collection_stream(self, db_name: str, collection_name: str, **kwargs):
+        """ Stream documents from a single collection one at a time,
+            without loading the entire collection into memory. """
+
+    @abstractmethod
     def create(self, db_name: str, table: str, data: dict):
         """Insert a new record into the database."""
 

@@ -134,6 +134,19 @@ class MongoClient(DatabaseClient):
 
         return export_data
 
+    async def list_collections(self, db_name: str) -> list:
+        """List collection names for a database."""
+
+        db = self._db_client[db_name]
+        return await db.list_collection_names()
+
+    async def export_collection_stream(self, db_name: str, collection_name: str, **kwargs):
+        """Yield documents from a single collection one at a time. """
+
+        cursor = self._db_client[db_name][collection_name].find({})
+        async for doc in cursor:
+            yield self._convert_object_id(doc)
+
     async def create(self,
                      db_name: str,
                      table: str,

@@ -7,9 +7,9 @@
 
 # routes/root.py
 
-import io
 import json
 import logging
+import tempfile
 import zipfile
 
 from fastapi import (
@@ -77,34 +77,68 @@ async def root_api(request: Request):
     return RedirectResponse(url=f"{base_url}/api/{API_VERSION}/docs")
 
 
-# @router.get(f"/api/{API_VERSION}/db-export",
-#             tags=["root"])
-# async def get_database_export(request: Request,
-#                               db_name: DBTarget):
-#     """ Root api endpoint to get a dump of the database. """
-#
-#     db = request.app.state.mdb
-#
-#     # Select the database
-#     db_target_list = db_selection(db_name)
-#
-#     zip_buffer = io.BytesIO()
-#     with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
-#         for db_item in db_target_list:
-#             # Call the export database function
-#             export_data = await db.export(db_name=db_item.name)
-#             # Write the exported data to the zip file as JSON
-#             for collection_name, documents in export_data.items():
-#                 json_bytes = json.dumps(documents, indent=2).encode("utf-8")
-#                 zf.writestr(f"{db_item.name}/{collection_name}.json", json_bytes)
-#     zip_buffer.seek(0)
-#
-#     return StreamingResponse(
-#         zip_buffer,
-#         status_code=status.HTTP_200_OK,
-#         media_type="application/zip",
-#         headers={"Content-Disposition": f'attachment; filename="db-export-{db_name.value}.zip"'}
-#     )
+@router.get(f"/api/{API_VERSION}/db-export",
+            tags=["root"])
+async def get_database_export(request: Request,
+                              db_name: DBTarget):
+    """ Root api endpoint to get a dump of the database. """
+
+    def iterfile():
+        """ Helper function to iterate through all db items """
+
+        try:
+            while True:
+                chunk = tmp_file.read(1024 * 1024)
+                if not chunk:
+                    break
+
+                yield chunk
+
+        finally:
+            tmp_file.close()
+
+    db = request.app.state.mdb
+
+    # Select the database
+    db_target_list = db_selection(db_name)
+
+    # Spill to disk once the export exceeds ~50MB
+    max_size = 25 * 1024 * 1024
+    tmp_file = tempfile.SpooledTemporaryFile(max_size=max_size)
+
+    with zipfile.ZipFile(tmp_file, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for db_item in db_target_list:
+            collection_names = await db.list_collections(db_name=db_item.name)
+            for collection_name in collection_names:
+
+                with zf.open(f"{db_item.name}/{collection_name}.json",
+                             mode="w",
+                             force_zip64=True) as entry:
+
+                    entry.write(b"[")
+                    first = True
+
+                    async for doc in db.export_collection_stream(
+                            db_name=db_item.name,
+                            collection_name=collection_name
+                    ):
+                        if not first:
+                            entry.write(b",")
+
+                        first = False
+                        entry.write(b"\n")
+                        entry.write(json.dumps(doc, indent=2).encode("utf-8"))
+
+                    entry.write(b"\n]")
+
+    tmp_file.seek(0)
+
+    return StreamingResponse(
+        iterfile(),
+        status_code=status.HTTP_200_OK,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="db-export-{db_name.value}.zip"'}
+    )
 
 
 @router.post(f"/api/{API_VERSION}/db-reset",
