@@ -133,13 +133,13 @@ DB_COLLECTION_TM_TCY = DBCollection(
 )
 
 # DB COLLECTIONS - RUNNER
-DB_COLLECTION_RUNNERS_TIMESTAMP_STATS = DBCollection(name="timestamp-stats")
+# DB_COLLECTION_RUNNERS_TIMESTAMP_STATS = DBCollection(name="timestamp-stats")
 DB_COLLECTION_RUNNERS_STATS_HISTORIC = DBCollection(name="runner-stats-historic")
-DB_COLLECTION_RUNNERS_STATS_CURRENT = DBCollection(name="runner-stats-current")
-DB_COLLECTION_RUNNERS_BUSY_STATS = DBCollection(name="runners-stats-busy")
-DB_COLLECTION_RUNNERS_BUSY_STATS_BY_JOB = DBCollection(name="runners-stats-busy-by-job")
-DB_COLLECTION_RUNNERS_ONLINE_STATS = DBCollection(name="runners-stats-online")
-DB_COLLECTION_USER_LEADERBOARD_STATS = DBCollection(name="user-leaderboard-stats")
+# DB_COLLECTION_RUNNERS_STATS_CURRENT = DBCollection(name="runner-stats-current")
+# DB_COLLECTION_RUNNERS_BUSY_STATS = DBCollection(name="runners-stats-busy")
+# DB_COLLECTION_RUNNERS_BUSY_STATS_BY_JOB = DBCollection(name="runners-stats-busy-by-job")
+# DB_COLLECTION_RUNNERS_ONLINE_STATS = DBCollection(name="runners-stats-online")
+# DB_COLLECTION_USER_LEADERBOARD_STATS = DBCollection(name="user-leaderboard-stats")
 
 # DB
 DB_NAME_TM = DB(
@@ -155,13 +155,13 @@ DB_NAME_TM = DB(
 DB_NAME_RUNNERS = DB(
     name=f"{DB_CORE}-runners",
     collections=[
-        DB_COLLECTION_RUNNERS_TIMESTAMP_STATS,
+        # DB_COLLECTION_RUNNERS_TIMESTAMP_STATS,
         DB_COLLECTION_RUNNERS_STATS_HISTORIC,
-        DB_COLLECTION_RUNNERS_STATS_CURRENT,
-        DB_COLLECTION_RUNNERS_BUSY_STATS,
-        DB_COLLECTION_RUNNERS_BUSY_STATS_BY_JOB,
-        DB_COLLECTION_RUNNERS_ONLINE_STATS,
-        DB_COLLECTION_USER_LEADERBOARD_STATS
+        # DB_COLLECTION_RUNNERS_STATS_CURRENT,
+        # DB_COLLECTION_RUNNERS_BUSY_STATS,
+        # DB_COLLECTION_RUNNERS_BUSY_STATS_BY_JOB,
+        # DB_COLLECTION_RUNNERS_ONLINE_STATS,
+        # DB_COLLECTION_USER_LEADERBOARD_STATS
     ]
 )
 
