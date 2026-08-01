@@ -131,7 +131,7 @@ export class TmResultsGraphComponent implements OnInit, OnDestroy {
       const d = new Date(c.created_at);
       return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`;
     });
-    // console.log('[chart] cycle keys + created_at dates:', cycles.map((c) => ({ key: c.test_cycle_key, created_at: c.created_at, label: xLabels[cycles.indexOf(c)] })));
+    
     const series: echarts.SeriesOption[] = STATUS_ORDER.map((status) => ({
       name: status.replace('_', ' '),
       type: 'line',
@@ -139,8 +139,7 @@ export class TmResultsGraphComponent implements OnInit, OnDestroy {
       areaStyle: { opacity: 0.3 },
       emphasis: { focus: 'series' },
       smooth: false,
-      symbol: 'circle',
-      symbolSize: 7,
+      symbol: 'none',
       cursor: 'pointer',
       itemStyle: { color: STATUS_COLORS[status] ?? '#9e9e9e' },
       data: cycles.map((c) => {
