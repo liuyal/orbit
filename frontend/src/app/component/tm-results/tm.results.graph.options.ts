@@ -50,7 +50,7 @@ export function buildChartOption(
   projectKey: string,
   xLabels: string[] = [],
 ): echarts.EChartsOption {
-  const labelInterval = Math.max(0, Math.ceil(categories.length / 10) - 1);
+  const labelInterval = Math.max(0, Math.ceil(categories.length / 16) - 1);
   const labelMap = new Map<string, string>(categories.map((key, i) => [key, xLabels[i] ?? key]));
   return {
     toolbox: {
