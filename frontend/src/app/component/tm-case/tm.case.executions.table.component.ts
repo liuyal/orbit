@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -23,6 +23,7 @@ import { formatDate } from '../../utils/date.utils';
     PaginationComponent
   ],
   styleUrls: ['./tm.case.executions.table.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './tm.case.executions.table.component.html'
 })
 export class TmCaseExecutionsTableComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
@@ -16,6 +16,7 @@ import { formatDate } from '../../utils/date.utils';
         TmCaseHeaderComponent,
     ],
     styleUrls: ['./tm.case.detail.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './tm.case.detail.component.html',
 })
 export class TmCaseDetailComponent {

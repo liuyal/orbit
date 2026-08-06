@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
@@ -20,6 +20,7 @@ import { TestCasesService, TestCases } from '../../services/tm.cases.service';
         TmCaseExecutionsTableComponent,
     ],
     styleUrls: ['./tm.case.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './tm.case.html'
 })
 

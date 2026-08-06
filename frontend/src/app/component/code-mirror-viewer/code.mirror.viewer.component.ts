@@ -8,6 +8,7 @@ import {
   ViewChild,
   SimpleChanges,
   ViewEncapsulation,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -33,6 +34,7 @@ import { monokai } from '@uiw/codemirror-theme-monokai';
   encapsulation: ViewEncapsulation.None,
   template: `<div #editorHost class="cm-host"></div>`,
   host: {  },
+  changeDetection: ChangeDetectionStrategy.Eager,
   styles: [
     `
       app-code-mirror-viewer .cm-host {

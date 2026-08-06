@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { ProjectsService, Projects } from '../../services/tm.project.service';
@@ -20,6 +20,7 @@ import { Router } from '@angular/router';
     StatusBadgeComponent
   ],
   styleUrls: ['./tm.project.table.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './tm.project.table.component.html'
 })
 

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { RunnersStatusService, RunnerStatus } from '../../services/runners.status.service';
@@ -24,6 +24,7 @@ import { StatusBadgeComponent } from '../status-badge/status.badge.component';
     StatusBadgeComponent
   ],
   styleUrls: ['./runners.status.table.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './runners.status.table.component.html'
 })
 

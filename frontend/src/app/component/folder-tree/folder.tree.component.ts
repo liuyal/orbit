@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface FolderNode {
@@ -67,6 +67,7 @@ export function isFolderPathMatch(folderPath: string | undefined | null, selecte
   standalone: true,
   imports: [CommonModule],
   styleUrls: ['./folder.tree.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './folder.tree.component.html'
 })
 export class FolderTreeComponent {

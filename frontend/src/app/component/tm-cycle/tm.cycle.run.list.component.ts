@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -20,6 +20,7 @@ import { TmExecutionDetailComponent } from '../tm-execution/tm.execution.detail.
     TmExecutionDetailComponent,
   ],
   styleUrls: ['./tm.cycle.run.list.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './tm.cycle.run.list.component.html'
 })
 

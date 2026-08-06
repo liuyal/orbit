@@ -7,6 +7,7 @@ import {
   ViewChild,
   ElementRef,
   HostListener,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -32,6 +33,7 @@ type FilterOption = 'NIGHTLY' | 'WEEKLY' | 'RELEASE' | 'ALL';
     ErrorStateComponent,
   ],
   styleUrls: ['./tm.results.graph.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './tm.results.graph.component.html',
 })
 export class TmResultsGraphComponent implements OnInit, OnDestroy {

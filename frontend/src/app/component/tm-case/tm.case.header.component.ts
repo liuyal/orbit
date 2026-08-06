@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TestCases } from '../../services/tm.cases.service';
 
@@ -9,6 +9,7 @@ import { TestCases } from '../../services/tm.cases.service';
         CommonModule
     ],
     templateUrl: './tm.case.header.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./tm.case.header.component.css'],
 })
 export class TmCaseHeaderComponent {

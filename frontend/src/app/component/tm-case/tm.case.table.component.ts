@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -24,6 +24,7 @@ import { TestCasesService, TestCases } from '../../services/tm.cases.service';
     FolderTreeComponent
   ],
   styleUrls: ['./tm.case.table.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './tm.case.table.component.html'
 })
 

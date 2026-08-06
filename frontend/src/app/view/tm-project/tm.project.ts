@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../component/navbar/navbar';
 import { TmProjectsTableComponent } from '../../component/tm-project/tm.project.table.component';
@@ -12,6 +12,7 @@ import { TmProjectsTableComponent } from '../../component/tm-project/tm.project.
         TmProjectsTableComponent
     ],
     styleUrls: ['./tm.project.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './tm.project.html'
 })
 

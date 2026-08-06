@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
@@ -14,6 +14,7 @@ import { formatDate } from '../../utils/date.utils';
     CodeMirrorViewerComponent
   ],
   styleUrls: ['./tm.execution.detail.component.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './tm.execution.detail.component.html'
 })
 export class TmExecutionDetailComponent {

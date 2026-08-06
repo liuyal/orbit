@@ -1,8 +1,9 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
     selector: 'app-footer',
     templateUrl: './footer.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./footer.css'],
 })
 

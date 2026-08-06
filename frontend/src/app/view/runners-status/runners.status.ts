@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../../component/navbar/navbar';
 import { RunnersStatusTableComponent } from '../../component/runners-status-table/runners.status.table.component';
@@ -12,6 +12,7 @@ import { RunnersStatusTableComponent } from '../../component/runners-status-tabl
     RunnersStatusTableComponent
   ],
   styleUrls: ['./runners.status.css'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   templateUrl: './runners.status.html'
 })
 

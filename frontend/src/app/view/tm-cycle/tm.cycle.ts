@@ -1,4 +1,4 @@
-import { Component, inject, ChangeDetectorRef, OnInit } from '@angular/core';
+import { Component, inject, ChangeDetectorRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
@@ -15,6 +15,7 @@ import { TmCyclesDetailsComponent } from '../../component/tm-cycle/tm.cycle.deta
         TmCyclesDetailsComponent
     ],
     styleUrls: ['./tm.cycle.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     templateUrl: './tm.cycle.html'
 })
 
