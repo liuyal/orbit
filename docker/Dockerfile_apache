@@ -70,7 +70,11 @@ RUN rm -f /usr/local/apache2/htdocs/index.html && \
 
 # Add entrypoint script to fix volume permissions at runtime
 COPY apache-entrypoint.sh /usr/local/bin/apache-entrypoint.sh
-RUN chmod +x /usr/local/bin/apache-entrypoint.sh
+
+# Strip Windows CRLF line endings (in case the file was edited on Windows)
+# so the shebang resolves correctly at exec time, then make it executable.
+RUN sed -i 's/\r$//' /usr/local/bin/apache-entrypoint.sh && \
+    chmod +x /usr/local/bin/apache-entrypoint.sh
 
 # Expose both HTTP and HTTPS ports
 EXPOSE 80 443
