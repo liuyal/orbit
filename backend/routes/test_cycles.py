@@ -10,8 +10,6 @@
 import asyncio
 import json
 import re
-from typing import Optional
-
 from fastapi import (
     APIRouter,
     Request,
@@ -20,6 +18,7 @@ from fastapi import (
 )
 from natsort import natsorted
 from starlette.responses import JSONResponse
+from typing import Optional
 
 from backend.app.app_def import (
     API_VERSION,
@@ -373,66 +372,91 @@ async def add_execution_to_cycle(request: Request,
 
     db = request.app.state.mdb
 
-    # Concurrently fetch cycle and execution
-    cycle_data, test_execution = await asyncio.gather(
-        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"test_cycle_key": test_cycle_key}),
-        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {"execution_key": execution_key})
-    )
-
-    if cycle_data is None:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"error": f"{test_cycle_key} not found"}
-        )
-
+    test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+        "execution_key": execution_key
+    })
     if test_execution is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{execution_key} not found"}
         )
 
-    # check execution project matches cycle project
-    if test_execution["project_key"] != cycle_data["project_key"]:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": f"Execution {execution_key} "
-                              f"belongs to different project "
-                              f"{test_execution['project_key']}"}
-        )
+    # concurrency access retry
+    max_retries = 25
 
-    # Check execution does not already belong to a different cycle
-    existing_cycle_key = test_execution.get("test_cycle_key", None)
-    if existing_cycle_key is not None and existing_cycle_key != test_cycle_key:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": f"Execution {execution_key} "
-                              f"already in cycle "
-                              f"{existing_cycle_key}"}
-        )
-
-    # Check for an existing execution in this cycle that covers the same test case.
-    # If found, replace it with the newly provided execution.
-    old_execution_key = None
-    tc_key = test_execution["test_case_key"]
-    if cycle_data["executions"]:
-        current_exec_keys = list(cycle_data["executions"].keys())
-        # Batch-fetch only executions already in the cycle that share the test_case_key
-        duplicate_execs = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
-            "execution_key": {"$in": current_exec_keys},
-            "test_case_key": tc_key
+    for attempt in range(max_retries):
+        cycle_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
+            "test_cycle_key": test_cycle_key
         })
-        if duplicate_execs:
-            old_execution_key = duplicate_execs[0]["execution_key"]
-            cycle_data["executions"].pop(old_execution_key, None)
+        if cycle_data is None:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"error": f"{test_cycle_key} not found"}
+            )
 
-    # Add the new execution to the cycle
-    cycle_data["executions"][execution_key] = test_execution["result"]
-    cycle_data = calculate_cycle_status(cycle_data)
+        # check execution project matches cycle project
+        if test_execution["project_key"] != cycle_data["project_key"]:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"Execution {execution_key} "
+                                  f"belongs to different project "
+                                  f"{test_execution['project_key']}"}
+            )
+
+        # Check execution does not already belong to a different cycle
+        existing_cycle_key = test_execution.get("test_cycle_key", None)
+        if existing_cycle_key is not None and existing_cycle_key != test_cycle_key:
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={"error": f"Execution {execution_key} "
+                                  f"already in cycle "
+                                  f"{existing_cycle_key}"}
+            )
+
+        # Snapshot of executions as read, used as the CAS filter below
+        original_executions = dict(cycle_data["executions"])
+
+        # Check for an existing execution in this cycle that covers the same test case.
+        # If found, replace it with the newly provided execution.
+        old_execution_key = None
+        tc_key = test_execution["test_case_key"]
+        if cycle_data["executions"]:
+            current_exec_keys = list(cycle_data["executions"].keys())
+
+            # Batch-fetch only executions already in the cycle that share the test_case_key
+            duplicate_execs = await db.find(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+                "execution_key": {"$in": current_exec_keys},
+                "test_case_key": tc_key
+            })
+
+            if duplicate_execs:
+                old_execution_key = duplicate_execs[0]["execution_key"]
+                cycle_data["executions"].pop(old_execution_key, None)
+
+        # Add the new execution to the cycle
+        cycle_data["executions"][execution_key] = test_execution["result"]
+        cycle_data = calculate_cycle_status(cycle_data)
+
+        # Attempt the update only if `executions` hasn't changed since we read it
+        _, matched_count = await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {
+            "test_cycle_key": test_cycle_key,
+            "executions": original_executions
+        })
+
+        if matched_count:
+            break
+
+    else:
+        return JSONResponse(
+            status_code=status.HTTP_409_CONFLICT,
+            content={"error": f"Could not add execution {execution_key} to cycle "
+                              f"{test_cycle_key} due to concurrent updates, "
+                              f"please retry"}
+        )
 
     # Build concurrent update tasks
     test_execution["test_cycle_key"] = test_cycle_key
     update_tasks = [
-        db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {"test_cycle_key": test_cycle_key}),
         db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {"execution_key": execution_key}),
     ]
     # If we displaced an old execution, clear its cycle link at the same time
@@ -458,41 +482,61 @@ async def remove_executions_from_cycle(request: Request,
 
     db = request.app.state.mdb
 
-    # Concurrently fetch cycle and execution
-    cycle_data, test_execution = await asyncio.gather(
-        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {"test_cycle_key": test_cycle_key}),
-        db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {"execution_key": execution_key})
-    )
-
-    if cycle_data is None:
-        return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"error": f"{test_cycle_key} not found"}
-        )
-
+    test_execution = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TE, {
+        "execution_key": execution_key
+    })
     if test_execution is None:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
             content={"error": f"{execution_key} not found"}
         )
 
-    # Check execution in cycle
-    if test_execution["test_case_key"] not in cycle_data["executions"]:
+    max_retries = 20
+    for attempt in range(max_retries):
+        cycle_data = await db.find_one(DB_NAME_TM, DB_COLLECTION_TM_TCY, {
+            "test_cycle_key": test_cycle_key
+        })
+        if cycle_data is None:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"error": f"{test_cycle_key} not found"}
+            )
+
+        # Check execution in cycle
+        if test_execution["test_case_key"] not in cycle_data["executions"]:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"error": f"Execution {execution_key} "
+                                  f"not in cycle {test_cycle_key}"}
+            )
+
+        # Snapshot of executions as read, used as the CAS filter below
+        original_executions = dict(cycle_data["executions"])
+
+        # Remove execution from cycle
+        cycle_data["executions"].pop(test_execution["test_case_key"])
+        cycle_data = calculate_cycle_status(cycle_data)
+
+        # Attempt the update only if `executions` hasn't changed since we read it
+        _, matched_count = await db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {
+            "test_cycle_key": test_cycle_key,
+            "executions": original_executions
+        })
+
+        if matched_count:
+            break
+
+    else:
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
-            content={"error": f"Execution {execution_key} "
-                              f"not in cycle {test_cycle_key}"}
+            status_code=status.HTTP_409_CONFLICT,
+            content={"error": f"Could not remove execution {execution_key} from cycle "
+                              f"{test_cycle_key} due to concurrent updates, "
+                              f"please retry"}
         )
 
-    # Remove execution from cycle
-    cycle_data["executions"].pop(test_execution["test_case_key"])
-
-    # Update cycle and clear execution's cycle key concurrently
+    # Clear execution's cycle key
     test_execution["test_cycle_key"] = None
-    await asyncio.gather(
-        db.update(DB_NAME_TM, DB_COLLECTION_TM_TCY, cycle_data, {"test_cycle_key": test_cycle_key}),
-        db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {"execution_key": execution_key})
-    )
+    await db.update(DB_NAME_TM, DB_COLLECTION_TM_TE, test_execution, {"execution_key": execution_key})
 
     return JSONResponse(status_code=status.HTTP_200_OK,
                         content=cycle_data)
