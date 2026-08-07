@@ -6,6 +6,7 @@ import { ErrorStateComponent } from '../error-state/error.state.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestCyclesService, TestCycleExecution } from '../../services/tm.cycles.service';
 import { TmExecutionDetailComponent } from '../tm-execution/tm.execution.detail.component';
+import { getResultColor } from '../../utils/result.utils';
 
 @Component({
   selector: 'app-tm-cycles-run-list',
@@ -33,13 +34,7 @@ export class TmCyclesRunListComponent implements OnInit {
   isLoading = false;
   error = '';
 
-  private readonly resultColors: Record<string, string> = {
-    PASS: '#4caf50',
-    FAIL: '#f44336',
-    BLOCKED: '#2196f3',
-    NOT_EXECUTED: '#757575',
-    IN_PROGRESS: '#ffd700',
-  };
+  private readonly statusOrder: string[] = ['PASS', 'FAIL', 'BLOCKED', 'NOT_EXECUTED', 'IN_PROGRESS'];
 
   constructor(
     private testCyclesService: TestCyclesService
@@ -48,7 +43,7 @@ export class TmCyclesRunListComponent implements OnInit {
   }
 
   getResultColor(result: string): string {
-    return this.resultColors[result?.toUpperCase()] ?? '#757575';
+    return getResultColor(result);
   }
 
   setSortMode(mode: 'status' | 'folder'): void {
@@ -67,8 +62,6 @@ export class TmCyclesRunListComponent implements OnInit {
   isGroupCollapsed(label: string): boolean {
     return this.collapsedGroups.has(label);
   }
-
-  private readonly statusOrder: string[] = ['PASS', 'FAIL', 'BLOCKED', 'NOT_EXECUTED', 'IN_PROGRESS'];
 
   get groupedExecutions(): { label: string; color?: string; executions: TestCycleExecution[] }[] {
     const data = this.executionDataSource.data;

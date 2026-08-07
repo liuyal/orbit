@@ -22,6 +22,7 @@
         <section class="detail-section">
             <h4 class="section-label">Execution Info</h4>
             <div class="detail-grid">
+
                 <div class="detail-field">
                     <span class="field-label">Result</span>
                     <span class="field-value">
@@ -30,6 +31,7 @@
                             [style.background-color]="getResultColor(execution.result)"></span>
                     </span>
                 </div>
+
                 <div class="detail-field">
                     <span class="field-label">Status</span>
                     <span class="field-value">{{ execution.status || '—' }}</span>
@@ -39,30 +41,17 @@
                     <span class="field-value">{{ execution.priority || '—' }}</span>
                 </div>
                 <div class="detail-field">
-                    <span class="field-label">Project</span>
-                    <span class="field-value">{{ execution.project_key }}</span>
+                    <span class="field-label">Folder</span>
+                    <span class="field-value">{{ execution.folder || '—' }}</span>
                 </div>
                 <div class="detail-field">
                     <span class="field-label">Cycle</span>
                     <span class="field-value">{{ execution.test_cycle_key }}</span>
                 </div>
                 <div class="detail-field">
-                    <span class="field-label">Folder</span>
-                    <span class="field-value">{{ execution.folder || '—' }}</span>
+                    <span class="field-label">Project</span>
+                    <span class="field-value">{{ execution.project_key }}</span>
                 </div>
-            </div>
-        </section>
-
-        @if (execution.description) {
-        <section class="detail-section">
-            <h4 class="section-label">Test Case Description</h4>
-            <p class="detail-text">{{ execution.description }}</p>
-        </section>
-        }
-
-        <section class="detail-section">
-            <h4 class="section-label">Dates</h4>
-            <div class="detail-grid">
                 <div class="detail-field">
                     <span class="field-label">Started</span>
                     <span class="field-value">{{ formatDate(execution.started_at) }}</span>
@@ -71,20 +60,19 @@
                     <span class="field-label">Finished</span>
                     <span class="field-value">{{ formatDate(execution.finished_at) }}</span>
                 </div>
-                <div class="detail-field">
-                    <span class="field-label">Created</span>
-                    <span class="field-value">{{ formatDate(execution.created_at) }}</span>
-                </div>
-                <div class="detail-field">
-                    <span class="field-label">Updated</span>
-                    <span class="field-value">{{ formatDate(execution.updated_at) }}</span>
-                </div>
             </div>
         </section>
 
+        @if (execution.description) {
+        <section class="detail-section">
+            <h4 class="section-label">Description</h4>
+            <p class="detail-text">{{ execution.description }}</p>
+        </section>
+        }
+
         @if (execution.test_frequency.length) {
         <section class="detail-section">
-            <h4 class="section-label">Test Frequency</h4>
+            <h4 class="section-label">Frequency</h4>
             <div class="tag-list">
                 @for (freq of execution.test_frequency; track freq) {
                 <span class="tag frequency">{{ freq }}</span>
@@ -95,7 +83,7 @@
 
         @if (execution.labels.length) {
         <section class="detail-section">
-            <h4 class="section-label">Appliance Labels</h4>
+            <h4 class="section-label">Labels</h4>
             <div class="tag-list">
                 @for (label of execution.labels; track label) {
                 <span class="tag">{{ label }}</span>
@@ -116,8 +104,7 @@
             <h4 class="section-label">Links</h4>
             <div class="link-list">
                 @for (link of execution.links; track link) {
-                <a class="detail-link" [href]="link" target="_blank"
-                    rel="noopener">
+                <a class="detail-link" [href]="link" target="_blank" rel="noopener">
                     {{ link }}
                 </a>
                 }

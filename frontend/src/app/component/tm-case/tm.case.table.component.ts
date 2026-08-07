@@ -39,9 +39,9 @@ export class TmCasesTableComponent implements OnInit {
   folderTree: FolderNode[] = [];
   selectedFolder: string | null = null;
 
-  pageSize = 20;
   pageIndex = 0;
-  readonly pageSizeOptions = [20, 50, 100];
+  pageSize = 100;
+  readonly pageSizeOptions = [100, 50, 20];
 
   constructor(
     private testCasesService: TestCasesService

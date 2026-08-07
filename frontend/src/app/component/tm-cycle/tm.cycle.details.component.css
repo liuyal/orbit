@@ -2,9 +2,17 @@
 /*        Details Wrapper     */
 /* ========================= */
 
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .cycle-details-wrapper {
   width: 100%;
-  height: calc(85vh - 10px);
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -36,24 +44,16 @@
   background-color: #555;
 }
 
-.cycle-status-accent.status-active {
+.cycle-status-accent.status-complete {
   background-color: #3fb950;
 }
 
-.cycle-status-accent.status-done {
-  background-color: #58a6ff;
+.cycle-status-accent.status-in_progress {
+  background-color: #f7ff1a;
 }
 
-.cycle-status-accent.status-closed {
+.cycle-status-accent.status-not_started {
   background-color: #888;
-}
-
-.cycle-status-accent.status-draft {
-  background-color: #d29922;
-}
-
-.cycle-status-accent.status-in_review {
-  background-color: #a371f7;
 }
 
 .cycle-header-content {

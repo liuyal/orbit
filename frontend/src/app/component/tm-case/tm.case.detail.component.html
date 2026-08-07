@@ -33,7 +33,10 @@
                     </div>
                     <div class="detail-field">
                         <span class="field-label">Last Result</span>
-                        <span class="field-value">{{ testCase.last_result || '—' }}</span>
+                        <span class="field-value">{{ testCase.last_result || '—' }}
+                            <span class="inline-result-dot"
+                            [style.background-color]="getResultColor(testCase.last_result)"></span>
+                        </span>
                     </div>
                     <div class="detail-field">
                         <span class="field-label">Last Execution</span>
@@ -42,6 +45,14 @@
                     <div class="detail-field">
                         <span class="field-label">Folder</span>
                         <span class="field-value">{{ testCase.folder || '—' }}</span>
+                    </div>
+                    <div class="detail-field">
+                        <span class="field-label">Created</span>
+                        <span class="field-value">{{ formatDate(testCase.created_at) }}</span>
+                    </div>
+                    <div class="detail-field">
+                        <span class="field-label">Updated</span>
+                        <span class="field-value">{{ formatDate(testCase.updated_at) }}</span>
                     </div>
                 </div>
             </section>
@@ -73,7 +84,7 @@
 
             @if (testCase.test_frequency.length) {
             <section class="detail-section">
-                <h4 class="section-label">Test Frequency</h4>
+                <h4 class="section-label">Frequency</h4>
                 <div class="tag-list">
                     @for (freq of testCase.test_frequency; track freq) {
                     <span class="tag frequency">{{ freq }}</span>
@@ -81,21 +92,6 @@
                 </div>
             </section>
             }
-
-            <section class="detail-section">
-                <h4 class="section-label">Dates</h4>
-                <div class="detail-grid">
-                    <div class="detail-field">
-                        <span class="field-label">Created</span>
-                        <span class="field-value">{{ formatDate(testCase.created_at) }}</span>
-                    </div>
-                    <div class="detail-field">
-                        <span class="field-label">Updated</span>
-                        <span class="field-value">{{ formatDate(testCase.updated_at) }}</span>
-                    </div>
-                </div>
-            </section>
-
         </div>
     }
 </div>

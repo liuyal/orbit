@@ -2,9 +2,17 @@
 /*        Table Wrapper      */
 /* ========================= */
 
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .table-wrapper {
   width: 100%;
-  height: calc(85vh - 10px);
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;

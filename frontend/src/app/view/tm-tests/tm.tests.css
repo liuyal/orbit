@@ -2,6 +2,13 @@
  * Tests View
  */
 
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
 .test-cases-container {
   padding: 0px;
   color: #e0e0e0;
@@ -9,18 +16,26 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
 }
 
 .test-cycles-container {
   display: flex;
   flex-direction: column;
   width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .test-results-container {
   display: flex;
   flex-direction: column;
   width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* 

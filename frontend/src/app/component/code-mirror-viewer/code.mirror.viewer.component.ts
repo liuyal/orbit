@@ -33,7 +33,9 @@ import { monokai } from '@uiw/codemirror-theme-monokai';
   imports: [CommonModule],
   encapsulation: ViewEncapsulation.None,
   template: `<div #editorHost class="cm-host"></div>`,
-  host: {  },
+  host: {
+    '[class.full-height]': 'fullHeight',
+  },
   changeDetection: ChangeDetectionStrategy.Eager,
   styles: [
     `

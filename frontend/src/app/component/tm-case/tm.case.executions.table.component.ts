@@ -36,9 +36,9 @@ export class TmCaseExecutionsTableComponent implements OnInit {
   error = '';
   displayedColumns = ['KEY', 'CYCLE', 'STARTED', 'FINISHED', 'RESULT'];
 
-  pageSize = 20;
   pageIndex = 0;
-  readonly pageSizeOptions = [20, 50, 100];
+  pageSize = 100;
+  readonly pageSizeOptions = [100, 50, 20];
 
   constructor(private testExecutionsService: TestExecutionsService) {
     this.executionsDataSource = new MatTableDataSource<TestExecutions>([]);

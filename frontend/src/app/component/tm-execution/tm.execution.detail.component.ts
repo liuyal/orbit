@@ -4,6 +4,7 @@ import { marked } from 'marked';
 import { TestCycleExecution } from '../../services/tm.cycles.service';
 import { CodeMirrorViewerComponent } from '../code-mirror-viewer/code.mirror.viewer.component';
 import { formatDate } from '../../utils/date.utils';
+import { getResultColor } from '../../utils/result.utils';
 
 @Component({
   selector: 'app-tm-execution-detail',
@@ -25,16 +26,8 @@ export class TmExecutionDetailComponent {
     return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
-  private readonly resultColors: Record<string, string> = {
-    PASS: '#4caf50',
-    FAIL: '#f44336',
-    BLOCKED: '#2196f3',
-    NOT_EXECUTED: '#757575',
-    IN_PROGRESS: '#ffd700',
-  };
-
   getResultColor(result: string): string {
-    return this.resultColors[result?.toUpperCase()] ?? '#757575';
+    return getResultColor(result);
   }
 
   formatDate(dateStr: string | null): string {

@@ -10,10 +10,10 @@ import { CommonModule } from '@angular/common';
   templateUrl: './pagination.component.html'
 })
 export class PaginationComponent {
-  @Input() pageIndex = 0;
-  @Input() pageSize = 20;
   @Input() totalItems = 0;
-  @Input() pageSizeOptions: number[] = [20, 50, 100];
+  @Input() pageIndex = 0;
+  @Input() pageSize = 100;
+  @Input() pageSizeOptions: number[] = [100, 50, 20];
 
   @Output() pageIndexChange = new EventEmitter<number>();
   @Output() pageSizeChange = new EventEmitter<number>();
