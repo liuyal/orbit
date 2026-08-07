@@ -37,4 +37,18 @@ export class TestExecutionsService {
 
         return this.http.get<TestExecutions[]>(`${this.apiUrl}/tm/projects/${projectKey}/test-cases/${testCaseKey}/executions`, { headers });
     }
+
+    /**
+    * Get details of a specific test execution by its key
+    * @param executionKey The key of the test execution to retrieve
+    * @returns An observable that emits the test execution details.
+    */
+    getExecutionByKey(executionKey: string): Observable<TestExecutions> {
+        const headers = new HttpHeaders({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        });
+
+        return this.http.get<TestExecutions>(`${this.apiUrl}/tm/executions/${executionKey}`, { headers });
+    }
 }

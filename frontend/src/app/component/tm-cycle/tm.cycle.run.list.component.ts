@@ -5,6 +5,7 @@ import { EmptyStateComponent } from '../empty-state/empty.state.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TestCyclesService, TestCycleExecution } from '../../services/tm.cycles.service';
+import { TmExecutionHeaderComponent } from '../tm-execution/tm.execution.header.component';
 import { TmExecutionDetailComponent } from '../tm-execution/tm.execution.detail.component';
 import { getResultColor } from '../../utils/result.utils';
 
@@ -16,6 +17,7 @@ import { getResultColor } from '../../utils/result.utils';
     LoaderComponent,
     EmptyStateComponent,
     ErrorStateComponent,
+    TmExecutionHeaderComponent,
     TmExecutionDetailComponent,
   ],
   styleUrls: ['./tm.cycle.run.list.component.css'],

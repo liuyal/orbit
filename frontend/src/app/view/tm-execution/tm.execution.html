@@ -1,5 +1,17 @@
 <app-navbar [showBackButton]="true" [backButtonText]="'Back'" [backButtonAction]="goBack.bind(this)"></app-navbar>
 
+@if (execution) {
+<app-tm-execution-header [execution]="execution"></app-tm-execution-header>
+}
+
 <div class="execution-details-container">
-E
+    @if (isLoading) {
+    <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+    } @else if (error) {
+    <app-error-state [error]="error"></app-error-state>
+    } @else if (!execution) {
+    <app-empty-state message="Execution Not Found"></app-empty-state>
+    } @else {
+    <app-tm-execution-detail [execution]="execution"></app-tm-execution-detail>
+    }
 </div>

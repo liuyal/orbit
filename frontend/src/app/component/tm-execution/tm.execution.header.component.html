@@ -1,0 +1,17 @@
+@if (execution) {
+<div class="detail-header">
+    <div class="result-accent" [style.background-color]="getResultColor(execution.result)"></div>
+    <div class="detail-header-content">
+        <div class="detail-header-top">
+            <div class="detail-header-text">
+                <span class="detail-execution-key">{{ execution.execution_key }}</span>
+                <h2 class="detail-title">{{ execution.title }}</h2>
+                <span class="detail-case-key">Test Case: {{ execution.test_case_key }}</span>
+            </div>
+            <span class="result-badge" [style.background-color]="getResultColor(execution.result)">
+                {{ execution.result }}
+            </span>
+        </div>
+    </div>
+</div>
+}

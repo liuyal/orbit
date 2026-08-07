@@ -45,6 +45,7 @@
             } @else if (executionDataSource.data.length === 0) {
             <app-empty-state message="No Executions Found"></app-empty-state>
             } @else {
+            <app-tm-execution-header [execution]="selectedExecution"></app-tm-execution-header>
             <app-tm-execution-detail [execution]="selectedExecution"></app-tm-execution-detail>
             }
         </div>
