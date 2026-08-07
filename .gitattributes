@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+# Force LF for shell scripts regardless of platform/editor settings
+*.sh text eol=lf
+
