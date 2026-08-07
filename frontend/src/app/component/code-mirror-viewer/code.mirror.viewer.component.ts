@@ -26,6 +26,7 @@ import {
 import { defaultKeymap } from '@codemirror/commands';
 import { languages } from '@codemirror/language-data';
 import { monokai } from '@uiw/codemirror-theme-monokai';
+import { gherkinLanguage } from './gherkin.language';
 
 @Component({
   selector: 'app-code-mirror-viewer',
@@ -128,6 +129,10 @@ export class CodeMirrorViewerComponent implements AfterViewInit, OnChanges, OnDe
   private async resolveLanguage(): Promise<Extension | null> {
     const name = this.language ?? this.detectLanguage(this.code);
     if (!name) return null;
+
+    if (name.toLowerCase() === 'gherkin') {
+      return gherkinLanguage();
+    }
 
     const desc = LanguageDescription.matchLanguageName(languages, name, true);
     if (!desc) return null;
