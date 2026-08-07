@@ -18,14 +18,20 @@
     </div>
 </div>
 
-<div class="test-cases-container" *ngIf="selectedTab === 'cases'">
+@if (selectedTab === 'cases') {
+<div class="test-cases-container">
     <app-tm-cases-table></app-tm-cases-table>
 </div>
+}
 
-<div class="test-cycles-container" *ngIf="selectedTab === 'cycles'">
+@if (selectedTab === 'cycles') {
+<div class="test-cycles-container">
     <app-tm-cycles-table></app-tm-cycles-table>
 </div>
+}
 
-<div class="test-results-container" *ngIf="selectedTab === 'results'">
+@if (selectedTab === 'results') {
+<div class="test-results-container">
     <app-tm-results-graph></app-tm-results-graph>
 </div>
+}

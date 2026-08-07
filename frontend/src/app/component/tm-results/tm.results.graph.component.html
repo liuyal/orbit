@@ -1,41 +1,34 @@
 <div class="results-graph-wrapper">
 
-    <ng-container *ngIf="isLoading; else notLoading">
-        <app-loader [active]="isLoading" [delay]="3000"></app-loader>
-    </ng-container>
-
-    <ng-template #notLoading>
-        <ng-container *ngIf="!isLoading && error; else checkEmpty">
-            <app-error-state [error]="error"></app-error-state>
-        </ng-container>
-    </ng-template>
-
-    <ng-template #checkEmpty>
-        <ng-container *ngIf="cyclesDataSource.data.length === 0; else showGraphTpl">
-            <app-empty-state message="No cycles results found."></app-empty-state>
-        </ng-container>
-    </ng-template>
-
-    <ng-template #showGraphTpl>
+    @if (isLoading) {
+    <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+    } @else if (error) {
+    <app-error-state [error]="error"></app-error-state>
+    } @else if (cyclesDataSource.data.length === 0) {
+    <app-empty-state message="No cycles results found."></app-empty-state>
+    } @else {
         <div class="filter-bar">
             <div class="custom-dropdown" (click)="$event.stopPropagation()">
                 <button class="dropdown-trigger" (click)="toggleDropdown($event)">
                     <span>{{ activeFilter }}</span>
                     <i class="fa-solid" [class.fa-chevron-down]="!dropdownOpen" [class.fa-chevron-up]="dropdownOpen"></i>
                 </button>
-                <div class="dropdown-panel" *ngIf="dropdownOpen">
+                @if (dropdownOpen) {
+                <div class="dropdown-panel">
+                    @for (f of filterOptions; track f) {
                     <div
-                        *ngFor="let f of filterOptions"
                         class="dropdown-item"
                         [class.selected]="activeFilter === f"
                         (click)="setFilter(f)">
                         {{ f }}
                     </div>
+                    }
                 </div>
+                }
             </div>
         </div>
 
         <div #chartContainer class="echarts-container"></div>
-    </ng-template>
+    }
 
 </div>

@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
@@ -15,7 +14,6 @@ import { FolderTreeComponent, FolderNode, buildFolderTree, isFolderPathMatch } f
   selector: 'app-tm-cycles-table',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     LoaderComponent,
     EmptyStateComponent,
@@ -91,6 +89,10 @@ export class TmCyclesTableComponent implements OnInit {
 
   hideProgressTooltip(): void {
     this.tooltipVisible = false;
+  }
+
+  get activeTooltipTotal(): number {
+    return this.activeTooltipSegments.reduce((sum, seg) => sum + seg.count, 0);
   }
 
   private computeProgressSummaries(cycles: TestCycle[]): void {

@@ -1,5 +1,4 @@
 import { Component, inject, ChangeDetectorRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
 import { TmCaseDetailComponent } from '../../component/tm-case/tm.case.detail.component';
@@ -12,7 +11,6 @@ import { TestCasesService, TestCases } from '../../services/tm.cases.service';
     selector: 'app-tm-case',
     standalone: true,
     imports: [
-        CommonModule,
         NavbarComponent,
         TmCaseDetailComponent,
         TmCaseScriptComponent,

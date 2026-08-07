@@ -9,7 +9,6 @@ import {
   HostListener,
   ChangeDetectionStrategy
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { LoaderComponent } from '../loader/loader.component';
@@ -26,7 +25,6 @@ type FilterOption = 'NIGHTLY' | 'WEEKLY' | 'RELEASE' | 'ALL';
   selector: 'app-tm-results-graph',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     LoaderComponent,
     EmptyStateComponent,

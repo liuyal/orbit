@@ -1,23 +1,17 @@
 <div class="execution-table-container">
-    <ng-container *ngIf="isLoading; else notLoading">
-        <div class="state-container">
-            <app-loader [active]="isLoading" [delay]="3000"></app-loader>
-        </div>
-    </ng-container>
-
-    <ng-template #notLoading>
-        <div class="state-container" *ngIf="!isLoading && error; else checkEmpty">
-            <app-error-state [error]="error"></app-error-state>
-        </div>
-    </ng-template>
-
-    <ng-template #checkEmpty>
-        <div class="state-container" *ngIf="executionsDataSource.data.length === 0; else showTable">
-            <app-empty-state message="No Test Executions Found"></app-empty-state>
-        </div>
-    </ng-template>
-
-    <ng-template #showTable>
+    @if (isLoading) {
+    <div class="state-container">
+        <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+    </div>
+    } @else if (error) {
+    <div class="state-container">
+        <app-error-state [error]="error"></app-error-state>
+    </div>
+    } @else if (executionsDataSource.data.length === 0) {
+    <div class="state-container">
+        <app-empty-state message="No Test Executions Found"></app-empty-state>
+    </div>
+    } @else {
         <div class="table-scroll">
             <table mat-table [dataSource]="pagedExecutions">
                 <ng-container matColumnDef="KEY">
@@ -62,5 +56,5 @@
             [pageSizeOptions]="pageSizeOptions" (pageIndexChange)="pageIndex = $event"
             (pageSizeChange)="onPageSizeChange($event)">
         </app-pagination>
-    </ng-template>
+    }
 </div>

@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { ProjectsService, Projects } from '../../services/tm.project.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -12,7 +11,6 @@ import { Router } from '@angular/router';
   selector: 'app-tm-projects-table',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     LoaderComponent,
     EmptyStateComponent,

@@ -1,5 +1,4 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
 import { TestCycleExecution } from '../../services/tm.cycles.service';
@@ -10,7 +9,6 @@ import { formatDate } from '../../utils/date.utils';
   selector: 'app-tm-execution-detail',
   standalone: true,
   imports: [
-    CommonModule,
     CodeMirrorViewerComponent
   ],
   styleUrls: ['./tm.execution.detail.component.css'],

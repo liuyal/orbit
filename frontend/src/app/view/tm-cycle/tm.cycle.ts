@@ -1,5 +1,4 @@
 import { Component, inject, ChangeDetectorRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
 import { TmCyclesRunListComponent } from '../../component/tm-cycle/tm.cycle.run.list.component';
@@ -9,7 +8,6 @@ import { TmCyclesDetailsComponent } from '../../component/tm-cycle/tm.cycle.deta
     selector: 'app-tm-cycle',
     standalone: true,
     imports: [
-        CommonModule,
         NavbarComponent,
         TmCyclesRunListComponent,
         TmCyclesDetailsComponent

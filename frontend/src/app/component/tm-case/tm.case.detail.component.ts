@@ -1,5 +1,4 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { TmCaseHeaderComponent } from './tm.case.header.component';
@@ -10,7 +9,6 @@ import { formatDate } from '../../utils/date.utils';
     selector: 'app-tm-case-detail',
     standalone: true,
     imports: [
-        CommonModule,
         LoaderComponent,
         ErrorStateComponent,
         TmCaseHeaderComponent,

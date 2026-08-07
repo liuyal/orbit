@@ -1,5 +1,4 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { ErrorStateComponent } from '../error-state/error.state.component';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
@@ -10,7 +9,6 @@ import { TestCases } from '../../services/tm.cases.service';
     selector: 'app-tm-case-links',
     standalone: true,
     imports: [
-        CommonModule,
         LoaderComponent,
         ErrorStateComponent,
         EmptyStateComponent,

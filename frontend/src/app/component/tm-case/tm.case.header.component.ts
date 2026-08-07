@@ -1,13 +1,10 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { TestCases } from '../../services/tm.cases.service';
 
 @Component({
     selector: 'app-tm-case-header',
     standalone: true,
-    imports: [
-        CommonModule
-    ],
+    imports: [],
     templateUrl: './tm.case.header.component.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./tm.case.header.component.css'],

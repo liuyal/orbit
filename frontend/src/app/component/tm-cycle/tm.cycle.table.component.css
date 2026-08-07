@@ -227,11 +227,22 @@
   text-transform: uppercase;
   font-size: 11px;
   letter-spacing: 0.4px;
+  color: #e2e6ea;
 }
 
 .tooltip-count {
   font-weight: 700;
   color: #e2e6ea;
+}
+
+.tooltip-total {
+  margin-top: 2px;
+  padding-top: 5px;
+  border-top: 1px solid #3a3f4b;
+}
+
+.tooltip-total .tooltip-label {
+  color: #9aa1ac;
 }
 
 .no-progress {

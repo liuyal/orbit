@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { LoaderComponent } from '../loader/loader.component';
@@ -14,7 +13,6 @@ import { formatDate } from '../../utils/date.utils';
   selector: 'app-tm-case-executions-table',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     LoaderComponent,
     EmptyStateComponent,

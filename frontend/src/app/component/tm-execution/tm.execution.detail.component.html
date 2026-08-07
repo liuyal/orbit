@@ -1,4 +1,5 @@
-<div class="detail-container" *ngIf="execution; else noSelection">
+@if (execution) {
+<div class="detail-container">
 
     <div class="detail-header">
         <div class="result-accent" [style.background-color]="getResultColor(execution.result)"></div>
@@ -52,10 +53,12 @@
             </div>
         </section>
 
-        <section class="detail-section" *ngIf="execution.description">
+        @if (execution.description) {
+        <section class="detail-section">
             <h4 class="section-label">Test Case Description</h4>
             <p class="detail-text">{{ execution.description }}</p>
         </section>
+        }
 
         <section class="detail-section">
             <h4 class="section-label">Dates</h4>
@@ -79,45 +82,60 @@
             </div>
         </section>
 
-        <section class="detail-section" *ngIf="execution.test_frequency.length">
+        @if (execution.test_frequency.length) {
+        <section class="detail-section">
             <h4 class="section-label">Test Frequency</h4>
             <div class="tag-list">
-                <span class="tag frequency" *ngFor="let freq of execution.test_frequency">{{ freq }}</span>
+                @for (freq of execution.test_frequency; track freq) {
+                <span class="tag frequency">{{ freq }}</span>
+                }
             </div>
         </section>
+        }
 
-        <section class="detail-section" *ngIf="execution.labels.length">
+        @if (execution.labels.length) {
+        <section class="detail-section">
             <h4 class="section-label">Appliance Labels</h4>
             <div class="tag-list">
-                <span class="tag" *ngFor="let label of execution.labels">{{ label }}</span>
+                @for (label of execution.labels; track label) {
+                <span class="tag">{{ label }}</span>
+                }
             </div>
         </section>
+        }
 
-        <section class="detail-section" *ngIf="execution.comments">
+        @if (execution.comments) {
+        <section class="detail-section">
             <h4 class="section-label">Comments</h4>
             <div class="detail-text markdown-body" [innerHTML]="renderMarkdown(execution.comments)"></div>
         </section>
+        }
 
-        <section class="detail-section" *ngIf="execution.links.length">
+        @if (execution.links.length) {
+        <section class="detail-section">
             <h4 class="section-label">Links</h4>
             <div class="link-list">
-                <a class="detail-link" *ngFor="let link of execution.links" [href]="link" target="_blank"
+                @for (link of execution.links; track link) {
+                <a class="detail-link" [href]="link" target="_blank"
                     rel="noopener">
                     {{ link }}
                 </a>
+                }
             </div>
         </section>
+        }
 
-        <section class="detail-section" *ngIf="execution.test_script">
+        @if (execution.test_script) {
+        <section class="detail-section">
             <h4 class="section-label">Test Script</h4>
             <app-code-mirror-viewer [code]="execution.test_script"></app-code-mirror-viewer>
         </section>
+        }
     </div>
 </div>
-
-<ng-template #noSelection>
-    <div class="no-selection">
-        <i class="fa-solid fa-flask"></i>
-        <p>Select a test case to view details</p>
-    </div>
-</ng-template>
+} @else {
+<div class="no-selection">
+    <i class="fa-solid fa-flask"></i>
+    <p>Select a test case to view details</p>
+</div>
+}

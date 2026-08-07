@@ -1,12 +1,16 @@
 <div class="case-detail-wrapper">
 
-    <app-loader *ngIf="isLoading"></app-loader>
+    @if (isLoading) {
+    <app-loader></app-loader>
+    }
 
-    <div class="state-container" *ngIf="!isLoading && error">
+    @if (!isLoading && error) {
+    <div class="state-container">
         <app-error-state [error]="error"></app-error-state>
     </div>
+    }
 
-    <ng-container *ngIf="!isLoading && !error && testCase">
+    @if (!isLoading && !error && testCase) {
 
         <app-tm-case-header [testCase]="testCase"></app-tm-case-header>
 
@@ -42,29 +46,41 @@
                 </div>
             </section>
 
-            <section class="detail-section" *ngIf="testCase.description">
+            @if (testCase.description) {
+            <section class="detail-section">
                 <h4 class="section-label">Description</h4>
                 <p class="detail-text">{{ testCase.description }}</p>
             </section>
+            }
 
-            <section class="detail-section" *ngIf="testCase.failing_steps">
+            @if (testCase.failing_steps) {
+            <section class="detail-section">
                 <h4 class="section-label">Failing Steps</h4>
                 <p class="detail-text">{{ testCase.failing_steps }}</p>
             </section>
+            }
 
-            <section class="detail-section" *ngIf="testCase.labels.length">
+            @if (testCase.labels.length) {
+            <section class="detail-section">
                 <h4 class="section-label">Labels</h4>
                 <div class="tag-list">
-                    <span class="tag" *ngFor="let label of testCase.labels">{{ label }}</span>
+                    @for (label of testCase.labels; track label) {
+                    <span class="tag">{{ label }}</span>
+                    }
                 </div>
             </section>
+            }
 
-            <section class="detail-section" *ngIf="testCase.test_frequency.length">
+            @if (testCase.test_frequency.length) {
+            <section class="detail-section">
                 <h4 class="section-label">Test Frequency</h4>
                 <div class="tag-list">
-                    <span class="tag frequency" *ngFor="let freq of testCase.test_frequency">{{ freq }}</span>
+                    @for (freq of testCase.test_frequency; track freq) {
+                    <span class="tag frequency">{{ freq }}</span>
+                    }
                 </div>
             </section>
+            }
 
             <section class="detail-section">
                 <h4 class="section-label">Dates</h4>
@@ -81,5 +97,5 @@
             </section>
 
         </div>
-    </ng-container>
+    }
 </div>

@@ -12,48 +12,41 @@
                     (click)="setSortMode('folder')">Folder</button>
             </div>
             <div class="execution-list-body">
-                <ng-container *ngFor="let group of groupedExecutions">
-                    <div class="execution-group-header" (click)="toggleGroup(group.label)">
-                        <span *ngIf="sortMode === 'status'" class="group-result-dot"
-                            [style.background-color]="group.color"></span>
-                        <span class="group-label">{{ group.label }}</span>
-                        <span class="group-count">{{ group.executions.length }}</span>
-                        <span class="material-icons group-chevron" [class.collapsed]="isGroupCollapsed(group.label)">expand_more</span>
+                @for (group of groupedExecutions; track group.label) {
+                <div class="execution-group-header" (click)="toggleGroup(group.label)">
+                    @if (sortMode === 'status') {
+                    <span class="group-result-dot" [style.background-color]="group.color"></span>
+                    }
+                    <span class="group-label">{{ group.label }}</span>
+                    <span class="group-count">{{ group.executions.length }}</span>
+                    <span class="material-icons group-chevron" [class.collapsed]="isGroupCollapsed(group.label)">expand_more</span>
+                </div>
+                @for (execution of group.executions; track execution.execution_key) {
+                <div class="execution-list-item"
+                    [style.display]="isGroupCollapsed(group.label) ? 'none' : null"
+                    [class.selected]="selectedExecution?.execution_key === execution.execution_key"
+                    (click)="selectExecution(execution)">
+                    <div class="result-bar" [style.background-color]="getResultColor(execution.result)"></div>
+                    <div class="execution-item-content">
+                        <span class="execution-key">{{ execution.test_case_key }}</span>
+                        <span class="execution-title">{{ execution.title }}</span>
                     </div>
-                    <div *ngFor="let execution of group.executions" class="execution-list-item"
-                        [style.display]="isGroupCollapsed(group.label) ? 'none' : null"
-                        [class.selected]="selectedExecution?.execution_key === execution.execution_key"
-                        (click)="selectExecution(execution)">
-                        <div class="result-bar" [style.background-color]="getResultColor(execution.result)"></div>
-                        <div class="execution-item-content">
-                            <span class="execution-key">{{ execution.test_case_key }}</span>
-                            <span class="execution-title">{{ execution.title }}</span>
-                        </div>
-                    </div>
-                </ng-container>
+                </div>
+                }
+                }
             </div>
         </div>
 
         <div class="execution-info-container">
-            <ng-container *ngIf="isLoading; else notLoading">
-                <app-loader [active]="isLoading" [delay]="3000"></app-loader>
-            </ng-container>
-
-            <ng-template #notLoading>
-                <ng-container *ngIf="!isLoading && error; else checkEmpty">
-                    <app-error-state [error]="error"></app-error-state>
-                </ng-container>
-            </ng-template>
-
-            <ng-template #checkEmpty>
-                <ng-container *ngIf="executionDataSource.data.length === 0; else showDetails">
-                    <app-empty-state message="No Executions Found"></app-empty-state>
-                </ng-container>
-            </ng-template>
-
-            <ng-template #showDetails>
-                <app-tm-execution-detail [execution]="selectedExecution"></app-tm-execution-detail>
-            </ng-template>
+            @if (isLoading) {
+            <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+            } @else if (error) {
+            <app-error-state [error]="error"></app-error-state>
+            } @else if (executionDataSource.data.length === 0) {
+            <app-empty-state message="No Executions Found"></app-empty-state>
+            } @else {
+            <app-tm-execution-detail [execution]="selectedExecution"></app-tm-execution-detail>
+            }
         </div>
     </div>
 </div>

@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ErrorStateComponent } from '../error-state/error.state.component';
@@ -13,7 +12,6 @@ import { formatDate } from '../../utils/date.utils';
   selector: 'app-tm-cycles-details',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     LoaderComponent,
     ErrorStateComponent,

@@ -1,5 +1,4 @@
 import { Component, inject, ChangeDetectorRef, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NavbarComponent } from '../../component/navbar/navbar';
 import { TmCasesTableComponent } from '../../component/tm-case/tm.case.table.component';
@@ -10,7 +9,6 @@ import { TmResultsGraphComponent } from '../../component/tm-results/tm.results.g
     selector: 'app-tm-tests',
     standalone: true,
     imports: [
-        CommonModule,
         NavbarComponent,
         TmCasesTableComponent,
         TmCyclesTableComponent,

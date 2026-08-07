@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { EmptyStateComponent } from '../empty-state/empty.state.component';
@@ -12,7 +11,6 @@ import { TmExecutionDetailComponent } from '../tm-execution/tm.execution.detail.
   selector: 'app-tm-cycles-run-list',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     LoaderComponent,
     EmptyStateComponent,

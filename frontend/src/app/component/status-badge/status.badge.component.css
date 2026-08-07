@@ -94,7 +94,23 @@
   color: #fff;
 }
 
-/* Status Badge Result Variants - Circular Design */
+/* Status Badge Label Variant */
+.status-badge.label {
+  background-color: #1e2a3d;
+  color: #8ab4f8;
+  border: 1px solid #2f4f7a;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Status Badge Frequency Variant */
+.status-badge.frequency {
+  background-color: #2d1b3d;
+  color: #d6a8f0;
+  border: 1px solid #6a3f8a;
+  font-weight: 600;
+  text-transform: none;
+}
 .status-badge.result {
   width: 18px;
   height: 18px;

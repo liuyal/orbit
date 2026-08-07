@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { LoaderComponent } from '../loader/loader.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -14,7 +13,6 @@ import { TestCasesService, TestCases } from '../../services/tm.cases.service';
   selector: 'app-tm-cases-table',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     LoaderComponent,
     EmptyStateComponent,
@@ -36,7 +34,7 @@ export class TmCasesTableComponent implements OnInit {
   isLoading = false;
   error = '';
   projectKey = '';
-  displayedColumns = ['KEY', 'TITLE', 'FREQUENCY', 'LABELS', 'RESULT', 'STATUS'];
+  displayedColumns = ['KEY', 'TITLE', 'LABELS', 'FREQUENCY', 'RESULT', 'STATUS'];
 
   folderTree: FolderNode[] = [];
   selectedFolder: string | null = null;

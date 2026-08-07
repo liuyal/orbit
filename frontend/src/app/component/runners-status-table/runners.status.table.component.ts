@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, AfterViewInit, OnDestroy, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { RunnersStatusService, RunnerStatus } from '../../services/runners.status.service';
 import { AutoRefreshService } from '../../services/auto-refresh.service';
@@ -15,7 +14,6 @@ import { StatusBadgeComponent } from '../status-badge/status.badge.component';
   selector: 'app-runners-status-table',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     LoaderComponent,
     ErrorStateComponent,

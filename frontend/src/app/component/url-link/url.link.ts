@@ -1,10 +1,9 @@
 import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-url-link',
     standalone: true,
-    imports: [CommonModule],
+    imports: [],
     templateUrl: './url.link.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./url.link.css']

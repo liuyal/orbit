@@ -1,15 +1,19 @@
 <div class="case-script-wrapper">
 
-    <app-loader *ngIf="isLoading"></app-loader>
+    @if (isLoading) {
+    <app-loader></app-loader>
+    }
 
-    <div class="state-container" *ngIf="!isLoading && error">
+    @if (!isLoading && error) {
+    <div class="state-container">
         <app-error-state [error]="error"></app-error-state>
     </div>
+    }
 
-    <ng-container *ngIf="!isLoading && !error && testCase">
+    @if (!isLoading && !error && testCase) {
         <app-tm-case-header [testCase]="testCase"></app-tm-case-header>
         <div class="script-body">
-            <ng-container *ngIf="testCase.test_script; else noScript">
+            @if (testCase.test_script) {
                 <div class="script-viewer-container">
                     <app-code-mirror-viewer
                         [code]="testCase.test_script"
@@ -17,10 +21,9 @@
                         language="Gherkin">
                     </app-code-mirror-viewer>
                 </div>
-            </ng-container>
-            <ng-template #noScript>
+            } @else {
                 <app-empty-state message="No test script available for this test case."></app-empty-state>
-            </ng-template>
+            }
         </div>
-    </ng-container>
+    }
 </div>

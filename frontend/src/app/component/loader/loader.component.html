@@ -1,3 +1,5 @@
-<div *ngIf="showSpinner" class="loading-container" >
+@if (showSpinner) {
+<div class="loading-container">
     <div class="loader"></div>
 </div>
+}

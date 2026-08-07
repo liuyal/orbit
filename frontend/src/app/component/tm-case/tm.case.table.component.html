@@ -1,89 +1,86 @@
 <div class="table-wrapper">
     <div class="split-view">
-        <app-folder-tree
-            [title]="'Folders'"
-            [totalCount]="testCasesDataSource.data.length"
-            [folderTree]="folderTree"
-            [selectedFolder]="selectedFolder"
-            (folderSelected)="onFolderSelected($event)">
+        <app-folder-tree [title]="'Folders'" [totalCount]="testCasesDataSource.data.length" [folderTree]="folderTree"
+            [selectedFolder]="selectedFolder" (folderSelected)="onFolderSelected($event)">
         </app-folder-tree>
 
-        <ng-container *ngIf="isLoading; else notLoading">
-            <div class="state-container">
-                <app-loader [active]="isLoading" [delay]="3000"></app-loader>
-            </div>
-        </ng-container>
-
-        <ng-template #notLoading>
-            <div class="state-container" *ngIf="!isLoading && error; else checkEmpty">
-                <app-error-state [error]="error"></app-error-state>
-            </div>
-        </ng-template>
-
-        <ng-template #checkEmpty>
-            <div class="state-container" *ngIf="testCasesDataSource.data.length === 0; else showTable">
-                <app-empty-state message="No Test Cases Found"></app-empty-state>
-            </div>
-        </ng-template>
-
-        <ng-template #showTable>
+        @if (isLoading) {
+        <div class="state-container">
+            <app-loader [active]="isLoading" [delay]="3000"></app-loader>
+        </div>
+        } @else if (error) {
+        <div class="state-container">
+            <app-error-state [error]="error"></app-error-state>
+        </div>
+        } @else if (testCasesDataSource.data.length === 0) {
+        <div class="state-container">
+            <app-empty-state message="No Test Cases Found"></app-empty-state>
+        </div>
+        } @else {
             <div class="test-case-table">
                 <div class="table-scroll">
-                <table mat-table [dataSource]="pagedTestCases">
-                    <ng-container matColumnDef="KEY">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>KEY</th>
-                        <td mat-cell *matCellDef="let testCase">{{testCase.test_case_key}}</td>
-                    </ng-container>
+                    <table mat-table [dataSource]="pagedTestCases">
+                        <ng-container matColumnDef="KEY">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>KEY</th>
+                            <td mat-cell *matCellDef="let testCase">{{testCase.test_case_key}}</td>
+                        </ng-container>
 
-                    <ng-container matColumnDef="TITLE">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>TITLE</th>
-                        <td mat-cell *matCellDef="let testCase">{{testCase.title}}</td>
-                    </ng-container>
+                        <ng-container matColumnDef="TITLE">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>TITLE</th>
+                            <td mat-cell *matCellDef="let testCase">{{testCase.title}}</td>
+                        </ng-container>
 
-                    <ng-container matColumnDef="FREQUENCY">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>FREQUENCY</th>
-                        <td mat-cell *matCellDef="let testCase">{{testCase.test_frequency}}</td>
-                    </ng-container>
+                        <ng-container matColumnDef="LABELS">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>LABELS</th>
+                            <td mat-cell *matCellDef="let testCase">
+                                <div class="labels-cell">
+                                    @for (label of sortLabels(testCase.labels); track label) {
+                                    <app-status-badge [text]="label" className="label"></app-status-badge>
+                                    }
+                                </div>
+                            </td>
+                        </ng-container>
 
-                    <ng-container matColumnDef="LABELS">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>LABELS</th>
-                        <td mat-cell *matCellDef="let testCase">{{sortLabels(testCase.labels)}}</td>
-                    </ng-container>
+                        <ng-container matColumnDef="FREQUENCY">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>FREQUENCY</th>
+                            <td mat-cell *matCellDef="let testCase">
+                                <div class="labels-cell">
+                                    @for (freq of testCase.test_frequency; track freq) {
+                                    <app-status-badge [text]="freq" className="frequency"></app-status-badge>
+                                    }
+                                </div>
+                            </td>
+                        </ng-container>
 
-                    <ng-container matColumnDef="RESULT">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>RESULT</th>
-                        <td mat-cell *matCellDef="let testCase">
-                            <app-status-badge
-                                [className]="'result ' + testCase.last_result.toLowerCase()">
-                            </app-status-badge>
-                        </td>
-                    </ng-container>
+                        <ng-container matColumnDef="RESULT">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>RESULT</th>
+                            <td mat-cell *matCellDef="let testCase">
+                                <app-status-badge [className]="'result ' + testCase.last_result.toLowerCase()">
+                                </app-status-badge>
+                            </td>
+                        </ng-container>
 
-                    <ng-container matColumnDef="STATUS">
-                        <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
-                        <td mat-cell *matCellDef="let testCase">
-                            <app-status-badge [text]="testCase.status.toUpperCase()"
-                                [className]="'test_status ' + testCase.status.toLowerCase().replace(/ /g, '_')">
-                            </app-status-badge>
-                        </td>
-                    </ng-container>
+                        <ng-container matColumnDef="STATUS">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>STATUS</th>
+                            <td mat-cell *matCellDef="let testCase">
+                                <app-status-badge [text]="testCase.status.toUpperCase()"
+                                    [className]="'test_status ' + testCase.status.toLowerCase().replace(/ /g, '_')">
+                                </app-status-badge>
+                            </td>
+                        </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                        (click)="onCaseClick($event, row.test_case_key)"
-                        (mousedown)="onCaseClick($event, row.test_case_key)">
-                    </tr>
-                </table>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                            (click)="onCaseClick($event, row.test_case_key)"
+                            (mousedown)="onCaseClick($event, row.test_case_key)">
+                        </tr>
+                    </table>
                 </div>
-                <app-pagination
-                    [pageIndex]="pageIndex"
-                    [pageSize]="pageSize"
-                    [totalItems]="totalItems"
-                    [pageSizeOptions]="pageSizeOptions"
-                    (pageIndexChange)="pageIndex = $event"
+                <app-pagination [pageIndex]="pageIndex" [pageSize]="pageSize" [totalItems]="totalItems"
+                    [pageSizeOptions]="pageSizeOptions" (pageIndexChange)="pageIndex = $event"
                     (pageSizeChange)="onPageSizeChange($event)">
                 </app-pagination>
             </div>
-        </ng-template>
+        }
     </div>
 </div>

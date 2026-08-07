@@ -13,10 +13,14 @@
     </div>
 </div>
 
-<div class="cycle-run-list-container" *ngIf="selectedTab === 'executions'">
+@if (selectedTab === 'executions') {
+<div class="cycle-run-list-container">
     <app-tm-cycles-run-list></app-tm-cycles-run-list>
 </div>
+}
 
-<div class="cycle-details-container" *ngIf="selectedTab === 'details'">
+@if (selectedTab === 'details') {
+<div class="cycle-details-container">
     <app-tm-cycles-details></app-tm-cycles-details>
 </div>
+}
